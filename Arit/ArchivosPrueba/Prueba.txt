@@ -1,0 +1,5 @@
+HOLA=10;
+NADA=20.05
+tetoca_10="hola como estas";
+pues= true;
+h=false;

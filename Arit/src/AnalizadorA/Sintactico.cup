@@ -1,0 +1,55 @@
+package AnalizadorA;
+import java_cup.runtime.Symbol;
+parser code 
+{://Codigo visible
+    
+    //public AST ast;
+   
+    //public ArrayList<Errores>listaerrores=new ArrayList<>();
+    public void syntax_error(Symbol s){
+        //Errores nuevo=new Errores(s.left+1,s.right+1,"Error R de sintaxis "+s.value,Errores.Terror.SINTACTICO);
+        //listaerrores.add(nuevo);
+        System.out.println("Error R de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
+       
+    }
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        //Errores nuevo=new Errores(s.left+1,s.right+1,"Error NR de sintaxis "+s.value,Errores.Terror.SINTACTICO);
+        //listaerrores.add(nuevo);
+        System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
+    }
+:}
+action code
+{://Codigo de usuario
+
+:}
+terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
+terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA;
+terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE;
+terminal String IGUAL,PYCOMA;
+
+non terminal String INICIO;
+non terminal String ASIGNACION,CUERPO,EXP;
+non terminal String CONTROLES,BLOQUE;
+start with INICIO;
+
+INICIO::= CUERPO;
+
+CUERPO::=ASIGNACION
+	|CUERPO ASIGNACION
+	|CONTROLES
+	|CUERPO CONTROLES
+	|BLOQUE
+	|CUERPO BLOQUE
+	;
+
+ASIGNACION::=ID IGUAL EXP
+	|ID IGUAL EXP PYCOMA;
+
+EXP::=
+	NUMERIC
+	|STRING
+	|INTEGER
+	|TRUE
+	|FALSE
+	;
+
