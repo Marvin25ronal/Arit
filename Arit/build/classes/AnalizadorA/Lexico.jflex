@@ -43,7 +43,17 @@ MENOR="<"
 AND="&"
 OR="|"
 NOT="!"
-
+PREGUNTA="?"
+DOSPUNTOS=":"
+/*
+██████╗░███████╗░██████╗███████╗██████╗░██╗░░░██╗░█████╗░██████╗░░█████╗░░██████╗
+██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██║░░░██║██╔══██╗██╔══██╗██╔══██╗██╔════╝
+██████╔╝█████╗░░╚█████╗░█████╗░░██████╔╝╚██╗░██╔╝███████║██║░░██║███████║╚█████╗░
+██╔══██╗██╔══╝░░░╚═══██╗██╔══╝░░██╔══██╗░╚████╔╝░██╔══██║██║░░██║██╔══██║░╚═══██╗
+██║░░██║███████╗██████╔╝███████╗██║░░██║░░╚██╔╝░░██║░░██║██████╔╝██║░░██║██████╔╝
+╚═╝░░╚═╝╚══════╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝╚═════╝░
+*/
+PRINT="print"
 /*
 ████████╗██╗██████╗░░█████╗░░██████╗
 ╚══██╔══╝██║██╔══██╗██╔══██╗██╔════╝
@@ -95,12 +105,16 @@ ENTER=[\ \n]
 <YYINITIAL>{NOT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NOT,yyline,yycolumn,yytext());}
 <YYINITIAL>{AND}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.AND,yyline,yycolumn,yytext());}
 <YYINITIAL>{OR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.OR,yyline,yycolumn,yytext());}
+<YYINITIAL>{PREGUNTA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PREGUNTA,yyline,yycolumn,yytext());}
+<YYINITIAL>{DOSPUNTOS}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DOSPUNTOS,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{PYCOMA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PYCOMA,yyline,yycolumn,yytext());}
 <YYINITIAL>{NUMERIC}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NUMERIC,yyline,yycolumn,yytext());}
 <YYINITIAL>{INTEGER}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.INTEGER,yyline,yycolumn,yytext());}
 <YYINITIAL>{TRUE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.TRUE,yyline,yycolumn,yytext());}
 <YYINITIAL>{FALSE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.FALSE,yyline,yycolumn,yytext());}
+<YYINITIAL>{PRINT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PRINT,yyline,yycolumn,yytext());}
+
 <YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
 <YYINITIAL>{ID}        			{System.out.println("Token ID "+yytext()+" reconocido"); return new Symbol(sym.ID,yyline,yycolumn,yytext());}
 <YYINITIAL>{COMENTARIO1}        {/*ignorado*/}

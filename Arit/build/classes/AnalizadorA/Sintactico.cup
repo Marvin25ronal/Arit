@@ -23,13 +23,35 @@ action code
 
 :}
 terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
-terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA;
-terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE;
-terminal String IGUAL,PYCOMA;
+terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
+terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE,UMENOS;
+terminal String IGUAL,PYCOMA,PRINT;
 
 non terminal String INICIO;
 non terminal String ASIGNACION,CUERPO,EXP;
-non terminal String CONTROLES,BLOQUE;
+non terminal String CONTROLES,BLOQUE,IMPRIMIR,FUNCIONES;
+
+precedence right IGUAL;
+precedence right PREGUNTA,DOSPUNTOS;
+precedence left OR;
+precedence left AND;
+precedence left IGUAL_IGUAL,DISTINTO;
+precedence nonassoc MENOR,MENOR_I,MAYOR_I,MAYOR;
+precedence left MAS,MENOS;
+precedence left POR,DIV,MODULO,POTENCIA;
+precedence right NOT;
+precedence right UMENOS;
+precedence left COR_A, COR_C;
+precedence left PAR_A, PAR_C;
+
+
+
+//precedence left PAR_A, TYPEVAR, PAR_C;
+
+//precedence right COR_A, COR_C;
+
+//precedence left POTENCIA;
+
 start with INICIO;
 
 INICIO::= CUERPO;
@@ -40,16 +62,55 @@ CUERPO::=ASIGNACION
 	|CUERPO CONTROLES
 	|BLOQUE
 	|CUERPO BLOQUE
+	|FUNCIONES
 	;
 
 ASIGNACION::=ID IGUAL EXP
-	|ID IGUAL EXP PYCOMA;
-
+	|ID IGUAL EXP PYCOMA
+	;
+/*
+█▀▀ ▀▄▀ █▀█ █▀█ █▀▀ █▀ █ █▀█ █▄░█
+██▄ █░█ █▀▀ █▀▄ ██▄ ▄█ █ █▄█ █░▀█
+*/
 EXP::=
-	NUMERIC
+	MENOS EXP {: :}%prec UMENOS
+	|EXP MAS EXP
+	|EXP MENOS EXP
+	|EXP POR EXP
+	|EXP DIV EXP
+	|EXP POTENCIA EXP
+	|EXP MODULO EXP
+	
+	|NOT EXP
+	|EXP OR EXP
+	|EXP AND EXP
+	|EXP MENOR EXP
+	|EXP MAYOR EXP
+	|EXP MENOR_I EXP
+	|EXP MAYOR_I EXP
+	|EXP IGUAL_IGUAL EXP
+	|EXP DISTINTO EXP
+	|EXP PREGUNTA EXP DOSPUNTOS EXP
+
+	|PAR_A EXP PAR_C
+	|ID
+	|NUMERIC
 	|STRING
 	|INTEGER
 	|TRUE
 	|FALSE
 	;
 
+/*
+░█▀▀▀ ░█─░█ ░█▄─░█ ░█▀▀█ ▀█▀ ░█▀▀▀█ ░█▄─░█ ░█▀▀▀ ░█▀▀▀█ ░█▀▀▀ ░█▀▀▀█ ░█▀▀█ ░█▀▀▀ ░█▀▀█ ▀█▀ ─█▀▀█ ░█─── ░█▀▀▀ ░█▀▀▀█ 
+░█▀▀▀ ░█─░█ ░█░█░█ ░█─── ░█─ ░█──░█ ░█░█░█ ░█▀▀▀ ─▀▀▀▄▄ ░█▀▀▀ ─▀▀▀▄▄ ░█▄▄█ ░█▀▀▀ ░█─── ░█─ ░█▄▄█ ░█─── ░█▀▀▀ ─▀▀▀▄▄ 
+░█─── ─▀▄▄▀ ░█──▀█ ░█▄▄█ ▄█▄ ░█▄▄▄█ ░█──▀█ ░█▄▄▄ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ ░█─── ░█▄▄▄ ░█▄▄█ ▄█▄ ░█─░█ ░█▄▄█ ░█▄▄▄ ░█▄▄▄█
+*/
+FUNCIONES::=
+	IMPRIMIR
+	|IMPRIMIR PYCOMA
+	;
+IMPRIMIR::=
+	PRINT PAR_A EXP PAR_C
+	|PRINT PAR_A PAR_C 
+	;
