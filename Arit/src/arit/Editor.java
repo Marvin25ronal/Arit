@@ -31,6 +31,7 @@ public class Editor extends javax.swing.JFrame {
         initComponents();
         Lista = new ArrayList<RSyntaxTextArea>();
         rutas = new ArrayList<String>();
+        agregarpest();
     }
 
     private void agregarpest() {
