@@ -5,10 +5,19 @@
  */
 package arit;
 
+import AST.AST;
+import AnalizadorA.parser;
+import AnalizadorA.scanner;
 import Color.CampoTexto;
 import Color.TextLineNumber;
+import Reportes.Errores;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 /**
@@ -68,6 +77,7 @@ public class Editor extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -100,6 +110,15 @@ public class Editor extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Ejecutar");
+
+        jMenuItem2.setText("Ascendente");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
         jMenuBar1.add(jMenu3);
 
         jMenu4.setText("Reportes");
@@ -153,6 +172,34 @@ public class Editor extends javax.swing.JFrame {
         agregarpest();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                for (Errores e : sc.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            if (parser.listaerrores.size() != 0) {
+                for (Errores e : parser.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            AST ast = parser.ast;
+        } catch (Exception e) {
+            jTextArea1.append(e.getMessage());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -196,6 +243,7 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;

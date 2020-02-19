@@ -1,5 +1,8 @@
 package AnalizadorA;
+import Reportes.Errores;
 import java_cup.runtime.*;
+import java.util.ArrayList;
+import Reportes.Errores.TipoError;
 %%
 %cup
 %class scanner
@@ -10,7 +13,7 @@ import java_cup.runtime.*;
 %full
 %ignorecase
 %{
-//public ArrayList<Errores>listaerrores=new ArrayList<>();;
+	public ArrayList<Errores>listaerrores=new ArrayList<>();;
 %}
 /*
 ░██████╗██╗███╗░░░███╗██████╗░░█████╗░██╗░░░░░░█████╗░░██████╗
@@ -91,22 +94,22 @@ ENTER=[\ \n]
 <YYINITIAL>{LLAV_A}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.LLAV_A,yyline,yycolumn,yytext());}
 <YYINITIAL>{LLAV_C}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.LLAV_C,yyline,yycolumn,yytext());}
 <YYINITIAL>{IGUAL}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IGUAL,yyline,yycolumn,yytext());}
-<YYINITIAL>{IGUAL_IGUAL}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IGUAL_IGUAL,yyline,yycolumn,yytext());}
+<YYINITIAL>{IGUAL_IGUAL}        {System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IGUAL_IGUAL,yyline,yycolumn,yytext());}
 <YYINITIAL>{MENOR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOR,yyline,yycolumn,yytext());}
-<YYINITIAL>{MAYOR_I}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAYOR_I,yyline,yycolumn,yytext());}
-<YYINITIAL>{MENOR_I}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOR_I,yyline,yycolumn,yytext());}
+<YYINITIAL>{MAYOR_I}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAYOR_I,yyline,yycolumn,yytext());}
+<YYINITIAL>{MENOR_I}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOR_I,yyline,yycolumn,yytext());}
 <YYINITIAL>{MAS}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAS,yyline,yycolumn,yytext());}
 <YYINITIAL>{MENOS}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOS,yyline,yycolumn,yytext());}
 <YYINITIAL>{POR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.POR,yyline,yycolumn,yytext());}
 <YYINITIAL>{DIV}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DIV,yyline,yycolumn,yytext());}
-<YYINITIAL>{POTENCIA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.POTENCIA,yyline,yycolumn,yytext());}
+<YYINITIAL>{POTENCIA}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.POTENCIA,yyline,yycolumn,yytext());}
 <YYINITIAL>{MODULO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MODULO,yyline,yycolumn,yytext());}
-<YYINITIAL>{DISTINTO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DISTINTO,yyline,yycolumn,yytext());}
+<YYINITIAL>{DISTINTO}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DISTINTO,yyline,yycolumn,yytext());}
 <YYINITIAL>{NOT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NOT,yyline,yycolumn,yytext());}
 <YYINITIAL>{AND}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.AND,yyline,yycolumn,yytext());}
-<YYINITIAL>{OR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.OR,yyline,yycolumn,yytext());}
-<YYINITIAL>{PREGUNTA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PREGUNTA,yyline,yycolumn,yytext());}
-<YYINITIAL>{DOSPUNTOS}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DOSPUNTOS,yyline,yycolumn,yytext());}
+<YYINITIAL>{OR}        			{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.OR,yyline,yycolumn,yytext());}
+<YYINITIAL>{PREGUNTA}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PREGUNTA,yyline,yycolumn,yytext());}
+<YYINITIAL>{DOSPUNTOS}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DOSPUNTOS,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{PYCOMA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PYCOMA,yyline,yycolumn,yytext());}
 <YYINITIAL>{NUMERIC}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NUMERIC,yyline,yycolumn,yytext());}
@@ -122,6 +125,8 @@ ENTER=[\ \n]
 <YYINITIAL>{SPACE}         		{/*ignorado*/}
 <YYINITIAL>{ENTER}         		{/*ignorado*/}
 <YYINITIAL> . {
+		Errores nuevo=new Errores(TipoError.LEXICO,"Error con el token: "+yytext(),yyline+1,yycolumn+1);
+        listaerrores.add(nuevo);
         String errLex = "Error léxico : '"+yytext()+"' en la línea: "+(yyline+1)+" y columna: "+(yycolumn+1);
         System.out.println(errLex);
 }

@@ -1,20 +1,26 @@
 package AnalizadorA;
 import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+import Reportes.Errores;
+import Reportes.Errores.TipoError;
+import java.util.ArrayList;
+import AST.*;
 parser code 
 {://Codigo visible
     
-    //public AST ast;
+    public AST ast;
    
-    //public ArrayList<Errores>listaerrores=new ArrayList<>();
+    public ArrayList<Errores>listaerrores=new ArrayList<>();
     public void syntax_error(Symbol s){
-        //Errores nuevo=new Errores(s.left+1,s.right+1,"Error R de sintaxis "+s.value,Errores.Terror.SINTACTICO);
-        //listaerrores.add(nuevo);
+        Errores nuevo=new Errores(TipoError.SINTACTICO,"Error R de sintaxis "+s.value,s.left+1,s.right+1);
+        listaerrores.add(nuevo);
         System.out.println("Error R de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
        
     }
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        Errores nuevo=new Errores(TipoError.SINTACTICO,"Error NR de sintaxis "+s.value,s.left+1,s.right+1);
         //Errores nuevo=new Errores(s.left+1,s.right+1,"Error NR de sintaxis "+s.value,Errores.Terror.SINTACTICO);
-        //listaerrores.add(nuevo);
+        listaerrores.add(nuevo);
         System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
     }
 :}
@@ -28,7 +34,8 @@ terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
 
 non terminal String INICIO;
-non terminal String ASIGNACION,CUERPO,EXP;
+non terminal String ASIGNACION,EXP;
+non terminal LinkedList<Nodo>CUERPO;
 non terminal String CONTROLES,BLOQUE,IMPRIMIR,FUNCIONES;
 
 precedence right IGUAL;
