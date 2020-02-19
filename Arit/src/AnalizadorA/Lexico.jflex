@@ -1,5 +1,8 @@
 package AnalizadorA;
+import Reportes.Errores;
 import java_cup.runtime.*;
+import java.util.ArrayList;
+import Reportes.Errores.TipoError;
 %%
 %cup
 %class scanner
@@ -10,7 +13,7 @@ import java_cup.runtime.*;
 %full
 %ignorecase
 %{
-//public ArrayList<Errores>listaerrores=new ArrayList<>();;
+	public ArrayList<Errores>listaerrores=new ArrayList<>();;
 %}
 /*
 ░██████╗██╗███╗░░░███╗██████╗░░█████╗░██╗░░░░░░█████╗░░██████╗
@@ -122,6 +125,8 @@ ENTER=[\ \n]
 <YYINITIAL>{SPACE}         		{/*ignorado*/}
 <YYINITIAL>{ENTER}         		{/*ignorado*/}
 <YYINITIAL> . {
+		Errores nuevo=new Errores(TipoError.LEXICO,"Error con el token: "+yytext(),yyline+1,yycolumn+1);
+        listaerrores.add(nuevo);
         String errLex = "Error léxico : '"+yytext()+"' en la línea: "+(yyline+1)+" y columna: "+(yycolumn+1);
         System.out.println(errLex);
 }
