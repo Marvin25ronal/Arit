@@ -83,6 +83,12 @@ public class Errores {
         this.columna = columna;
         
     }
+
+    @Override
+    public String toString() {
+        return "Error de tipo "+tipo.toString()+" en la linea "+ linea+" columna "+columna+ " mensaje:  "+mensaje;
+    }
+    
     
 
 }
