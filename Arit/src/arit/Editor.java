@@ -194,6 +194,9 @@ public class Editor extends javax.swing.JFrame {
                 }
             }
             AST ast = parser.ast;
+            if(ast!=null){
+                ast.ejecutar();
+            }
         } catch (Exception e) {
             jTextArea1.append(e.getMessage());
             Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);

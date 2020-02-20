@@ -21,4 +21,5 @@ public class Entorno {
         tabla = new HashMap<>();
     }
     
+    
 }

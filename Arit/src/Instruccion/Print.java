@@ -6,27 +6,30 @@
 package Instruccion;
 
 import Entorno.Entorno;
+import Expresion.Expresion;
 import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  *
  * @author marvi
  */
-public class Print implements Intruccion {
+public class Print implements Instruccion {
 
-    private int linea, columna;
-    Expresion.Expresion toPrint;
+    Expresion toPrint;
+    int linea,columna;
 
-    public Print(int linea, int columna, Expresion.Expresion toprint) {
+    public Print(Expresion toPrint, int linea, int columna) {
+        this.toPrint = toPrint;
         this.linea = linea;
         this.columna = columna;
-        this.toPrint = toprint;
     }
+    
 
     @Override
     public Object ejecutar(Entorno e) {
         Object val = toPrint.getValor(e);
         //
+        
         return null;
     }
 

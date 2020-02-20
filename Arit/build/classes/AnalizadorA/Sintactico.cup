@@ -4,7 +4,11 @@ import java.util.LinkedList;
 import Reportes.Errores;
 import Reportes.Errores.TipoError;
 import java.util.ArrayList;
+import Expresion.*;
+import Expresion.TipoExp.Tipos;
 import AST.*;
+import Instruccion.Instruccion;
+import Instruccion.Print;
 parser code 
 {://Codigo visible
     
@@ -30,14 +34,15 @@ action code
 :}
 terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
-terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE,UMENOS;
+terminal String ID,NUMERIC,STRING,BOOLEANO,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
+terminal String INTEGER;
 
-non terminal String INICIO;
-non terminal String ASIGNACION,EXP;
+non terminal AST INICIO;
+non terminal Expresion ASIGNACION,EXP;
 non terminal LinkedList<Nodo>CUERPO;
-non terminal String CONTROLES,BLOQUE,IMPRIMIR,FUNCIONES;
-
+non terminal String CONTROLES,BLOQUE;
+non terminal Instruccion IMPRIMIR,FUNCIONES;
 precedence right IGUAL;
 precedence right PREGUNTA,DOSPUNTOS;
 precedence left OR;
@@ -61,7 +66,7 @@ precedence left PAR_A, PAR_C;
 
 start with INICIO;
 
-INICIO::= CUERPO;
+INICIO::= CUERPO:a{:AST arbol=new AST(a);ast=arbol;:};
 
 CUERPO::=ASIGNACION
 	|CUERPO ASIGNACION
@@ -69,7 +74,8 @@ CUERPO::=ASIGNACION
 	|CUERPO CONTROLES
 	|BLOQUE
 	|CUERPO BLOQUE
-	|FUNCIONES
+	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
 	;
 
 ASIGNACION::=ID IGUAL EXP
@@ -101,11 +107,10 @@ EXP::=
 
 	|PAR_A EXP PAR_C
 	|ID
-	|NUMERIC
-	|STRING
-	|INTEGER
-	|TRUE
-	|FALSE
+	|NUMERIC:a{:RESULT=new Literal(a,new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
+	|STRING:a{:RESULT=new Literal(a,new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
+	|INTEGER:a{:RESULT=new Literal(a,new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
+	|BOOLEANO:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	;
 
 /*
@@ -118,6 +123,6 @@ FUNCIONES::=
 	|IMPRIMIR PYCOMA
 	;
 IMPRIMIR::=
-	PRINT PAR_A EXP PAR_C
-	|PRINT PAR_A PAR_C 
+	PRINT:a PAR_A EXP:b PAR_C{:RESULT=new Print(b,aleft+1,aright+1);:}
+	|PRINT:a PAR_A PAR_C{:RESULT=new Print(new Literal("",new TipoExp(Tipos.STRING),aleft+1,aright+1),aleft+1,aright+1);:} 
 	;
