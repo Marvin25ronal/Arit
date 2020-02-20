@@ -12,6 +12,6 @@ import Entorno.Entorno;
  *
  * @author marvi
  */
-public interface Intruccion extends Nodo{
+public interface Instruccion extends Nodo{
     Object ejecutar(Entorno e);
 }

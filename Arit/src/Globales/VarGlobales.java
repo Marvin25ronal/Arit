@@ -57,8 +57,10 @@ public final class VarGlobales {
     }
 
     public void AgregarEU(Errores e) {
+        this.consola.append(e.toString()+"\n");
         this.listaE.add(e);
     }
+    
 
     public String cadE() {
         s.setLength(0);
