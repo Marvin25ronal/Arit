@@ -7,12 +7,14 @@
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AnalizadorA/Lexico.jflex</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AST/Nodo.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/arit/Arit.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/Instruccion.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Globales/VarGlobales.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Nulo.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/TipoExp.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AnalizadorA/parser.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Expresion.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Literal.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AST/AST.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/Intruccion.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Entorno/Entorno.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/Print.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Reportes/Errores.java</file>

@@ -7,6 +7,8 @@ package Instruccion;
 
 import Entorno.Entorno;
 import Expresion.Expresion;
+import Objetos.Nulo;
+import Reportes.Errores;
 import com.sun.xml.internal.bind.v2.TODO;
 
 /**
@@ -29,7 +31,16 @@ public class Print implements Instruccion {
     public Object ejecutar(Entorno e) {
         Object val = toPrint.getValor(e);
         //
-        
+        if(val instanceof Reportes.Errores){
+            Globales.VarGlobales.getInstance().AgregarEU((Reportes.Errores)val);
+            return null;
+        }
+        if(val instanceof Nulo){
+            Errores nuevo=new Errores(Errores.TipoError.SEMANTICO,"Valor NULO",linea, columna);
+            Globales.VarGlobales.getInstance().AgregarEU(nuevo);
+            return null;
+        }
+        Globales.VarGlobales.getInstance().getConsola().append(val.toString()+"\n");
         return null;
     }
 

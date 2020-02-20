@@ -38,6 +38,7 @@ public class sym {
   public static final int PRINT = 32;
   public static final int error = 1;
   public static final int PREGUNTA = 23;
+  public static final int NULO = 34;
   public static final int INTEGER = 33;
   public static final int NUMERIC = 26;
   public static final int MENOR_I = 14;
@@ -76,7 +77,8 @@ public class sym {
   "IGUAL",
   "PYCOMA",
   "PRINT",
-  "INTEGER"
+  "INTEGER",
+  "NULO"
   };
 }
 

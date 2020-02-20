@@ -68,6 +68,7 @@ PRINT="print"
 NUMERIC=[0-9]+ "." [0-9]+
 INTEGER=[0-9]+
 BOOLEANO="true" | "false"
+NULO="null"
 STRING=\"([^\"])*\"
 /*
 ░█████╗░░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗░█████╗░██████╗░██╗░█████╗░░██████╗
@@ -115,6 +116,7 @@ ENTER=[\ \n]
 <YYINITIAL>{INTEGER}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.INTEGER,yyline,yycolumn,yytext());}
 <YYINITIAL>{BOOLEANO}         	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.BOOLEANO,yyline,yycolumn,yytext());}
 <YYINITIAL>{PRINT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PRINT,yyline,yycolumn,yytext());}
+<YYINITIAL>{NULO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NULO,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
 <YYINITIAL>{ID}        			{System.out.println("Token ID "+yytext()+" reconocido"); return new Symbol(sym.ID,yyline,yycolumn,yytext());}

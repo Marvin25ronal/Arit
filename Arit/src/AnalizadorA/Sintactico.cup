@@ -9,6 +9,7 @@ import Expresion.TipoExp.Tipos;
 import AST.*;
 import Instruccion.Instruccion;
 import Instruccion.Print;
+import Objetos.Nulo;
 parser code 
 {://Codigo visible
     
@@ -36,7 +37,7 @@ terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
 terminal String ID,NUMERIC,STRING,BOOLEANO,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
-terminal String INTEGER;
+terminal String INTEGER,NULO;
 
 non terminal AST INICIO;
 non terminal Expresion ASIGNACION,EXP;
@@ -108,9 +109,10 @@ EXP::=
 	|PAR_A EXP PAR_C
 	|ID
 	|NUMERIC:a{:RESULT=new Literal(a,new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
-	|STRING:a{:RESULT=new Literal(a,new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
+	|STRING:a{:RESULT=new Literal(a.toString().replace("\"",""),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
 	|INTEGER:a{:RESULT=new Literal(a,new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
 	|BOOLEANO:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
+	|NULO:a{:RESULT=new Nulo(aleft+1,aright+1);:}
 	;
 
 /*
@@ -119,8 +121,8 @@ EXP::=
 ░█─── ─▀▄▄▀ ░█──▀█ ░█▄▄█ ▄█▄ ░█▄▄▄█ ░█──▀█ ░█▄▄▄ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ ░█─── ░█▄▄▄ ░█▄▄█ ▄█▄ ░█─░█ ░█▄▄█ ░█▄▄▄ ░█▄▄▄█
 */
 FUNCIONES::=
-	IMPRIMIR
-	|IMPRIMIR PYCOMA
+	IMPRIMIR:a{:RESULT=a;:}
+	|IMPRIMIR:a PYCOMA{:RESULT=a;:}
 	;
 IMPRIMIR::=
 	PRINT:a PAR_A EXP:b PAR_C{:RESULT=new Print(b,aleft+1,aright+1);:}
