@@ -31,19 +31,19 @@ public class TipoExp {
     }
 
     public boolean isNumeric() {
-        return  tp == Tipos.NUMERIC|| tp == Tipos.INTEGER;
+        return  tp == Tipos.NUMERIC;
     }
-
+    public boolean esNumero(){
+        return tp==Tipos.INTEGER||tp==Tipos.NUMERIC;
+    }
+    
+    
     public boolean isBoolean() {
         return tp == Tipos.BOOLEAN;
     }
 
     public boolean isString() {
         return tp == Tipos.STRING;
-    }
-
-    public boolean isDouble() {
-        return tp == Tipos.NUMERIC;
     }
 
     public boolean isInt() {
