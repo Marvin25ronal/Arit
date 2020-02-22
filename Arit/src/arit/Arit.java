@@ -29,6 +29,7 @@ public class Arit {
         Editor editor=new Editor();
         editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         editor.show();
+       
     }
     /*
     File archivo = null;

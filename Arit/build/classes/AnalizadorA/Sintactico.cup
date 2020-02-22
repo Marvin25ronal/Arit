@@ -91,11 +91,11 @@ ASIGNACION::=ID IGUAL EXP
 EXP::=
 	MENOS EXP {: :}%prec UMENOS
 	|EXP:a MAS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.SUMA,aleft+1,aright+1);:}
-	|EXP MENOS EXP
-	|EXP POR EXP
-	|EXP DIV EXP
-	|EXP POTENCIA EXP
-	|EXP MODULO EXP
+	|EXP:a MENOS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.RESTA,aleft+1,aright+1);:}
+	|EXP:a POR EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MULTIPLICACION,aleft+1,aright+1);:}
+	|EXP:a DIV EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.DIVISION,aleft+1,aright+1);:}
+	|EXP:a POTENCIA EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,aleft+1,aright+1);:}
+	|EXP:a MODULO EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MODULO,aleft+1,aright+1);:}
 	
 	|NOT EXP
 	|EXP OR EXP
