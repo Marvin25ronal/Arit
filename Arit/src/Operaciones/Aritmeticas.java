@@ -38,6 +38,10 @@ public class Aritmeticas extends Operacion {
         if (t1.isNulo() || t2.isNulo()) {
             return new TipoExp(Tipos.NULO);
         }
+        if(t1.esNumero()&&t2.esNumero()&&op==Operador.POTENCIA){
+            return new TipoExp(Tipos.NUMERIC);
+        }
+        
         if (t1.isString() || t2.isString()) {
             return new TipoExp(Tipos.STRING);
         } else if (t1.isBoolean() || t2.isBoolean()) {
@@ -72,11 +76,15 @@ public class Aritmeticas extends Operacion {
             case SUMA:
                 return new Suma(op1, op2, op, linea, columna).ejecutar(e);
             case RESTA:
-
+                return new Resta(op1, op2, op, linea, columna).ejecutar(e);
             case MULTIPLICACION:
+                return new Multiplicacion(op1, op2, op, linea, columna).ejecutar(e);
             case DIVISION:
+                return new Division(op1, op2, op, linea, columna).ejecutar(e);
             case POTENCIA:
+                return new Potencia(op1, op2, op, linea, columna).ejecutar(e);
             case MODULO:
+                
         }
         return null;
     }

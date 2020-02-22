@@ -5,20 +5,19 @@
  */
 package Operaciones;
 
-import Expresion.Expresion;
 import Entorno.Entorno;
+import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
-import Expresion.TipoExp.Tipos;
 import Reportes.Errores;
 
 /**
  *
  * @author marvi
  */
-public class Suma extends Aritmeticas {
+public class Division extends Aritmeticas {
 
-    public Suma(Expresion op1, Expresion op2, Operador op, int linea, int columna) {
+    public Division(Expresion op1, Expresion op2, Operador op, int linea, int columna) {
         super(op1, op2, op, linea, columna);
     }
 
@@ -35,20 +34,17 @@ public class Suma extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+
         switch (aux.tp) {
-            case STRING:
-                //se suman cadenas
-                return new Literal(valor1.toString() + valor2.toString(), new TipoExp(Tipos.STRING), linea, columna);
             case NULO:
-                return new Errores(Errores.TipoError.SEMANTICO, "No se puede sumar valores NULOS", linea, columna);
+                return new Errores(Errores.TipoError.SEMANTICO, "No se puede DIVIDIR valores NULOS", linea, columna);
             case INTEGER:
-                return new Literal((int)Double.parseDouble(valor1.toString()) + (int)Double.parseDouble(valor2.toString()), new TipoExp(Tipos.INTEGER), linea, columna);
+                return Double.parseDouble(valor1.toString()) % Double.parseDouble(valor2.toString()) == 0 ? new Literal(Integer.parseInt(valor1.toString()) / Integer.parseInt(valor2.toString()), new TipoExp(TipoExp.Tipos.INTEGER), linea, columna) : new Literal(Double.parseDouble(valor1.toString()) / Double.parseDouble(valor2.toString()), new TipoExp(TipoExp.Tipos.NUMERIC), linea, columna);
             case NUMERIC:
-                return new Literal(Double.parseDouble(valor1.toString()) + Double.parseDouble(valor2.toString()), new TipoExp(Tipos.NUMERIC), linea, columna);
+                return new Literal(Double.parseDouble(valor1.toString()) / Double.parseDouble(valor2.toString()), new TipoExp(TipoExp.Tipos.NUMERIC), linea, columna);
             default:
-                return new Errores(Errores.TipoError.SEMANTICO, "No se pueden sumar ese tipo de objetos", linea, columna);
+                return new Errores(Errores.TipoError.SEMANTICO, "No se pueden DIVIDIR ese tipo de objetos", linea, columna);
         }
 
     }
-
 }

@@ -56,4 +56,39 @@ public abstract class Operacion implements Expresion {
     public boolean OperadorDouble(Expresion op1, Expresion op2, Entorno.Entorno e) {
         return op1.getTipo(e).isNumeric() || op2.getTipo(e).isNumeric();
     }
+    public String obtenerSignocadena(){
+        switch(op){
+            case SUMA:
+                return "+";
+            case RESTA:
+                return "-";
+            case DIVISION:
+                return "/";
+            case MULTIPLICACION:
+                return "*";
+            case AND:
+                return "&";
+            case OR:
+                return "|";
+            case MODULO:
+                return "%%";
+            case POTENCIA:
+                return "^";
+            case IGUAL_IGUAL:
+                return "==";
+            case DISTINTO:
+                return "!=";
+            case NOT:
+                return "!";
+            case MAYOR:
+                return ">";
+            case MENOR:
+                return "<";
+            case MAYOR_IGUAL:
+                return ">=";
+            case MENOR_IGUAL:
+                return "<=";
+        }
+        return "##";
+    }
 }

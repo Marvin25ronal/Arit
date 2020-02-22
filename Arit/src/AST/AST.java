@@ -15,21 +15,36 @@ import Instruccion.Instruccion;
  * @author marvi
  */
 public class AST {
-    LinkedList<Nodo>Acciones;
+
+    /**
+     * @return the Acciones
+     */
+    public LinkedList<Nodo> getAcciones() {
+        return Acciones;
+    }
+
+    /**
+     * @param Acciones the Acciones to set
+     */
+    public void setAcciones(LinkedList<Nodo> Acciones) {
+        this.Acciones = Acciones;
+    }
+    private LinkedList<Nodo> Acciones;
 
     public AST(LinkedList<Nodo> Acciones) {
         this.Acciones = Acciones;
     }
-    public Object ejecutar(){
-        Entorno global=new Entorno(null);
+
+    public Object ejecutar() {
+        Entorno global = new Entorno(null);
         Globales.VarGlobales.getInstance().getConsola().append("Salida--------\n");
-        for(Nodo n : Acciones){
-            if(n instanceof Instruccion){
-                Object result=((Instruccion)((Instruccion) n).ejecutar(global));
-             
-            }else if(n instanceof Expresion){
-                Expresion exp=(Expresion)n;
-                Object result=exp.getValor(global);
+        for (Nodo n : getAcciones()) {
+            if (n instanceof Instruccion) {
+                Object result = ((Instruccion) ((Instruccion) n).ejecutar(global));
+
+            } else if (n instanceof Expresion) {
+                Expresion exp = (Expresion) n;
+                Object result = exp.getValor(global);
             }
         }
         return null;
