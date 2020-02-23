@@ -38,10 +38,10 @@ public class Aritmeticas extends Operacion {
         if (t1.isNulo() || t2.isNulo()) {
             return new TipoExp(Tipos.NULO);
         }
-        if(t1.esNumero()&&t2.esNumero()&&op==Operador.POTENCIA){
+        if (t1.esNumero() && t2.esNumero() && op == Operador.POTENCIA) {
             return new TipoExp(Tipos.NUMERIC);
         }
-        
+
         if (t1.isString() || t2.isString()) {
             return new TipoExp(Tipos.STRING);
         } else if (t1.isBoolean() || t2.isBoolean()) {
@@ -84,13 +84,14 @@ public class Aritmeticas extends Operacion {
             case POTENCIA:
                 return new Potencia(op1, op2, op, linea, columna).ejecutar(e);
             case MODULO:
-                
+                return new Modulo(op1, op2, op, linea, columna).Ejecutar(e);
         }
         return null;
     }
 
     @Override
     public TipoExp getTipo(Entorno e) {
+
         return tipoDominante(op1.getTipo(e), op2.getTipo(e));
     }
 

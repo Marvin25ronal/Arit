@@ -35,6 +35,10 @@ public class Suma extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        //esto para cuando la division trae algun numero raro
+        if (aux.isNumeric() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
+            aux.tp = Tipos.NUMERIC;
+        }
         switch (aux.tp) {
             case STRING:
                 //se suman cadenas
@@ -42,7 +46,8 @@ public class Suma extends Aritmeticas {
             case NULO:
                 return new Errores(Errores.TipoError.SEMANTICO, "No se puede sumar valores NULOS", linea, columna);
             case INTEGER:
-                return new Literal((int)Double.parseDouble(valor1.toString()) + (int)Double.parseDouble(valor2.toString()), new TipoExp(Tipos.INTEGER), linea, columna);
+
+                return new Literal(Integer.parseInt(valor1.toString()) + Integer.parseInt(valor2.toString()), new TipoExp(Tipos.INTEGER), linea, columna);
             case NUMERIC:
                 return new Literal(Double.parseDouble(valor1.toString()) + Double.parseDouble(valor2.toString()), new TipoExp(Tipos.NUMERIC), linea, columna);
             default:
