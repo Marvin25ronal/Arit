@@ -34,6 +34,15 @@ public class Division extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        //esto para cuando la division trae algun numero raro
+        if (aux.esNumero() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
+            aux.tp = TipoExp.Tipos.NUMERIC;
+            //reglas de la division
+            double aux2 = Double.parseDouble(valor2.toString());
+            if (aux2 == 0) {
+                return new Errores(Errores.TipoError.SEMANTICO, "No se puede dividir entre 0 ", linea, columna);
+            }
+        }
 
         switch (aux.tp) {
             case NULO:

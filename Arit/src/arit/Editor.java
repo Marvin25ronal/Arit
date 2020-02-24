@@ -8,6 +8,9 @@ package arit;
 import AST.AST;
 import AnalizadorA.parser;
 import AnalizadorA.scanner;
+import AnalizadorD.Gramatica;
+import AnalizadorD.ParseException;
+import AnalizadorD.TokenMgrError;
 import Color.CampoTexto;
 import Color.TextLineNumber;
 import Reportes.Errores;
@@ -82,6 +85,7 @@ public class Editor extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
 
@@ -123,6 +127,14 @@ public class Editor extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem2);
+
+        jMenuItem4.setText("Descendente");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem4);
 
         jMenuBar1.add(jMenu3);
 
@@ -257,7 +269,6 @@ public class Editor extends javax.swing.JFrame {
                 cmd[4] = "Arbol.png";
                 Runtime rt = Runtime.getRuntime();
                 rt.exec(cmd);
-                
 
             }
         } catch (Exception e) {
@@ -265,6 +276,27 @@ public class Editor extends javax.swing.JFrame {
             Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        if (!texto.isEmpty()) {
+            try {
+                Gramatica parser = new Gramatica(new BufferedReader(new StringReader((texto))));
+                AST arbol = parser.INICIO();
+                arbol.ejecutar();
+            } catch (ParseException e) {
+                jTextArea1.append(e.getMessage() + "\n");
+            } catch (TokenMgrError e) {
+                jTextArea1.append(e.getMessage() + "\n");
+            }
+        }
+
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -311,6 +343,7 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;

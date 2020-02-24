@@ -12,6 +12,8 @@ import Instruccion.Print;
 import Objetos.Nulo;
 import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
+import Operaciones.Logicas;
+import Operaciones.Relacional;
 parser code 
 {://Codigo visible
     
@@ -98,13 +100,13 @@ EXP::=
 	|EXP:a MODULO EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MODULO,aleft+1,aright+1);:}
 	
 	|NOT EXP
-	|EXP OR EXP
-	|EXP AND EXP
-	|EXP MENOR EXP
-	|EXP MAYOR EXP
-	|EXP MENOR_I EXP
-	|EXP MAYOR_I EXP
-	|EXP IGUAL_IGUAL EXP
+	|EXP:a OR EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.OR,aleft+1,aright+1);:}
+	|EXP:a AND EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.AND,aleft+1,aright+1);:}
+	|EXP:a MENOR EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR,aleft+1,aright+1);:}
+	|EXP:a MAYOR EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MAYOR,aleft+1,aright+1);:}
+	|EXP:a MENOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR_IGUAL,aleft+1,aright+1);:}
+	|EXP:a MAYOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MAYOR_IGUAL,aleft+1,aright+1);:}
+	|EXP:a IGUAL_IGUAL EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.IGUAL_IGUAL,aleft+1,aright+1);:}
 	|EXP DISTINTO EXP
 	|EXP PREGUNTA EXP DOSPUNTOS EXP
 

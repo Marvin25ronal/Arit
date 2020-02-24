@@ -1,11 +1,25 @@
 options{
 	IGNORE_CASE=true;
 	STATIC=false;
+	
 }
 PARSER_BEGIN(Gramatica)
 package AnalizadorD;
+import java.util.LinkedList;
+import Reportes.Errores;
+import Reportes.Errores.TipoError;
+import java.util.ArrayList;
+import Expresion.*;
+import Expresion.TipoExp.Tipos;
+import AST.*;
+import Instruccion.Instruccion;
+import Instruccion.Print;
+import Objetos.Nulo;
+import Operaciones.Aritmeticas;
+import Operaciones.Operacion;
+import Operaciones.Logicas;
+import Operaciones.Relacional;
 public class Gramatica{
-	
 }
 PARSER_END(Gramatica)
 /*
@@ -51,9 +65,13 @@ TOKEN : {
 	|<AND:"&">
 	|<OR:"|">
 	|<NOT:"!">
-	|<TRUE:"true">
-	|<FALSE:"false">
-
+	|<BOOLEANO:"true"|"false">
+	|<PREGUNTA:"?">
+	|<PRINT: "print">
+	|<NULO: "null">
+	|<DOSPUNTOS:":">
+	//|<IDENTIFICADOR: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_"] | ["0"-"9"] )* >
+	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z"](["a"-"z","A"-"Z","_"]|["0"-"9"])*)>
 }
 MORE:{
 	"\"" : STRING_STATE
@@ -76,18 +94,145 @@ MORE:{
 /**
 INICIO->(CUERPO)+EOF
 */
-void INICIO():
+AST INICIO():
 {
-
+AST arbol;
+LinkedList<Nodo>lista=new LinkedList();
+Nodo aux;
 }
 {
-	(CUERPO)+ <EOF>
+	(aux=CUERPO(){lista.add(aux);})+ <EOF>{arbol=new AST(lista);return arbol;}
 }
 
-void CUERPO():
+Nodo CUERPO():
 {
-
+Instruccion aux;
 }
 {
-	(NUMERIC)+
+	aux=FUNCIONES(){return aux;}
+
+}
+Instruccion FUNCIONES():
+{
+	Instruccion ins;
+}
+{
+	ins=IMPRIMIR(){return ins;}
+}
+
+Instruccion IMPRIMIR():
+{
+	Expresion exp;
+	Token t;
+}
+{
+	t=<PRINT> <PAR_A> exp=EXP()<PAR_C> (<PYCOMA>)? {return new Print(exp,t.beginLine,t.beginColumn);}
+}
+Expresion EXP():
+{
+	Expresion a,b,c;
+	Token t;
+}
+{
+	a=CondicionOR()(t=<PREGUNTA>b=CondicionOR()<DOSPUNTOS>c=CondicionOR()
+		)*
+	{return a;}
+}
+Expresion CondicionOR():
+{
+	Expresion a,b;
+	Token t;
+}
+{
+	a=CondicionAnd()(t=<OR>b=CondicionAnd(){a=new Logicas(a,b,Operacion.Operador.OR,t.beginLine,t.beginColumn);}
+
+		)*
+	{return a;}
+}
+Expresion CondicionAnd():
+{
+Expresion a,b;
+	Token t;
+}
+{
+	a=ExpresionIgualdad()(t=<AND>b=ExpresionIgualdad(){a=new Logicas(a,b,Operacion.Operador.AND,t.beginLine,t.beginColumn);}
+		)*
+	
+	{return a;}
+}
+Expresion ExpresionIgualdad():
+{
+Expresion a,b;
+	Token t;
+}
+{
+	a=ExpresionRelacional()(t=<IGUAL_IGUAL> b=ExpresionRelacional(){a=new Relacional(a,b,Operacion.Operador.IGUAL_IGUAL,t.beginLine,t.beginColumn);}
+	|t=<DISTINTO> b=ExpresionRelacional() {a=new Relacional(a,b,Operacion.Operador.DISTINTO,t.beginLine,t.beginColumn);}
+	)*
+	{return a;}
+}
+Expresion ExpresionRelacional():
+{
+	Expresion a,b;
+	Token t;
+}
+{
+	a=ExpresionAditiva()
+	(
+		t=<MAYOR> b=ExpresionAditiva(){a=new Relacional(a,b,Operacion.Operador.MAYOR,t.beginLine,t.beginColumn);}
+		|t=<MENOR> b=ExpresionAditiva(){a=new Relacional(a,b,Operacion.Operador.MENOR,t.beginLine,t.beginColumn);}
+		|t=<MAYOR_I>b=ExpresionAditiva(){a=new Relacional(a,b,Operacion.Operador.MAYOR_IGUAL,t.beginLine,t.beginColumn);}
+		|t=<MENOR_I>b=ExpresionAditiva(){a=new Relacional(a,b,Operacion.Operador.MENOR_IGUAL,t.beginLine,t.beginColumn);}
+	)*
+	{return a;}
+}
+Expresion ExpresionAditiva():
+{
+	Expresion a,b;
+	Token t;
+}
+{
+	a=ExpresionMultiplicativas()
+	(
+		t=<MAS>b=ExpresionMultiplicativas(){a=new Aritmeticas(a,b,Operacion.Operador.SUMA,t.beginLine,t.beginColumn);}
+		|t=<MENOS>b=ExpresionMultiplicativas(){a=new Aritmeticas(a,b,Operacion.Operador.RESTA,t.beginLine,t.beginColumn);}
+	)*
+	{return a;}
+}
+Expresion ExpresionMultiplicativas():
+{
+Expresion a,b;
+ Token t;
+}
+{
+	a=ExpresionUnaria()
+	(
+		t=<POR> b=ExpresionUnaria(){a=new Aritmeticas(a,b,Operacion.Operador.MULTIPLICACION,t.beginLine,t.beginColumn);}
+		|t=<DIV>b=ExpresionUnaria(){a=new Aritmeticas(a,b,Operacion.Operador.DIVISION,t.beginLine,t.beginColumn);}
+		|t=<POTENCIA>b=ExpresionUnaria(){a=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,t.beginLine,t.beginColumn);}
+		|t=<MODULO>b=ExpresionUnaria(){a=new Aritmeticas(a,b,Operacion.Operador.MODULO,t.beginLine,t.beginColumn);}
+	)*
+	{return a;}
+}
+Expresion ExpresionUnaria():
+{
+	Expresion exp;
+}
+{
+	<MENOS>ExpresionUnaria(){}
+	|<NOT>ExpresionUnaria(){}
+	|exp=Primitivo(){return exp;}
+}
+Expresion Primitivo():
+{
+	Expresion aux;
+}
+{
+	<NUMERIC>{return new Literal(Double.parseDouble(token.image),new TipoExp(Tipos.NUMERIC),token.beginLine,token.beginColumn);}
+	|<BOOLEANO>{return new Literal(Boolean.parseBoolean(token.image),new TipoExp(Tipos.BOOLEAN),token.beginLine,token.beginColumn);}
+	|<INTEGER>{return new Literal(Integer.parseInt(token.image),new TipoExp(Tipos.INTEGER),token.beginLine,token.beginColumn);}
+	|<STRING>{return new Literal(token.image.substring(1,token.image.length()-1),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
+	|<IDENTIFICADOR>
+	|<PAR_A> aux=EXP() <PAR_C>{return aux;}
+	|<NULO>{return new  Nulo(token.beginLine,token.beginColumn); }
 }
