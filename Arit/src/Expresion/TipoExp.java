@@ -12,7 +12,7 @@ package Expresion;
 public class TipoExp {
 
     public enum Tipos {
-        INTEGER, BOOLEAN, STRING, NUMERIC, NULO
+        INTEGER, BOOLEAN, STRING, NUMERIC, NULO,VECTOR
     }
     public Tipos tp;
     public String tr = "";

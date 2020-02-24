@@ -71,7 +71,7 @@ public class Relacional extends Operacion {
                 default:
                     return new Errores(Errores.TipoError.SEMANTICO, "No se pueden comparar nulos con esos operadores", linea, columna);
             }
-        } else if (top1.isString() || top2.isString()) {
+        } else if (top1.isString() && top2.isString()) {
             String cad1 = valor1.toString();
             String cad2 = valor2.toString();
             switch (op) {
