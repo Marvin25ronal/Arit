@@ -90,7 +90,26 @@ public class Relacional extends Operacion {
             }
 
         } else if (top1.esNumero() || top2.esNumero()) {
-
+            if (top1.esNumero() && top2.esNumero()) {
+                double a = Double.parseDouble(valor1.toString());
+                double b = Double.parseDouble(valor2.toString());
+                switch (op) {
+                    case IGUAL_IGUAL:
+                        return new Literal(a == b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    case DISTINTO:
+                        return new Literal(a != b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    case MAYOR:
+                        return new Literal(a > b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    case MENOR:
+                        return new Literal(a < b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    case MAYOR_IGUAL:
+                        return new Literal(a >= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    case MENOR_IGUAL:
+                        return new Literal(a <= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                }
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "No se puede comparar operadores que no sean numero", linea, columna);
+            }
         }
         return null;
     }
