@@ -20,14 +20,9 @@ public abstract class Operacion implements Expresion {
     public Expresion op1;
     public Expresion op2;
     public Operador op;
-    public Object valor2;
 
-    public Operacion(Expresion op1, Expresion op2, Operador op, Object valor2) {
-        this.op1 = op1;
-        this.op2 = op2;
-        this.op = op;
-        this.valor2 = valor2;
-    }
+
+
 
     public Operacion(Expresion op1, Expresion op2, Operador op) {
         this.op1 = op1;

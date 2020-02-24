@@ -36,7 +36,7 @@ public class Suma extends Aritmeticas {
             return valor2;
         }
         //esto para cuando la division trae algun numero raro
-        if (aux.isNumeric() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
+        if (aux.esNumero() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
             aux.tp = Tipos.NUMERIC;
         }
         switch (aux.tp) {

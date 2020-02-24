@@ -15,13 +15,14 @@ import Reportes.Errores;
  *
  * @author marvi
  */
-public class Modulo extends Aritmeticas{
-    
+public class Modulo extends Aritmeticas {
+
     public Modulo(Expresion op1, Expresion op2, Operador op, int linea, int columna) {
         super(op1, op2, op, linea, columna);
     }
-    public Object Ejecutar(Entorno e){
-         TipoExp top1 = op1.getTipo(e);
+    
+    public Object Ejecutar(Entorno e) {
+        TipoExp top1 = op1.getTipo(e);
         TipoExp top2 = op2.getTipo(e);
         TipoExp aux = max(top1, top2);
 
@@ -33,7 +34,7 @@ public class Modulo extends Aritmeticas{
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
-          //esto para cuando la division trae algun numero raro
+        //esto para cuando la division trae algun numero raro
         if (aux.isNumeric() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
             aux.tp = TipoExp.Tipos.NUMERIC;
         }

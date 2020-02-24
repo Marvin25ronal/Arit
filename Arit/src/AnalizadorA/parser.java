@@ -18,6 +18,8 @@ import Instruccion.Print;
 import Objetos.Nulo;
 import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
+import Operaciones.Logicas;
+import Operaciones.Relacional;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -562,7 +564,13 @@ class CUP$parser$actions {
           case 20: // EXP ::= EXP OR EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Logicas(a,b,Operacion.Operador.OR,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -571,7 +579,13 @@ class CUP$parser$actions {
           case 21: // EXP ::= EXP AND EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Logicas(a,b,Operacion.Operador.AND,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -580,7 +594,13 @@ class CUP$parser$actions {
           case 22: // EXP ::= EXP MENOR EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Relacional(a,b,Operacion.Operador.MENOR,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -589,7 +609,13 @@ class CUP$parser$actions {
           case 23: // EXP ::= EXP MAYOR EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Relacional(a,b,Operacion.Operador.MAYOR,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -598,7 +624,13 @@ class CUP$parser$actions {
           case 24: // EXP ::= EXP MENOR_I EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Relacional(a,b,Operacion.Operador.MENOR_IGUAL,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -607,7 +639,13 @@ class CUP$parser$actions {
           case 25: // EXP ::= EXP MAYOR_I EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Relacional(a,b,Operacion.Operador.MAYOR_IGUAL,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -616,7 +654,13 @@ class CUP$parser$actions {
           case 26: // EXP ::= EXP IGUAL_IGUAL EXP 
             {
               Expresion RESULT =null;
-
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Expresion a = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Expresion b = (Expresion)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=new Relacional(a,b,Operacion.Operador.IGUAL_IGUAL,aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",2, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

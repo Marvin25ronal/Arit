@@ -34,8 +34,8 @@ public class Resta extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
-          //esto para cuando la division trae algun numero raro
-        if (aux.isNumeric() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
+        //esto para cuando la division trae algun numero raro
+        if (aux.esNumero() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
             aux.tp = TipoExp.Tipos.NUMERIC;
             aux.tp = TipoExp.Tipos.NUMERIC;
         }
