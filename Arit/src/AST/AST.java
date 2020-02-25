@@ -5,10 +5,12 @@
  */
 package AST;
 
+import Control.Return;
 import Entorno.Entorno;
 import Expresion.Expresion;
 import java.util.LinkedList;
 import Instruccion.Instruccion;
+import Reportes.Errores;
 
 /**
  *
@@ -41,10 +43,25 @@ public class AST {
         for (Nodo n : getAcciones()) {
             if (n instanceof Instruccion) {
                 Object result = ((Instruccion) ((Instruccion) n).ejecutar(global));
+                if (result instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
+                } else if (result instanceof Control.Continue) {
+                    Control.Continue aux = ((Control.Continue) result);
+                    Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Continue esta en un ambito que no es el correcto", aux.getLinea(), aux.getColumna()));
+                } else if (result instanceof Control.Break) {
+                    Control.Break aux = (Control.Break) result;
+                    Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Break esta en un ambito que no es el correcto", aux.getLinea(), aux.getColumna()));
+                }
 
             } else if (n instanceof Expresion) {
                 Expresion exp = (Expresion) n;
                 Object result = exp.getValor(global);
+                if (result instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
+                } else if (result instanceof Return) {
+                    Return aux = (Return) result;
+                    Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Return esta en un ambito que no es el correcto", aux.getLinea(), aux.getColumna()));
+                }
             }
         }
         return null;

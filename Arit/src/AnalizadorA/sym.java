@@ -19,6 +19,7 @@ public class sym {
   public static final int OR = 8;
   public static final int PREGUNTA = 23;
   public static final int DIV = 19;
+  public static final int IF = 36;
   public static final int UMENOS = 28;
   public static final int LLAV_C = 3;
   public static final int IGUAL_IGUAL = 16;
@@ -38,6 +39,7 @@ public class sym {
   public static final int PAR_A = 6;
   public static final int MAYOR = 11;
   public static final int POTENCIA = 22;
+  public static final int ELSE = 37;
   public static final int STRING = 27;
   public static final int COR_C = 5;
   public static final int FALSE = 35;
@@ -80,7 +82,9 @@ public class sym {
   "INTEGER",
   "NULO",
   "TRUE",
-  "FALSE"
+  "FALSE",
+  "IF",
+  "ELSE"
   };
 }
 

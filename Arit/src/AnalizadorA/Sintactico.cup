@@ -18,6 +18,7 @@ import Instruccion.DecAsig;
 import Expresion.Identificador;
 import Operaciones.Ternarias;
 import Operaciones.Unarias;
+import Control.*;
 parser code 
 {://Codigo visible
     
@@ -45,13 +46,15 @@ terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
 terminal String ID,NUMERIC,STRING,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
-terminal String INTEGER,NULO,TRUE,FALSE;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE;
 
 non terminal AST INICIO;
 non terminal Expresion EXP;
 non terminal LinkedList<Nodo>CUERPO;
-non terminal String CONTROLES,BLOQUE;
-non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION;
+non terminal LinkedList<Nodo> BLOQUE;
+non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH;
+non terminal LinkedList<Instruccion>LIFS;
+
 precedence right IGUAL;
 precedence right PREGUNTA,DOSPUNTOS;
 precedence left OR;
@@ -79,10 +82,10 @@ INICIO::= CUERPO:a{:AST arbol=new AST(a);ast=arbol;:};
 
 CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
-	|CONTROLES
-	|CUERPO CONTROLES
-	|BLOQUE
-	|CUERPO BLOQUE
+	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
+	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
 	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
 	;
@@ -136,4 +139,29 @@ FUNCIONES::=
 IMPRIMIR::=
 	PRINT:a PAR_A EXP:b PAR_C{:RESULT=new Print(b,aleft+1,aright+1);:}
 	|PRINT:a PAR_A PAR_C{:RESULT=new Print(new Literal("",new TipoExp(Tipos.STRING),aleft+1,aright+1),aleft+1,aright+1);:} 
+	;
+BLOQUE::=
+	LLAV_A CUERPO:l LLAV_C{:RESULT=l;:}
+	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
+	;
+/*
+░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
+██╔══██╗██╔══██╗████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
+██║░░╚═╝██║░░██║██╔██╗██║░░░██║░░░██████╔╝██║░░██║██║░░░░░
+██║░░██╗██║░░██║██║╚████║░░░██║░░░██╔══██╗██║░░██║██║░░░░░
+╚█████╔╝╚█████╔╝██║░╚███║░░░██║░░░██║░░██║╚█████╔╝███████╗
+░╚════╝░░╚════╝░╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░╚══════╝
+*/
+CONTROLES::=
+	CONTROL_IF:a{:RESULT=a;:}
+	|CONTROL_SWITCH
+	;
+CONTROL_IF::=
+	IF:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new IF(e,b,null,aleft+1,aright+1);:}
+	|IF:a PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:RESULT=new IF(e,b,l,aleft+1,aright+1);:}
+	;
+LIFS::=
+	ELSE:a IF PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:l.addFirst(new ElseIf(e,b,aleft+1,aright+1));RESULT=l;:}
+	|ELSE:as IF PAR_A EXP:e PAR_C BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new ElseIf(e,b,asleft+1,asright+1));RESULT=a;:}
+	|ELSE:as BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new Else(b,asleft+1,asright+1));RESULT=a;:}
 	;

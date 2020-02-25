@@ -59,6 +59,9 @@ DOSPUNTOS=":"
 PRINT="print"
 TRUE="true"
 FALSE="false"
+IF="if"
+ELSE="else"
+
 /*
 ████████╗██╗██████╗░░█████╗░░██████╗
 ╚══██╔══╝██║██╔══██╗██╔══██╗██╔════╝
@@ -119,6 +122,8 @@ ENTER=[\ \n]
 <YYINITIAL>{TRUE} 	        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.TRUE,yyline,yycolumn,yytext());}
 <YYINITIAL>{FALSE}  	       	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.FALSE,yyline,yycolumn,yytext());}
 <YYINITIAL>{PRINT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PRINT,yyline,yycolumn,yytext());}
+<YYINITIAL>{IF}        			{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IF,yyline,yycolumn,yytext());}
+<YYINITIAL>{ELSE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.ELSE,yyline,yycolumn,yytext());}
 <YYINITIAL>{NULO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NULO,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
