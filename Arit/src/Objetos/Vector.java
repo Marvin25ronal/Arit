@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Entorno;
+package Objetos;
 
+import Entorno.Simbolo;
 import Expresion.TipoExp;
 import java.util.LinkedList;
 
@@ -28,31 +29,22 @@ public class Vector extends Simbolo {
         this.tam = tam;
     }
 
-    private String id;
     private LinkedList<Object> dimensiones;
     private int tam;
 
     /**
      * @return the id
      */
-    public Vector(TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
-        super(tipo, tipoprimitivo);
+    public Vector(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
+        super(tipo, tipoprimitivo, id);
         this.dimensiones = dimensiones;
         this.tam = dimensiones.size();
 
     }
 
-    public String getId() {
-        return id;
-    }
-
     /**
      * @param id the id to set
      */
-    public void setId(String id) {
-        this.id = id;
-    }
-
     /**
      * @return the dimensiones
      */
@@ -67,8 +59,12 @@ public class Vector extends Simbolo {
         this.dimensiones = dimensiones;
     }
 
+    @Override
+    public String toString() {
+        return "Este es un vector";
+    }
+
     /**
      * @return the dimension
      */
-   
 }
