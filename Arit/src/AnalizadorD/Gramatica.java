@@ -87,20 +87,16 @@ Instruccion aux;
         Expresion a,b,c;
         Token t;
     a = CondicionOR();
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case PREGUNTA:
-        ;
-        break;
-      default:
-        jj_la1[2] = jj_gen;
-        break label_2;
-      }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case PREGUNTA:
       t = jj_consume_token(PREGUNTA);
-      b = CondicionOR();
+      b = EXP();
       jj_consume_token(DOSPUNTOS);
-      c = CondicionOR();
+      c = EXP();
+      break;
+    default:
+      jj_la1[2] = jj_gen;
+      ;
     }
          {if (true) return a;}
     throw new Error("Missing return statement in function");
@@ -110,7 +106,7 @@ Instruccion aux;
         Expresion a,b;
         Token t;
     a = CondicionAnd();
-    label_3:
+    label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OR:
@@ -118,7 +114,7 @@ Instruccion aux;
         break;
       default:
         jj_la1[3] = jj_gen;
-        break label_3;
+        break label_2;
       }
       t = jj_consume_token(OR);
       b = CondicionAnd();
@@ -132,7 +128,7 @@ Instruccion aux;
 Expresion a,b;
         Token t;
     a = ExpresionIgualdad();
-    label_4:
+    label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
@@ -140,7 +136,7 @@ Expresion a,b;
         break;
       default:
         jj_la1[4] = jj_gen;
-        break label_4;
+        break label_3;
       }
       t = jj_consume_token(AND);
       b = ExpresionIgualdad();
@@ -154,7 +150,7 @@ Expresion a,b;
 Expresion a,b;
         Token t;
     a = ExpresionRelacional();
-    label_5:
+    label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DISTINTO:
@@ -163,7 +159,7 @@ Expresion a,b;
         break;
       default:
         jj_la1[5] = jj_gen;
-        break label_5;
+        break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IGUAL_IGUAL:
@@ -190,7 +186,7 @@ Expresion a,b;
         Expresion a,b;
         Token t;
     a = ExpresionAditiva();
-    label_6:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAYOR_I:
@@ -201,7 +197,7 @@ Expresion a,b;
         break;
       default:
         jj_la1[7] = jj_gen;
-        break label_6;
+        break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAYOR:
@@ -238,7 +234,7 @@ Expresion a,b;
         Expresion a,b;
         Token t;
     a = ExpresionMultiplicativas();
-    label_7:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAS:
@@ -247,7 +243,7 @@ Expresion a,b;
         break;
       default:
         jj_la1[9] = jj_gen;
-        break label_7;
+        break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAS:
@@ -274,7 +270,7 @@ Expresion a,b;
 Expresion a,b;
  Token t;
     a = ExpresionUnaria();
-    label_8:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case POR:
@@ -285,7 +281,7 @@ Expresion a,b;
         break;
       default:
         jj_la1[11] = jj_gen;
-        break label_8;
+        break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case POR:

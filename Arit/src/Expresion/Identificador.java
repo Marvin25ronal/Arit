@@ -6,6 +6,8 @@
 package Expresion;
 
 import Entorno.Entorno;
+import Entorno.Simbolo;
+import Reportes.Errores;
 
 /**
  *
@@ -67,12 +69,21 @@ public class Identificador implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (e.ExisteVariable(val)) {
+            return e.get(val);
+        } else {
+            return new Errores(Errores.TipoError.SEMANTICO, "No se encontro la variable", linea, columna);
+        }
     }
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Simbolo s = (Simbolo) getValor(e);
+        if (s == null) {
+            return null;
+
+        }
+        return s.getTipo();
     }
 
     @Override

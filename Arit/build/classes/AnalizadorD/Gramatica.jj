@@ -19,6 +19,7 @@ import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
 import Operaciones.Logicas;
 import Operaciones.Relacional;
+import Operaciones.Ternarias;
 public class Gramatica{
 }
 PARSER_END(Gramatica)
@@ -134,8 +135,8 @@ Expresion EXP():
 	Token t;
 }
 {
-	a=CondicionOR()(t=<PREGUNTA>b=CondicionOR()<DOSPUNTOS>c=CondicionOR()
-		)*
+	a=CondicionOR()(t=<PREGUNTA>b=EXP()<DOSPUNTOS>c=EXP()
+		)?
 	{return a;}
 }
 Expresion CondicionOR():

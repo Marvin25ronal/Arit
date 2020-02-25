@@ -57,6 +57,8 @@ DOSPUNTOS=":"
 ╚═╝░░╚═╝╚══════╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝╚═════╝░
 */
 PRINT="print"
+TRUE="true"
+FALSE="false"
 /*
 ████████╗██╗██████╗░░█████╗░░██████╗
 ╚══██╔══╝██║██╔══██╗██╔══██╗██╔════╝
@@ -67,7 +69,6 @@ PRINT="print"
 */
 NUMERIC=[0-9]+ "." [0-9]+
 INTEGER=[0-9]+
-BOOLEANO="true" | "false"
 NULO="null"
 STRING=\"([^\"])*\"
 /*
@@ -82,7 +83,8 @@ STRING=\"([^\"])*\"
 
 COMENTARIO1= "#*" ([^*])* ~"*#"
 COMENTARIO2= "#"[^\r\n]* (\r|\n|\r\n)?
-ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ "."]* | "." [A-Za-zñÑ][_.0-9A-Za-zñÑ]*
+ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ"."]* | "."[A-Za-zñÑ][_.0-9A-Za-zñÑ]*
+//ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ]*
 SPACE=[\ \r\t\f\t]
 ENTER=[\ \n]
 
@@ -114,7 +116,8 @@ ENTER=[\ \n]
 <YYINITIAL>{PYCOMA}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PYCOMA,yyline,yycolumn,yytext());}
 <YYINITIAL>{NUMERIC}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NUMERIC,yyline,yycolumn,yytext());}
 <YYINITIAL>{INTEGER}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.INTEGER,yyline,yycolumn,yytext());}
-<YYINITIAL>{BOOLEANO}         	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.BOOLEANO,yyline,yycolumn,yytext());}
+<YYINITIAL>{TRUE} 	        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.TRUE,yyline,yycolumn,yytext());}
+<YYINITIAL>{FALSE}  	       	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.FALSE,yyline,yycolumn,yytext());}
 <YYINITIAL>{PRINT}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PRINT,yyline,yycolumn,yytext());}
 <YYINITIAL>{NULO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NULO,yyline,yycolumn,yytext());}
 

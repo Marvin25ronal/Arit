@@ -6,6 +6,7 @@
 package Entorno;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  *
@@ -37,6 +38,16 @@ public class Entorno {
 
     public void add(String id, Simbolo s) {
         tabla.put(id, s);
+    }
+
+    public Simbolo get(String id) {
+        for (Entorno e = this; e != null; e = e.getPadre()) {
+            Simbolo encontrado = e.tabla.get(id);
+            if (encontrado != null) {
+                return encontrado;
+            }
+        }
+        return null;
     }
 
 }

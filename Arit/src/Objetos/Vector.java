@@ -6,6 +6,7 @@
 package Objetos;
 
 import Entorno.Simbolo;
+import Expresion.Literal;
 import Expresion.TipoExp;
 import java.util.LinkedList;
 
@@ -61,7 +62,17 @@ public class Vector extends Simbolo {
 
     @Override
     public String toString() {
-        return "Este es un vector";
+        StringBuilder cadena=new StringBuilder();
+        cadena.append("[");
+        for(int i=0;i<dimensiones.size();i++){
+            Literal l=(Literal) dimensiones.get(i);
+            cadena.append(l.valor);
+            if(i<dimensiones.size()-1){
+                cadena.append(",");
+            }
+        }
+        cadena.append("]");
+        return cadena.toString();
     }
 
     /**
