@@ -8,7 +8,12 @@ package Instruccion;
 import Entorno.Entorno;
 import Expresion.Expresion;
 import Expresion.Identificador;
+import Expresion.Literal;
+import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Vector;
+import Reportes.Errores;
+import java.util.LinkedList;
 
 /**
  *
@@ -29,12 +34,35 @@ public class DecAsig implements Instruccion {
 
     @Override
     public Object ejecutar(Entorno e) {
-        if(valor.getTipo(e).tp==Tipos.NULO){
+        if (valor == null) {
+            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No se pudo declarar", linea, columna));
+        }
+        Object setvalor = valor.getValor(e);
+        if (setvalor instanceof Errores) {
+            Globales.VarGlobales.getInstance().AgregarEU((Errores) setvalor);
+        }
+        if (valor.getTipo(e).tp == Tipos.NULO) {
             //cuando es nulo
-        }else if(isPrimitive(e)){
+
+        } else if (isPrimitive(e)) {
             //se crea el arreglo con los nuevos valores
-        }else{
-            //el vector va a cambiar
+            /*
+            Reglas--------------
+            primero ver si no existe antes para reasignar valor
+            agregarla a la tabla
+             */
+            if (e.ExisteVariable(id.getVal())) {
+                //se reasigna
+            } else {
+                //arreglo nuevo
+                LinkedList<Object> datos = new LinkedList<>();
+                Literal nueva = new Literal(setvalor, valor.getTipo(e), linea, columna);
+                datos.add(nueva);
+                Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), valor.getTipo(e), datos);
+                e.add(id.getVal(),nuevo);
+            }
+        } else {
+            //el vector va a cambiar cuando son una lista de valores
         }
         return null;
     }
@@ -48,8 +76,9 @@ public class DecAsig implements Instruccion {
     public int columna() {
         return this.columna;
     }
-    private boolean isPrimitive(Entorno e){
-        if(valor.getTipo(e).tp==Tipos.VECTOR){
+
+    private boolean isPrimitive(Entorno e) {
+        if (valor.getTipo(e).tp == Tipos.VECTOR) {
             return false;
         }
         return true;

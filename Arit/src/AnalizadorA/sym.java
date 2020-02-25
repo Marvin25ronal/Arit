@@ -8,40 +8,43 @@ package AnalizadorA;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int MENOS = 18;
-  public static final int AND = 10;
-  public static final int PYCOMA = 31;
-  public static final int MENOR = 13;
   public static final int DOSPUNTOS = 24;
-  public static final int IGUAL = 30;
-  public static final int OR = 8;
-  public static final int MAYOR_I = 12;
-  public static final int LLAV_C = 3;
-  public static final int NOT = 9;
-  public static final int LLAV_A = 2;
-  public static final int POTENCIA = 22;
-  public static final int PAR_C = 7;
-  public static final int UMENOS = 29;
-  public static final int MODULO = 21;
-  public static final int PAR_A = 6;
-  public static final int COR_C = 5;
-  public static final int BOOLEANO = 28;
-  public static final int ID = 25;
-  public static final int POR = 20;
-  public static final int COR_A = 4;
-  public static final int STRING = 27;
-  public static final int IGUAL_IGUAL = 16;
   public static final int DISTINTO = 15;
-  public static final int MAYOR = 11;
-  public static final int EOF = 0;
-  public static final int DIV = 19;
-  public static final int PRINT = 32;
-  public static final int error = 1;
-  public static final int PREGUNTA = 23;
-  public static final int NULO = 34;
-  public static final int INTEGER = 33;
+  public static final int POR = 20;
+  public static final int INTEGER = 32;
   public static final int NUMERIC = 26;
+  public static final int NOT = 9;
+  public static final int AND = 10;
+  public static final int IGUAL = 29;
+  public static final int OR = 8;
+  public static final int PREGUNTA = 23;
+  public static final int DIV = 19;
+  public static final int IF = 36;
+  public static final int UMENOS = 28;
+  public static final int LLAV_C = 3;
+  public static final int IGUAL_IGUAL = 16;
+  public static final int ID = 25;
+  public static final int LLAV_A = 2;
+  public static final int PYCOMA = 30;
+  public static final int EOF = 0;
+  public static final int TRUE = 34;
+  public static final int error = 1;
+  public static final int MAYOR_I = 12;
+  public static final int NULO = 33;
+  public static final int MODULO = 21;
+  public static final int MENOS = 18;
+  public static final int MENOR = 13;
+  public static final int PAR_C = 7;
   public static final int MENOR_I = 14;
+  public static final int PAR_A = 6;
+  public static final int MAYOR = 11;
+  public static final int POTENCIA = 22;
+  public static final int ELSE = 37;
+  public static final int STRING = 27;
+  public static final int COR_C = 5;
+  public static final int FALSE = 35;
+  public static final int COR_A = 4;
+  public static final int PRINT = 31;
   public static final int MAS = 17;
   public static final String[] terminalNames = new String[] {
   "EOF",
@@ -72,13 +75,16 @@ public class sym {
   "ID",
   "NUMERIC",
   "STRING",
-  "BOOLEANO",
   "UMENOS",
   "IGUAL",
   "PYCOMA",
   "PRINT",
   "INTEGER",
-  "NULO"
+  "NULO",
+  "TRUE",
+  "FALSE",
+  "IF",
+  "ELSE"
   };
 }
 

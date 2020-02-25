@@ -15,9 +15,10 @@ public abstract class Simbolo {
 
     private TipoExp tipo;
     private TipoExp tiposecundario;
-
-    public Simbolo(TipoExp tipo, TipoExp tiposecundario) {
+    private String id;
+    public Simbolo(TipoExp tipo, TipoExp tiposecundario,String id) {
         this.tipo = tipo;
+        this.id=id;
         this.tiposecundario = tiposecundario;
     }
 
@@ -47,6 +48,20 @@ public abstract class Simbolo {
      */
     public void setTiposecundario(TipoExp tiposecundario) {
         this.tiposecundario = tiposecundario;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

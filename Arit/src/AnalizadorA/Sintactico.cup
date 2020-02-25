@@ -14,6 +14,11 @@ import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
 import Operaciones.Logicas;
 import Operaciones.Relacional;
+import Instruccion.DecAsig;
+import Expresion.Identificador;
+import Operaciones.Ternarias;
+import Operaciones.Unarias;
+import Control.*;
 parser code 
 {://Codigo visible
     
@@ -39,15 +44,17 @@ action code
 :}
 terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
-terminal String ID,NUMERIC,STRING,BOOLEANO,UMENOS;
+terminal String ID,NUMERIC,STRING,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
-terminal String INTEGER,NULO;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE;
 
 non terminal AST INICIO;
-non terminal Expresion ASIGNACION,EXP;
+non terminal Expresion EXP;
 non terminal LinkedList<Nodo>CUERPO;
-non terminal String CONTROLES,BLOQUE;
-non terminal Instruccion IMPRIMIR,FUNCIONES;
+non terminal LinkedList<Nodo> BLOQUE;
+non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH;
+non terminal LinkedList<Instruccion>LIFS;
+
 precedence right IGUAL;
 precedence right PREGUNTA,DOSPUNTOS;
 precedence left OR;
@@ -73,25 +80,25 @@ start with INICIO;
 
 INICIO::= CUERPO:a{:AST arbol=new AST(a);ast=arbol;:};
 
-CUERPO::=ASIGNACION
-	|CUERPO ASIGNACION
-	|CONTROLES
-	|CUERPO CONTROLES
-	|BLOQUE
-	|CUERPO BLOQUE
+CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
+	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
+	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
 	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
 	;
 
-ASIGNACION::=ID IGUAL EXP
-	|ID IGUAL EXP PYCOMA
+ASIGNACION::=ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	|ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
 	;
 /*
 █▀▀ ▀▄▀ █▀█ █▀█ █▀▀ █▀ █ █▀█ █▄░█
 ██▄ █░█ █▀▀ █▀▄ ██▄ ▄█ █ █▄█ █░▀█
 */
 EXP::=
-	MENOS EXP {: :}%prec UMENOS
+	MENOS:a EXP:b {:RESULT=new Unarias(b,null,Operacion.Operador.RESTA,aleft+1,aright+1);:}%prec UMENOS
 	|EXP:a MAS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.SUMA,aleft+1,aright+1);:}
 	|EXP:a MENOS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.RESTA,aleft+1,aright+1);:}
 	|EXP:a POR EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MULTIPLICACION,aleft+1,aright+1);:}
@@ -99,7 +106,7 @@ EXP::=
 	|EXP:a POTENCIA EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,aleft+1,aright+1);:}
 	|EXP:a MODULO EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MODULO,aleft+1,aright+1);:}
 	
-	|NOT EXP
+	|NOT:a EXP:b{:RESULT=new Unarias(b,null,Operacion.Operador.NOT,aleft+1,aright+1);:}
 	|EXP:a OR EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.OR,aleft+1,aright+1);:}
 	|EXP:a AND EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.AND,aleft+1,aright+1);:}
 	|EXP:a MENOR EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR,aleft+1,aright+1);:}
@@ -107,15 +114,16 @@ EXP::=
 	|EXP:a MENOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR_IGUAL,aleft+1,aright+1);:}
 	|EXP:a MAYOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MAYOR_IGUAL,aleft+1,aright+1);:}
 	|EXP:a IGUAL_IGUAL EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.IGUAL_IGUAL,aleft+1,aright+1);:}
-	|EXP DISTINTO EXP
-	|EXP PREGUNTA EXP DOSPUNTOS EXP
+	|EXP:a DISTINTO EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.DISTINTO,aleft+1,aright+1);:}
+	|EXP:c PREGUNTA:p EXP:a DOSPUNTOS EXP:b{:RESULT=new Ternarias(c,a,b,pleft+1,pright+1);:}
 
 	|PAR_A EXP:a PAR_C{:RESULT=a;:}
-	|ID
+	|ID:a{:RESULT=new Identificador(a,aleft+1,aright+1);:}
 	|NUMERIC:a{:RESULT=new Literal(a,new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
 	|STRING:a{:RESULT=new Literal(a.toString().replace("\"",""),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
 	|INTEGER:a{:RESULT=new Literal(a,new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
-	|BOOLEANO:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
+	|TRUE:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
+	|FALSE:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	|NULO:a{:RESULT=new Nulo(aleft+1,aright+1);:}
 	;
 
@@ -131,4 +139,29 @@ FUNCIONES::=
 IMPRIMIR::=
 	PRINT:a PAR_A EXP:b PAR_C{:RESULT=new Print(b,aleft+1,aright+1);:}
 	|PRINT:a PAR_A PAR_C{:RESULT=new Print(new Literal("",new TipoExp(Tipos.STRING),aleft+1,aright+1),aleft+1,aright+1);:} 
+	;
+BLOQUE::=
+	LLAV_A CUERPO:l LLAV_C{:RESULT=l;:}
+	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
+	;
+/*
+░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
+██╔══██╗██╔══██╗████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
+██║░░╚═╝██║░░██║██╔██╗██║░░░██║░░░██████╔╝██║░░██║██║░░░░░
+██║░░██╗██║░░██║██║╚████║░░░██║░░░██╔══██╗██║░░██║██║░░░░░
+╚█████╔╝╚█████╔╝██║░╚███║░░░██║░░░██║░░██║╚█████╔╝███████╗
+░╚════╝░░╚════╝░╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░╚══════╝
+*/
+CONTROLES::=
+	CONTROL_IF:a{:RESULT=a;:}
+	|CONTROL_SWITCH
+	;
+CONTROL_IF::=
+	IF:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new IF(e,b,null,aleft+1,aright+1);:}
+	|IF:a PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:RESULT=new IF(e,b,l,aleft+1,aright+1);:}
+	;
+LIFS::=
+	ELSE:a IF PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:l.addFirst(new ElseIf(e,b,aleft+1,aright+1));RESULT=l;:}
+	|ELSE:as IF PAR_A EXP:e PAR_C BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new ElseIf(e,b,asleft+1,asright+1));RESULT=a;:}
+	|ELSE:as BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new Else(b,asleft+1,asright+1));RESULT=a;:}
 	;
