@@ -11,7 +11,9 @@ public class sym {
   public static final int DOSPUNTOS = 24;
   public static final int DISTINTO = 15;
   public static final int POR = 20;
+  public static final int CASE = 41;
   public static final int INTEGER = 32;
+  public static final int CONTINUE = 40;
   public static final int NUMERIC = 26;
   public static final int NOT = 9;
   public static final int AND = 10;
@@ -35,11 +37,14 @@ public class sym {
   public static final int MENOS = 18;
   public static final int MENOR = 13;
   public static final int PAR_C = 7;
+  public static final int BREAK = 39;
   public static final int MENOR_I = 14;
   public static final int PAR_A = 6;
+  public static final int SWITCH = 38;
   public static final int MAYOR = 11;
   public static final int POTENCIA = 22;
   public static final int ELSE = 37;
+  public static final int DEFAULT = 42;
   public static final int STRING = 27;
   public static final int COR_C = 5;
   public static final int FALSE = 35;
@@ -84,7 +89,12 @@ public class sym {
   "TRUE",
   "FALSE",
   "IF",
-  "ELSE"
+  "ELSE",
+  "SWITCH",
+  "BREAK",
+  "CONTINUE",
+  "CASE",
+  "DEFAULT"
   };
 }
 

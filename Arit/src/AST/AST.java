@@ -42,7 +42,7 @@ public class AST {
         Globales.VarGlobales.getInstance().getConsola().append("Salida--------\n");
         for (Nodo n : getAcciones()) {
             if (n instanceof Instruccion) {
-                Object result = ((Instruccion) ((Instruccion) n).ejecutar(global));
+                Object result = (((Instruccion) n).ejecutar(global));
                 if (result instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
                 } else if (result instanceof Control.Continue) {
