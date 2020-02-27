@@ -46,14 +46,16 @@ terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
 terminal String ID,NUMERIC,STRING,UMENOS;
 terminal String IGUAL,PYCOMA,PRINT;
-terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT;
 
 non terminal AST INICIO;
 non terminal Expresion EXP;
-non terminal LinkedList<Nodo>CUERPO;
+non terminal LinkedList<Nodo>CUERPO,CUERPOINTERNO;
 non terminal LinkedList<Nodo> BLOQUE;
-non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH;
-non terminal LinkedList<Instruccion>LIFS;
+non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS;
+non terminal LinkedList<Instruccion>LIFS,LCASE;
+non terminal Expresion ACCESOARREGLO;
+non terminal LinkedList<Expresion> LCORCHETES;
 
 precedence right IGUAL;
 precedence right PREGUNTA,DOSPUNTOS;
@@ -88,8 +90,21 @@ CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RES
 	|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
 	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
+	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
 	;
-
+CUERPOINTERNO::=
+	ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPOINTERNO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
+	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+	|CUERPOINTERNO:c CONTROLES:b{:c.add(b);RESULT=c;:}
+	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	|CUERPOINTERNO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
+	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPOINTERNO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
+	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPOINTERNO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
+	;
 ASIGNACION::=ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
 	|ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
 	;
@@ -125,6 +140,8 @@ EXP::=
 	|TRUE:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	|FALSE:a{:RESULT=new Literal(a,new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	|NULO:a{:RESULT=new Nulo(aleft+1,aright+1);:}
+
+	|ACCESOARREGLO:a{:RESULT=a;:}
 	;
 
 /*
@@ -141,7 +158,7 @@ IMPRIMIR::=
 	|PRINT:a PAR_A PAR_C{:RESULT=new Print(new Literal("",new TipoExp(Tipos.STRING),aleft+1,aright+1),aleft+1,aright+1);:} 
 	;
 BLOQUE::=
-	LLAV_A CUERPO:l LLAV_C{:RESULT=l;:}
+	LLAV_A CUERPOINTERNO:l LLAV_C{:RESULT=l;:}
 	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
 	;
 /*
@@ -154,7 +171,7 @@ BLOQUE::=
 */
 CONTROLES::=
 	CONTROL_IF:a{:RESULT=a;:}
-	|CONTROL_SWITCH
+	|CONTROL_SWITCH:a{:RESULT=a;:}
 	;
 CONTROL_IF::=
 	IF:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new IF(e,b,null,aleft+1,aright+1);:}
@@ -164,4 +181,32 @@ LIFS::=
 	ELSE:a IF PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:l.addFirst(new ElseIf(e,b,aleft+1,aright+1));RESULT=l;:}
 	|ELSE:as IF PAR_A EXP:e PAR_C BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new ElseIf(e,b,asleft+1,asright+1));RESULT=a;:}
 	|ELSE:as BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new Else(b,asleft+1,asright+1));RESULT=a;:}
+	;
+CONTROL_SWITCH::=
+	SWITCH:i PAR_A EXP:e PAR_C LLAV_A LCASE:l LLAV_C{:RESULT=new Switch(e,l,ileft+1,iright+1);:}
+	|SWITCH:i PAR_A EXP:e PAR_C LLAV_A LLAV_C{:RESULT=new Switch(e,new LinkedList<Instruccion>(),ileft+1,iright+1);:}
+	;
+LCASE::=
+	CASE:i EXP:e DOSPUNTOS CUERPOINTERNO:c LCASE:l{:l.addFirst(new Case(e,c,ileft+1,iright+1));RESULT=l;:}
+	|CASE:i EXP:e DOSPUNTOS LCASE:l{:l.addFirst(new Case(e,new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=l;:}
+	|CASE:i EXP:e DOSPUNTOS CUERPOINTERNO:c{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Case(e,c,ileft+1,iright+1));RESULT=lista;:}
+	|CASE:i EXP:e DOSPUNTOS{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Case(e,new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=lista;:}
+	|DEFAULT:i DOSPUNTOS CUERPOINTERNO:l{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Else(l,ileft+1,iright+1));RESULT=lista;:}
+	|DEFAULT:i DOSPUNTOS{:LinkedList<Instruccion>lista=new LinkedList<>();lista.add(new Else(new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=lista;:}
+	;
+TRANSFERENCIAS::=
+	BREAK:a PYCOMA{:RESULT=new Break(aleft+1,aright+1);:}
+	|BREAK:a {:RESULT=new Break(aleft+1,aright+1);:}
+	|CONTINUE:a PYCOMA{:RESULT=new Continue(aleft+1,aright+1);:}
+	|CONTINUE:a{:RESULT=new Continue(aleft+1,aright+1);:}
+	;
+
+ACCESOARREGLO::=
+	ID:a LCORCHETES:l{:RESULT=new Acceso(new Identificador(a,aleft+1,aright+1),l,aleft+1,aright+1);:}
+	;
+LCORCHETES::=
+	COR_A:a EXP:e COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.add(new AccesoUnico(e,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a EXP:e COR_C LCORCHETES:l{:l.add(new AccesoUnico(e,aleft+1,aright+1));RESULT=l;:}
+	|COR_A:a COR_A EXP:e COR_C COR_C
+	|COR_A:a COR_A EXP:e COR_C COR_C LCORCHETES
 	;

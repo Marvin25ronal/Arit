@@ -7,7 +7,9 @@ package Control;
 
 import AST.Nodo;
 import Entorno.Entorno;
+import Expresion.Expresion;
 import Instruccion.Instruccion;
+import Reportes.Errores;
 import java.util.LinkedList;
 
 /**
@@ -27,17 +29,38 @@ public class Else implements Instruccion {
 
     @Override
     public Object ejecutar(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Entorno global = new Entorno(e);
+        if (sentencias == null) {
+            return null;
+        }
+        for (Nodo n : sentencias) {
+            if (n instanceof Instruccion) {
+                Object result = ((Instruccion) n).ejecutar(global);
+                if (result instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU((Errores) result);
+                } else if (result != null) {
+                    return result;
+                }
+            } else if (n instanceof Expresion) {
+                Object exp = ((Expresion) n).getValor(global);
+                if (exp instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU((Errores) exp);
+                } else if (exp != null) {
+                    return exp;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     public int linea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.linea;
     }
 
     @Override
     public int columna() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.columna;
     }
 
     /**

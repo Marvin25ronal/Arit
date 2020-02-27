@@ -30,7 +30,7 @@ public class Bloque implements Instruccion {
         //Globales.VarGlobales.getInstance().getConsola().append("Salida--------\n");
         for (Nodo n : getAcciones()) {
             if (n instanceof Instruccion) {
-                Object result = ((Instruccion) ((Instruccion) n).ejecutar(global));
+                Object result = (((Instruccion) n).ejecutar(global));
                 if (result instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
                 } else if (result != null) {
@@ -42,7 +42,7 @@ public class Bloque implements Instruccion {
                 Object result = exp.getValor(global);
                 if (result instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
-                } else if(result !=null){
+                } else if (result != null) {
                     return result;
                 }
             }

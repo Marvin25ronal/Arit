@@ -5,13 +5,23 @@
  */
 package Control;
 
+import Entorno.Entorno;
+import Instruccion.Instruccion;
+
 /**
  *
  * @author marvi
  */
-public class Break {
+public class Break implements Instruccion {
+
     private int linea;
     private int columna;
+
+    public Break(int linea, int columna) {
+        this.linea = linea;
+        this.columna = columna;
+    }
+    
 
     /**
      * @return the linea
@@ -39,5 +49,20 @@ public class Break {
      */
     public void setColumna(int columna) {
         this.columna = columna;
+    }
+
+    @Override
+    public Object ejecutar(Entorno e) {
+        return this;
+    }
+
+    @Override
+    public int linea() {
+        return this.linea;
+    }
+
+    @Override
+    public int columna() {
+        return this.columna;
     }
 }

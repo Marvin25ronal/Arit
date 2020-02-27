@@ -5,13 +5,22 @@
  */
 package Control;
 
+import Entorno.Entorno;
+import Instruccion.Instruccion;
+
 /**
  *
  * @author marvi
  */
-public class Continue {
+public class Continue implements Instruccion {
+
     private int linea;
     private int columna;
+
+    public Continue(int linea, int columna) {
+        this.linea = linea;
+        this.columna = columna;
+    }
 
     /**
      * @return the linea
@@ -39,5 +48,20 @@ public class Continue {
      */
     public void setColumna(int columna) {
         this.columna = columna;
+    }
+
+    @Override
+    public Object ejecutar(Entorno e) {
+        return this;
+    }
+
+    @Override
+    public int linea() {
+        return this.linea;
+    }
+
+    @Override
+    public int columna() {
+        return this.columna;
     }
 }

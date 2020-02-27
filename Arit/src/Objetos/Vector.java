@@ -19,6 +19,9 @@ public class Vector extends Simbolo {
     /**
      * @return the tam
      */
+    private LinkedList<Object> dimensiones;
+    private int tam;
+
     public int getTam() {
         return tam;
     }
@@ -29,9 +32,6 @@ public class Vector extends Simbolo {
     public void setTam(int tam) {
         this.tam = tam;
     }
-
-    private LinkedList<Object> dimensiones;
-    private int tam;
 
     /**
      * @return the id
@@ -62,12 +62,12 @@ public class Vector extends Simbolo {
 
     @Override
     public String toString() {
-        StringBuilder cadena=new StringBuilder();
+        StringBuilder cadena = new StringBuilder();
         cadena.append("[");
-        for(int i=0;i<dimensiones.size();i++){
-            Literal l=(Literal) dimensiones.get(i);
+        for (int i = 0; i < dimensiones.size(); i++) {
+            Literal l = (Literal) dimensiones.get(i);
             cadena.append(l.valor);
-            if(i<dimensiones.size()-1){
+            if (i < dimensiones.size() - 1) {
                 cadena.append(",");
             }
         }

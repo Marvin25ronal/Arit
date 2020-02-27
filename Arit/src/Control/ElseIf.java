@@ -9,6 +9,7 @@ import AST.Nodo;
 import Entorno.Entorno;
 import Instruccion.Instruccion;
 import Expresion.Expresion;
+import Reportes.Errores;
 import java.util.LinkedList;
 
 /**
@@ -21,26 +22,49 @@ public class ElseIf implements Instruccion {
     private LinkedList<Nodo> sentencias;
     private int linea;
     private int columna;
-    public ElseIf(Expresion condicion, LinkedList<Nodo> sentencias,int linea,int columna) {
+
+    public ElseIf(Expresion condicion, LinkedList<Nodo> sentencias, int linea, int columna) {
         this.condicion = condicion;
         this.sentencias = sentencias;
-        this.linea=linea;
-        this.columna=columna;
+        this.linea = linea;
+        this.columna = columna;
     }
 
     @Override
     public Object ejecutar(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Entorno global = new Entorno(e);
+        if (sentencias == null) {
+            return null;
+        }
+        for (Nodo n : sentencias) {
+            if (n instanceof Instruccion) {
+                Object result = ((Instruccion) n).ejecutar(global);
+                if (result instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU((Errores) result);
+                } else if (result != null) {
+                    return result;
+                }
+            } else if (n instanceof Expresion) {
+                Object result = ((Expresion) n).getValor(global);
+                if (result instanceof Errores) {
+                    Globales.VarGlobales.getInstance().AgregarEU((Errores) result);
+                } else if (result != null) {
+                    return result;
+                }
+
+            }
+        }
+        return null;
     }
 
     @Override
     public int linea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.linea;
     }
 
     @Override
     public int columna() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.columna;
     }
 
     /**

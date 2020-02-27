@@ -61,7 +61,10 @@ TRUE="true"
 FALSE="false"
 IF="if"
 ELSE="else"
-
+SWITCH="switch"
+CASE="case"
+BREAK="break"
+DEFAULT="default"
 /*
 ████████╗██╗██████╗░░█████╗░░██████╗
 ╚══██╔══╝██║██╔══██╗██╔══██╗██╔════╝
@@ -101,6 +104,7 @@ ENTER=[\ \n]
 <YYINITIAL>{IGUAL}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IGUAL,yyline,yycolumn,yytext());}
 <YYINITIAL>{IGUAL_IGUAL}        {System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IGUAL_IGUAL,yyline,yycolumn,yytext());}
 <YYINITIAL>{MENOR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOR,yyline,yycolumn,yytext());}
+<YYINITIAL>{MAYOR}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAYOR,yyline,yycolumn,yytext());}
 <YYINITIAL>{MAYOR_I}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAYOR_I,yyline,yycolumn,yytext());}
 <YYINITIAL>{MENOR_I}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MENOR_I,yyline,yycolumn,yytext());}
 <YYINITIAL>{MAS}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.MAS,yyline,yycolumn,yytext());}
@@ -125,6 +129,10 @@ ENTER=[\ \n]
 <YYINITIAL>{IF}        			{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IF,yyline,yycolumn,yytext());}
 <YYINITIAL>{ELSE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.ELSE,yyline,yycolumn,yytext());}
 <YYINITIAL>{NULO}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.NULO,yyline,yycolumn,yytext());}
+<YYINITIAL>{SWITCH}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.SWITCH,yyline,yycolumn,yytext());}
+<YYINITIAL>{CASE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.CASE,yyline,yycolumn,yytext());}
+<YYINITIAL>{BREAK}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.BREAK,yyline,yycolumn,yytext());}
+<YYINITIAL>{DEFAULT}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DEFAULT,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
 <YYINITIAL>{ID}        			{System.out.println("Token ID "+yytext()+" reconocido"); return new Symbol(sym.ID,yyline,yycolumn,yytext());}
