@@ -6,6 +6,7 @@
 package Instruccion;
 
 import Entorno.Entorno;
+import Entorno.Simbolo;
 import Expresion.Expresion;
 import Expresion.Identificador;
 import Expresion.Literal;
@@ -41,7 +42,8 @@ public class DecAsig implements Instruccion {
         if (setvalor instanceof Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Errores) setvalor);
         }
-        if (valor.getTipo(e).tp == Tipos.NULO) {
+        TipoExp t = valor.getTipo(e);
+        if (t.tp == Tipos.NULO) {
             //cuando es nulo
 
         } else if (isPrimitive(e)) {
@@ -53,18 +55,64 @@ public class DecAsig implements Instruccion {
              */
             if (e.ExisteVariable(id.getVal())) {
                 //se reasigna
+                ReasignarVector_Primitivo(e, setvalor, t);
             } else {
                 //arreglo nuevo
-                LinkedList<Object> datos = new LinkedList<>();
-                Literal nueva = new Literal(setvalor, valor.getTipo(e), linea, columna);
-                datos.add(nueva);
-                Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), valor.getTipo(e), datos);
-                e.add(id.getVal(),nuevo);
+                CrearNuevoVector_Primitivo(e, setvalor, t);
             }
         } else {
             //el vector va a cambiar cuando son una lista de valores
+            if (t.isVector()) {
+                if (e.ExisteVariable(id.getVal())) {
+                    ReasignarVector_Vector(e, setvalor, t);
+                } else {
+                    CrearNuevoVector_Vector(e, setvalor, t);
+                }
+            }
         }
         return null;
+    }
+
+    private void CrearNuevoVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
+        LinkedList<Object> datos = new LinkedList<>();
+        Literal nueva = new Literal(setvalor, t, linea, columna);
+        datos.add(nueva);
+        Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        e.add(id.getVal(), nuevo);
+    }
+
+    private void ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
+        //Verificar si es un vector
+        Simbolo s = e.get(id.getVal());
+        if (s.getTipo().tp == Tipos.VECTOR) {
+            Vector v = (Vector) s;
+            LinkedList<Object> datos = new LinkedList<>();
+            Literal nueva = new Literal(setvalor, t, linea, columna);
+            datos.add(nueva);
+            v.setTipo(new TipoExp(Tipos.VECTOR));
+            v.setTiposecundario(t);
+            v.setDimensiones(datos);
+
+        }
+    }
+
+    private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
+        Vector v = (Vector) setvalor;
+        LinkedList<Object> datos = (LinkedList<Object>) v.getDimensiones().clone();
+        Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        e.add(id.getVal(), nuevo);
+    }
+
+    private void ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t) {
+        Simbolo s = e.get(id.getVal());
+        //a un vector solo se le puede asignar un vector
+        Vector v = (Vector) s;
+        Vector aux = (Vector) setvalor;
+        LinkedList<Object> datos = new LinkedList<>(aux.getDimensiones());
+        v.setDimensiones(datos);
+        v.setTipo(new TipoExp(Tipos.VECTOR));
+        v.setTiposecundario(aux.getTiposecundario());
+        v.setDimensiones(datos);
     }
 
     @Override

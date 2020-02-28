@@ -5,6 +5,8 @@
  */
 package Expresion;
 
+import Entorno.Entorno;
+
 /**
  *
  * @author marvi
@@ -12,32 +14,22 @@ package Expresion;
 public class TipoExp {
 
     public enum Tipos {
-        INTEGER, BOOLEAN, STRING, NUMERIC, NULO,VECTOR
+        INTEGER, BOOLEAN, STRING, NUMERIC, NULO, VECTOR
     }
     public Tipos tp;
-    public String tr = "";
 
     public TipoExp(Tipos tp) {
         this.tp = tp;
     }
 
-    public TipoExp(String tr) {
-        this.tr = tr;
-    }
-
-    public TipoExp(Tipos tp, String tr) {
-        this.tp = tp;
-        this.tr = tr;
-    }
-
     public boolean isNumeric() {
-        return  tp == Tipos.NUMERIC;
+        return tp == Tipos.NUMERIC;
     }
-    public boolean esNumero(){
-        return tp==Tipos.INTEGER||tp==Tipos.NUMERIC;
+
+    public boolean esNumero() {
+        return tp == Tipos.INTEGER || tp == Tipos.NUMERIC;
     }
-    
-    
+
     public boolean isBoolean() {
         return tp == Tipos.BOOLEAN;
     }
@@ -49,8 +41,20 @@ public class TipoExp {
     public boolean isInt() {
         return tp == Tipos.INTEGER;
     }
-    public boolean isNulo(){
-        return tp==Tipos.NULO;
+
+    public boolean isNulo() {
+        return tp == Tipos.NULO;
+    }
+
+    public boolean isVector() {
+        return tp == Tipos.VECTOR;
+    }
+
+    public boolean isPrimitive(Entorno e) {
+        if (tp == Tipos.VECTOR) {
+            return false;
+        }
+        return true;
     }
 
 }

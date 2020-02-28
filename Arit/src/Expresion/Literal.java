@@ -6,6 +6,7 @@
 package Expresion;
 
 import Entorno.Entorno;
+import Objetos.Nulo;
 
 /**
  *
@@ -24,9 +25,12 @@ public class Literal implements Expresion {
         this.linea = linea;
         this.columna = columna;
     }
-    
+
     @Override
     public Object getValor(Entorno e) {
+        /*if (valor instanceof Nulo) {
+            return ((Nulo) valor).getValor(e);
+        }*/
         return this.valor;
     }
 
