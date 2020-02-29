@@ -36,8 +36,10 @@ public class AsignacionPosicion implements Instruccion {
     @Override
     public Object ejecutar(Entorno e) {
         Acceso ac = (Acceso) acc;
-        ac.setIncremento(true);
         TipoExp tvalor = valor.getTipo(e);
+        if(ac.getIndices().size()==1){
+            ac.setIncremento(true);
+        }
         Object obj = ac.getValor(e);
         if (obj instanceof Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Errores) obj);

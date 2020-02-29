@@ -12,6 +12,7 @@ import Expresion.Identificador;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
@@ -45,7 +46,11 @@ public class DecAsig implements Instruccion {
         TipoExp t = valor.getTipo(e);
         if (t.tp == Tipos.NULO) {
             //cuando es nulo
-
+            if (e.ExisteVariable(id.getVal())) {
+                ReasignarVector_Nulo(e);
+            } else {
+                CrearVector_Nulo(e);
+            }
         } else if (isPrimitive(e)) {
             //se crea el arreglo con los nuevos valores
             /*
@@ -81,17 +86,30 @@ public class DecAsig implements Instruccion {
         e.add(id.getVal(), nuevo);
     }
 
+    private void CrearVector_Nulo(Entorno e) {
+        LinkedList<Object> datos = new LinkedList<>();
+        Literal nueva = new Literal(new Nulo(linea, columna), new TipoExp(Tipos.NULO), linea, columna);
+        datos.add(nueva);
+        Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
+        e.add(id.getVal(), nuevo);
+    }
+
+    private void ReasignarVector_Nulo(Entorno e) {
+        Simbolo s = e.get(id.getVal());
+        LinkedList<Object> datos = new LinkedList<>();
+        Literal nueva = new Literal(new Nulo(linea, columna), new TipoExp(Tipos.NULO), linea, columna);
+        //Vector nuevo=new Vector(id, this, this, dimensiones)
+    }
+
     private void ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
         //Verificar si es un vector
         Simbolo s = e.get(id.getVal());
         if (s.getTipo().tp == Tipos.VECTOR) {
-            Vector v = (Vector) s;
             LinkedList<Object> datos = new LinkedList<>();
             Literal nueva = new Literal(setvalor, t, linea, columna);
             datos.add(nueva);
-            v.setTipo(new TipoExp(Tipos.VECTOR));
-            v.setTiposecundario(t);
-            v.setDimensiones(datos);
+            Vector v = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+            e.Actualizar(id.getVal(), v);
 
         }
     }
@@ -104,15 +122,11 @@ public class DecAsig implements Instruccion {
     }
 
     private void ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t) {
-        Simbolo s = e.get(id.getVal());
         //a un vector solo se le puede asignar un vector
-        Vector v = (Vector) s;
         Vector aux = (Vector) setvalor;
         LinkedList<Object> datos = new LinkedList<>(aux.getDimensiones());
-        v.setDimensiones(datos);
-        v.setTipo(new TipoExp(Tipos.VECTOR));
-        v.setTiposecundario(aux.getTiposecundario());
-        v.setDimensiones(datos);
+        Vector v = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), aux.getTiposecundario(), datos);
+        e.Actualizar(id.getVal(), v);
     }
 
     @Override

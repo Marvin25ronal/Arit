@@ -13,15 +13,15 @@ import java.util.LinkedList;
  * @author marvi
  */
 public class Entorno {
-    
+
     public Entorno padre;
     public HashMap<String, Simbolo> tabla;
-    
+
     public Entorno(Entorno padre) {
         this.padre = padre;
         tabla = new HashMap<>();
     }
-    
+
     public boolean ExisteVariable(String id) {
         for (Entorno e = this; e != null; e = e.getPadre()) {
             Simbolo encontrado = e.tabla.get(id);
@@ -31,17 +31,23 @@ public class Entorno {
         }
         return false;
     }
-    
+
     private Entorno getPadre() {
         return this.padre;
     }
-    
+
     public void add(String id, Simbolo s) {
         tabla.put(id, s);
     }
 
-    public void Remover(String id) {
-        tabla.remove(id);
+    public void Actualizar(String id, Simbolo valor) {
+        for (Entorno e = this; e != null; e = e.getPadre()) {
+            Simbolo encontrado = e.tabla.get(id);
+            if (encontrado != null) {
+                e.tabla.put(id, valor);
+            }
+        }
+
     }
 
     public Simbolo get(String id) {
@@ -53,5 +59,5 @@ public class Entorno {
         }
         return null;
     }
-    
+
 }

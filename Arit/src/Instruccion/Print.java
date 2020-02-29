@@ -49,8 +49,7 @@ public class Print implements Instruccion {
             return null;
         }
         if (val instanceof Nulo) {
-            Errores nuevo = new Errores(Errores.TipoError.SEMANTICO, "Valor NULO", linea, columna);
-            Globales.VarGlobales.getInstance().AgregarEU(nuevo);
+            Globales.VarGlobales.getInstance().getConsola().append(((Nulo) val).toString());
             return null;
         }
         Globales.VarGlobales.getInstance().getConsola().append(val.toString() + "\n");
