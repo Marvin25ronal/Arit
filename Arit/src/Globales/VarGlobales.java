@@ -5,6 +5,8 @@
  */
 package Globales;
 
+import Expresion.Literal;
+import Objetos.Vector;
 import java.util.LinkedList;
 import Reportes.Errores;
 import javax.swing.JTextArea;
@@ -57,10 +59,9 @@ public final class VarGlobales {
     }
 
     public void AgregarEU(Errores e) {
-        this.consola.append(e.toString()+"\n");
+        this.consola.append(e.toString() + "\n");
         this.listaE.add(e);
     }
-    
 
     public String cadE() {
         s.setLength(0);
@@ -68,5 +69,15 @@ public final class VarGlobales {
             s.append(this.listaE.get(i).toString() + "\n");
         }
         return s.toString();
+    }
+
+    public LinkedList<Object> clonarListaVector(LinkedList<Object> referencia, Entorno.Entorno e) {
+        LinkedList<Object> l = new LinkedList<>();
+        for (int i = 0; i < referencia.size(); i++) {
+            Literal aux = (Literal) referencia.get(i);
+            Literal nueva = new Literal(aux.getValor(e), aux.getTipo(e), aux.linea(), aux.columna());
+            l.add(nueva);
+        }
+        return l;
     }
 }

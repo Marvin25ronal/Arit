@@ -60,17 +60,23 @@ public class Acceso implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Simbolo s = e.get(id.getVal());
+        if (s != null) {
+            if (s instanceof Vector) {
+                return ((Vector) s).getTipo();
+            }
+        }
+        return null;
     }
 
     @Override
     public int linea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.linea;
     }
 
     @Override
     public int columna() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.columna;
     }
 
     /**

@@ -11,6 +11,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
@@ -20,24 +21,24 @@ import java.util.LinkedList;
  * @author marvi
  */
 public class AsignacionPosicion implements Instruccion {
-
+    
     private Expresion acc;
     private Expresion valor;
     private int linea;
     private int columna;
-
+    
     public AsignacionPosicion(Expresion acc, Expresion valor, int linea, int columna) {
         this.acc = acc;
         this.valor = valor;
         this.linea = linea;
         this.columna = columna;
     }
-
+    
     @Override
     public Object ejecutar(Entorno e) {
         Acceso ac = (Acceso) acc;
         TipoExp tvalor = valor.getTipo(e);
-        if(ac.getIndices().size()==1){
+        if (ac.getIndices().size() == 1) {
             ac.setIncremento(true);
         }
         Object obj = ac.getValor(e);
@@ -67,28 +68,89 @@ public class AsignacionPosicion implements Instruccion {
          */
         return null;
     }
-
+    
     private Object ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t, Vector v) {
         TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
-        ((Literal) v.getDimensiones().get(0)).valor = setvalor;
+        ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, setvalor, t);
+        ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
+        CastearVector(nuevot, e);
         return null;
     }
-
+    
     private Object ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t, Vector v) {
         if (setvalor instanceof Vector) {
-
+            Vector set = (Vector) setvalor;
+            if (set.getDimensiones().size() == 1) {
+                LinkedList<Object> listaAux = Globales.VarGlobales.getInstance().clonarListaVector(set.getDimensiones(), e);
+                Literal aux = (Literal) listaAux.get(0);//--Retorna un arreglo con un elemento que es una literal
+                TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, aux.getTipo(e));
+                ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, aux.valor, aux.getTipo(e));
+                ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
+                CastearVector(nuevot, e);
+                
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector solo puede contener vectores de tamanio 1", linea, columna);
+            }
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden meter otras estructuras en un vector", linea, columna);
         }
         return null;
     }
-
+    
+    private void CastearVector(TipoExp t, Entorno e) {
+        Vector v = (Vector) e.get(((Acceso) acc).getId().getVal());
+        Literal aux;
+        for (int i = 0; i < v.getDimensiones().size(); i++) {
+            aux = (Literal) v.getDimensiones().get(i);
+            aux.valor = CastearValor(t, aux.getValor(e), aux.getTipo(e));
+            aux.tipo = t;
+        }
+    }
+    
+    private Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
+        if (null != tdestino.tp) {
+            switch (tdestino.tp) {
+                case STRING:
+                    if (valor instanceof Nulo) {
+                        return valor;
+                    } else {
+                        return valor.toString();
+                    }
+                case NUMERIC:
+                    if (valor instanceof Nulo) {
+                        return 0.0;
+                    } else if (torigen.tp == Tipos.BOOLEAN) {
+                        boolean b = Boolean.parseBoolean(valor.toString());
+                        return b ? 1.0 : 0.00;
+                    } else {
+                        return Double.parseDouble(valor.toString());
+                    }
+                case INTEGER:
+                    if (torigen.isBoolean()) {
+                        return Boolean.parseBoolean(valor.toString()) ? 1 : 0;
+                    }
+                    return valor instanceof Nulo ? 0 : Integer.parseInt(valor.toString());
+                case BOOLEAN:
+                    if (valor instanceof Nulo) {
+                        return false;
+                    } else {
+                        return Boolean.parseBoolean(valor.toString());
+                    }
+                default:
+                    break;
+            }
+        }
+        return null;
+    }
+    
     private TipoExp Dominante_Vector(LinkedList<Object> l, Entorno e, TipoExp tul) {
         Literal li = (Literal) l.get(0);
-        if (tul.tp == Tipos.STRING || li.getTipo(e).tp == Tipos.STRING) {
+        if (tul.tp == Tipos.NULO || li.getTipo(e).tp == Tipos.NULO) {
+            return new TipoExp(Tipos.STRING);
+        } else if (tul.tp == Tipos.STRING || li.getTipo(e).tp == Tipos.STRING) {
             return new TipoExp(Tipos.STRING);
         } else if (tul.tp == Tipos.NUMERIC || li.getTipo(e).tp == Tipos.NUMERIC) {
-            return new TipoExp(Tipos.STRING);
+            return new TipoExp(Tipos.NUMERIC);
         } else if (tul.tp == Tipos.INTEGER || li.getTipo(e).tp == Tipos.INTEGER) {
             return new TipoExp(Tipos.INTEGER);
         } else if (tul.tp == Tipos.BOOLEAN && li.getTipo(e).tp == Tipos.BOOLEAN) {
@@ -96,12 +158,12 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-
+    
     @Override
     public int linea() {
         return this.linea;
     }
-
+    
     @Override
     public int columna() {
         return this.columna;
@@ -162,5 +224,5 @@ public class AsignacionPosicion implements Instruccion {
     public void setColumna(int columna) {
         this.columna = columna;
     }
-
+    
 }

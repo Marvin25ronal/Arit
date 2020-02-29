@@ -98,7 +98,9 @@ public class DecAsig implements Instruccion {
         Simbolo s = e.get(id.getVal());
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(new Nulo(linea, columna), new TipoExp(Tipos.NULO), linea, columna);
-        //Vector nuevo=new Vector(id, this, this, dimensiones)
+        datos.add(nueva);
+        Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
+        e.Actualizar(id.getVal(), nuevo);
     }
 
     private void ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
@@ -116,7 +118,7 @@ public class DecAsig implements Instruccion {
 
     private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
         Vector v = (Vector) setvalor;
-        LinkedList<Object> datos = (LinkedList<Object>) v.getDimensiones().clone();
+        LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), t, datos);
         e.add(id.getVal(), nuevo);
     }
@@ -124,7 +126,7 @@ public class DecAsig implements Instruccion {
     private void ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t) {
         //a un vector solo se le puede asignar un vector
         Vector aux = (Vector) setvalor;
-        LinkedList<Object> datos = new LinkedList<>(aux.getDimensiones());
+        LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
         Vector v = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), aux.getTiposecundario(), datos);
         e.Actualizar(id.getVal(), v);
     }
