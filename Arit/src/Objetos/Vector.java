@@ -20,26 +20,20 @@ public class Vector extends Simbolo {
      * @return the tam
      */
     private LinkedList<Object> dimensiones;
-    private int tam;
 
     public int getTam() {
-        return tam;
+        return dimensiones.size();
     }
 
     /**
      * @param tam the tam to set
      */
-    public void setTam(int tam) {
-        this.tam = tam;
-    }
-
     /**
      * @return the id
      */
     public Vector(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
         super(tipo, tipoprimitivo, id);
         this.dimensiones = dimensiones;
-        this.tam = dimensiones.size();
 
     }
 

@@ -10,7 +10,9 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Vector;
 import Reportes.Errores;
+import java.util.LinkedList;
 
 /**
  *
@@ -51,7 +53,11 @@ public class Unarias extends Operacion {
         } else {
             //comparamos vectores
             if (tip.tp == Tipos.VECTOR) {
-
+                if (op == Operador.NOT) {
+                    return NotVectores((Vector) valor, e);
+                } else {
+                    return MenosVectores((Vector) valor, e);
+                }
             } else {
                 if (tip.esNumero() && (Double.parseDouble(valor.toString()) % 1 != 0)) {
                     tip.tp = TipoExp.Tipos.NUMERIC;
@@ -78,8 +84,44 @@ public class Unarias extends Operacion {
             }
 
         }
-        return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion Unarios", linea, columna);
+        //return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion Unarios", linea, columna);
 
+    }
+
+    private Object MenosVectores(Vector v, Entorno e) {
+        LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
+        LinkedList<Object> NuevoVal = new LinkedList<>();
+        Literal l = null;
+        Object aux = null;
+        for (int i = 0; i < lista.size(); i++) {
+            l = (Literal) lista.get(i);
+            aux = new Unarias(l,null, op, linea, columna).val(e);
+            if (aux instanceof Errores) {
+                ((Errores) aux).setMensaje("No se pudo hacer Not con  el arreglo, por los tipos que no son booleanos");
+                return aux;
+            }
+            NuevoVal.add(aux);
+        }
+        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
+        return nuevo;
+    }
+
+    private Object NotVectores(Vector v, Entorno e) {
+        LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
+        LinkedList<Object> NuevoVal = new LinkedList<>();
+        Literal l = null;
+        Object aux = null;
+        for (int i = 0; i < lista.size(); i++) {
+            l = (Literal) lista.get(i);
+            aux = new Multiplicacion(new Literal(-1, new TipoExp(Tipos.INTEGER), linea, columna), l, Operador.MULTIPLICACION, linea, columna).ejecutar(e);
+            if (aux instanceof Errores) {
+                ((Errores) aux).setMensaje("No se pudo negar el arreglo, por los tipos que no son numericos");
+                return aux;
+            }
+            NuevoVal.add(aux);
+        }
+        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
+        return nuevo;
     }
 
     @Override

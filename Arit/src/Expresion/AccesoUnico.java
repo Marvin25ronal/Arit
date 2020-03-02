@@ -9,6 +9,7 @@ import Entorno.Entorno;
 import Expresion.TipoExp.Tipos;
 import Objetos.Vector;
 import Reportes.Errores;
+import java.util.LinkedList;
 
 /**
  *
@@ -20,6 +21,7 @@ public class AccesoUnico implements Expresion {
     private int linea;
     private int columna;
     private Object objeto;
+    private boolean incremento;
 
     public AccesoUnico(Expresion indice, int linea, int columna) {
         this.indice = indice;
@@ -29,14 +31,28 @@ public class AccesoUnico implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
-        if (indice.getTipo(e).tp != Tipos.INTEGER) {
-            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", linea, columna);
+        Object i = getIndice().getValor(e);
+        if (getIndice().getTipo(e).tp == Tipos.VECTOR) {
+            //solo tenga un valor
+            Vector v = (Vector) i;
+            if (v.getTiposecundario().tp != Tipos.INTEGER) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector no es de tipo INTEGER", linea, columna);
+            }
+            if (v.getDimensiones().size() == 1) {
+
+                indice = (Expresion) v.getDimensiones().get(0);
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
+            }
         }
-        Object i = indice.getValor(e);
+        if (getIndice().getTipo(e).tp != Tipos.INTEGER) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", getLinea(), getColumna());
+        }
+
         if (i instanceof Errores) {
             return i;
         }
-        if (objeto instanceof Vector) {
+        if (getObjeto() instanceof Vector) {
             return AccesoVector(e);
         }
         return null;
@@ -49,12 +65,12 @@ public class AccesoUnico implements Expresion {
 
     @Override
     public int linea() {
-        return this.linea;
+        return this.getLinea();
     }
 
     @Override
     public int columna() {
-        return this.columna;
+        return this.getColumna();
     }
 
     /**
@@ -114,7 +130,59 @@ public class AccesoUnico implements Expresion {
     }
 
     private Object AccesoVector(Entorno e) {
+        Vector v = (Vector) getObjeto();
+        int inde = Integer.parseInt(getIndice().getValor(e).toString());
+        if (inde <= 0) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", getLinea(), getColumna());
+        } else if (inde > v.getTam()) {
+            if (incremento) {
+                return AccesoVectorIncremento(v, inde);
+            }
+            return new Errores(Errores.TipoError.SEMANTICO, "Se paso del indice del vector ", getLinea(), getColumna());
+        }
+        inde--;
+        LinkedList<Object> lista = new LinkedList<Object>();
+        lista.add(v.getDimensiones().get(inde));
+        return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+    }
+
+    private Object AccesoVectorIncremento(Vector v, int inde) {
+        for (int i = v.getTam(); i < inde; i++) {
+            v.getDimensiones().add(ObtenerDefault(v.getTiposecundario()));
+        }
+        inde--;
+        LinkedList<Object> lista = new LinkedList<>();
+        lista.add(v.getDimensiones().get(inde));
+        return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+    }
+
+    private Literal ObtenerDefault(TipoExp t) {
+        switch (t.tp) {
+            case BOOLEAN:
+                return new Literal(false, t, linea, columna);
+            case INTEGER:
+                return new Literal(0, t, linea, columna);
+            case STRING:
+                return new Literal("", t, linea, columna);
+            case NUMERIC:
+                return new Literal(0.0, t, linea, columna);
+
+        }
         return null;
+    }
+
+    /**
+     * @return the incremento
+     */
+    public boolean isIncremento() {
+        return incremento;
+    }
+
+    /**
+     * @param incremento the incremento to set
+     */
+    public void setIncremento(boolean incremento) {
+        this.incremento = incremento;
     }
 
 }

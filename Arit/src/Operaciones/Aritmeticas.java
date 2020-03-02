@@ -41,8 +41,9 @@ public class Aritmeticas extends Operacion {
         if (t1.esNumero() && t2.esNumero() && op == Operador.POTENCIA) {
             return new TipoExp(Tipos.NUMERIC);
         }
-
-        if (t1.isString() || t2.isString()) {
+        if (t1.isVector() || t2.isVector()) {
+            return new TipoExp(Tipos.VECTOR);
+        } else if (t1.isString() || t2.isString()) {
             return new TipoExp(Tipos.STRING);
         } else if (t1.isBoolean() || t2.isBoolean()) {
             return new TipoExp(Tipos.BOOLEAN);

@@ -21,34 +21,38 @@ public class Acceso implements Expresion {
     private LinkedList<Expresion> indices;
     private int linea;
     private int columna;
+    private boolean incremento;
 
     public Acceso(Identificador id, LinkedList<Expresion> indices, int linea, int columna) {
         this.id = id;
         this.indices = indices;
         this.linea = linea;
         this.columna = columna;
+        this.incremento = false;
     }
 
     @Override
     public Object getValor(Entorno e) {
-        Object s = id.getValor(e);
+        Object s = getId().getValor(e);
         if (s instanceof Errores) {
             return s;
         } else if (s instanceof Vector) {
             Object vector = s;
-            for (Expresion exp : indices) {
+            for (Expresion exp : getIndices()) {
                 if (exp instanceof AccesoUnico) {
                     AccesoUnico aux = (AccesoUnico) exp;
                     aux.setObjeto(vector);
+                    aux.setIncremento(incremento);
                     vector = aux.getValor(e);
                 } else if (exp instanceof AccesoDoble) {
-                    return new Errores(Errores.TipoError.SEMANTICO, "El vector no se puede invocar con acceso doble", linea, columna);
+                    return new Errores(Errores.TipoError.SEMANTICO, "El vector no se puede invocar con acceso doble", getLinea(), getColumna());
                 }
-                if(vector instanceof Errores){
+                if (vector instanceof Errores) {
                     return vector;
                 }
 
             }
+            return vector;
         }
         return null;
 
@@ -56,17 +60,23 @@ public class Acceso implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Simbolo s = e.get(id.getVal());
+        if (s != null) {
+            if (s instanceof Vector) {
+                return ((Vector) s).getTipo();
+            }
+        }
+        return null;
     }
 
     @Override
     public int linea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.linea;
     }
 
     @Override
     public int columna() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.columna;
     }
 
     /**
@@ -123,6 +133,20 @@ public class Acceso implements Expresion {
      */
     public void setColumna(int columna) {
         this.columna = columna;
+    }
+
+    /**
+     * @return the incremento
+     */
+    public boolean isIncremento() {
+        return incremento;
+    }
+
+    /**
+     * @param incremento the incremento to set
+     */
+    public void setIncremento(boolean incremento) {
+        this.incremento = incremento;
     }
 
 }

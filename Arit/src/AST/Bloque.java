@@ -26,7 +26,7 @@ public class Bloque implements Instruccion {
 
     @Override
     public Object ejecutar(Entorno e) {
-        Entorno global = new Entorno(null);
+        Entorno global = new Entorno(e);
         //Globales.VarGlobales.getInstance().getConsola().append("Salida--------\n");
         for (Nodo n : getAcciones()) {
             if (n instanceof Instruccion) {

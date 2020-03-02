@@ -25,7 +25,7 @@ public class Nulo implements Expresion.Expresion {
 
     @Override
     public String toString() {
-        return "null";
+        return "NULO";
     }
 
     @Override
