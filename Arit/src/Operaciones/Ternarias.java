@@ -7,8 +7,10 @@ package Operaciones;
 
 import Entorno.Entorno;
 import Expresion.Expresion;
+import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Vector;
 import Reportes.Errores;
 
 /**
@@ -38,6 +40,13 @@ public class Ternarias implements Expresion {
         }
         if (cond.getTipo(e).tp == Tipos.BOOLEAN) {
             return Boolean.parseBoolean(con.toString()) ? isTrue.getValor(e) : isFalse.getValor(e);
+        } else if (cond.getTipo(e).isVector()) {
+            Literal l = (Literal) ((Vector) con).getDimensiones().get(0);
+            if (l.getTipo(e).isBoolean()) {
+                return Boolean.parseBoolean(l.getValor(e).toString()) ? isTrue.getValor(e) : isFalse.getValor(e);
+            } else {
+                return null;
+            }
         } else {
             //validar matrices jajaja
             return new Errores(Errores.TipoError.SEMANTICO, "La condicion tiene que ser de tipo boolean", linea, columna);
@@ -46,13 +55,21 @@ public class Ternarias implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        Object condicion = cond.getValor(e);
+        Entorno aux=e.Copiar();
+        Object condicion = cond.getValor(aux);
         if (condicion instanceof Errores) {
             return null;
         } else if (condicion == null) {
             return null;
+        } else if (condicion instanceof Vector) {
+            Literal l = (Literal) ((Vector) condicion).getDimensiones().get(0);
+            if (l.getTipo(aux).isBoolean()) {
+                return Boolean.parseBoolean(l.getValor(aux).toString()) ? isTrue.getTipo(aux) : isFalse.getTipo(aux);
+            } else {
+                return null;
+            }
         } else {
-            return (boolean) condicion ? isTrue.getTipo(e) : isFalse.getTipo(e);
+            return (boolean) condicion ? isTrue.getTipo(aux) : isFalse.getTipo(aux);
         }
     }
 

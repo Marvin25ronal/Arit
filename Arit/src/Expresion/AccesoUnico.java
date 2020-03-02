@@ -31,11 +31,24 @@ public class AccesoUnico implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
+        Object i = getIndice().getValor(e);
+        if (getIndice().getTipo(e).tp == Tipos.VECTOR) {
+            //solo tenga un valor
+            Vector v = (Vector) i;
+            if (v.getTiposecundario().tp != Tipos.INTEGER) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector no es de tipo INTEGER", linea, columna);
+            }
+            if (v.getDimensiones().size() == 1) {
 
+                indice = (Expresion) v.getDimensiones().get(0);
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
+            }
+        }
         if (getIndice().getTipo(e).tp != Tipos.INTEGER) {
             return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", getLinea(), getColumna());
         }
-        Object i = getIndice().getValor(e);
+
         if (i instanceof Errores) {
             return i;
         }
@@ -148,12 +161,12 @@ public class AccesoUnico implements Expresion {
             case BOOLEAN:
                 return new Literal(false, t, linea, columna);
             case INTEGER:
-                return new Literal(0,t,linea,columna);
+                return new Literal(0, t, linea, columna);
             case STRING:
                 return new Literal("", t, linea, columna);
             case NUMERIC:
-                return new Literal(0.0,t,linea,columna);
-                
+                return new Literal(0.0, t, linea, columna);
+
         }
         return null;
     }

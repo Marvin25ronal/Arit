@@ -38,10 +38,12 @@ public class DecAsig implements Instruccion {
     public Object ejecutar(Entorno e) {
         if (valor == null) {
             Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No se pudo declarar", linea, columna));
+             return null;
         }
         Object setvalor = valor.getValor(e);
         if (setvalor instanceof Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Errores) setvalor);
+            return null;
         }
         TipoExp t = valor.getTipo(e);
         if (t.tp == Tipos.NULO) {

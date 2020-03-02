@@ -78,12 +78,12 @@ public class Identificador implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        Simbolo s = (Simbolo) getValor(e);
-        if (s == null) {
+        Object s = getValor(e);
+        if (s == null|| s instanceof Errores) {
             return null;
 
         }
-        return s.getTipo();
+        return ((Simbolo)s).getTipo();
     }
 
     @Override
