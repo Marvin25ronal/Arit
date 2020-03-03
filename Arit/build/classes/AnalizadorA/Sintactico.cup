@@ -10,6 +10,7 @@ import AST.*;
 import Instruccion.Instruccion;
 import Instruccion.Print;
 import Instruccion.AsignacionPosicion;
+import Instruccion.DecFuncion;
 import Objetos.Nulo;
 import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
@@ -44,19 +45,22 @@ action code
 
 :}
 terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
-terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS;
+terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS,COMA;
 terminal String ID,NUMERIC,STRING,UMENOS;
-terminal String IGUAL,PYCOMA,PRINT;
-terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT;
+terminal String IGUAL,PYCOMA,FUNCTION;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT,RETURN,IGUALMAYOR;
 
 non terminal AST INICIO;
 non terminal Expresion EXP;
 non terminal LinkedList<Nodo>CUERPO,CUERPOINTERNO;
 non terminal LinkedList<Nodo> BLOQUE;
-non terminal Instruccion IMPRIMIR,FUNCIONES,ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS;
+non terminal Nodo ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS,DECFUNCION;
 non terminal LinkedList<Instruccion>LIFS,LCASE;
 non terminal Expresion ACCESOARREGLO;
-non terminal LinkedList<Expresion> LCORCHETES;
+non terminal LinkedList<Expresion> LCORCHETES,LISTAEXPRESION;
+non terminal LinkedList<Object> LISTAPARAMETROS;
+non terminal Expresion LLAMADAS;
+non terminal Nodo RETORNOS;
 
 precedence right IGUAL;
 precedence right PREGUNTA,DOSPUNTOS;
@@ -70,6 +74,7 @@ precedence right NOT;
 precedence right UMENOS;
 precedence left COR_A, COR_C;
 precedence left PAR_A, PAR_C;
+precedence left RETURN;
 
 
 
@@ -89,10 +94,16 @@ CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RES
 	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
 	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
 	|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
-	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
-	|CUERPO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
 	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
+	|DECFUNCION:d{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(d);RESULT=lista;:}
+	|CUERPO:l DECFUNCION:d{:l.add(d);RESULT=l;:}
+	|LLAMADAS:l{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|LLAMADAS:l PYCOMA{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|CUERPO:l LLAMADAS:a PYCOMA{:l.add(a);RESULT=l;:}
+	|CUERPO:l LLAMADAS:a{:l.add(a);RESULT=l;:}
+	|CUERPO:l RETORNOS:r{:l.add(r);RESULT=l;:}
+	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
 	;
 CUERPOINTERNO::=
 	ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
@@ -101,10 +112,14 @@ CUERPOINTERNO::=
 	|CUERPOINTERNO:c CONTROLES:b{:c.add(b);RESULT=c;:}
 	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
 	|CUERPOINTERNO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
-	|FUNCIONES:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
-	|CUERPOINTERNO:a FUNCIONES:b{:a.add(b);RESULT=a;:}
 	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPOINTERNO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
+	|LLAMADAS:l{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:} 
+	|LLAMADAS:l PYCOMA{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|CUERPOINTERNO:l LLAMADAS:a{:l.add(a);RESULT=l;:}
+	|CUERPOINTERNO:l LLAMADAS:a PYCOMA{:l.add(a);RESULT=l;:}
+	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
+	|CUERPOINTERNO:l RETORNOS:r{:l.add(r);RESULT=l;:}
 	;
 ASIGNACION::=ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
 	|ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
@@ -145,6 +160,7 @@ EXP::=
 	|NULO:a{:RESULT=new Nulo(aleft+1,aright+1);:}
 
 	|ACCESOARREGLO:a{:RESULT=a;:}
+	|LLAMADAS:a{:RESULT=a;:}
 	;
 
 /*
@@ -152,17 +168,16 @@ EXP::=
 ░█▀▀▀ ░█─░█ ░█░█░█ ░█─── ░█─ ░█──░█ ░█░█░█ ░█▀▀▀ ─▀▀▀▄▄ ░█▀▀▀ ─▀▀▀▄▄ ░█▄▄█ ░█▀▀▀ ░█─── ░█─ ░█▄▄█ ░█─── ░█▀▀▀ ─▀▀▀▄▄ 
 ░█─── ─▀▄▄▀ ░█──▀█ ░█▄▄█ ▄█▄ ░█▄▄▄█ ░█──▀█ ░█▄▄▄ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ ░█─── ░█▄▄▄ ░█▄▄█ ▄█▄ ░█─░█ ░█▄▄█ ░█▄▄▄ ░█▄▄▄█
 */
-FUNCIONES::=
-	IMPRIMIR:a{:RESULT=a;:}
-	|IMPRIMIR:a PYCOMA{:RESULT=a;:}
-	;
-IMPRIMIR::=
-	PRINT:a PAR_A EXP:b PAR_C{:RESULT=new Print(b,aleft+1,aright+1);:}
-	|PRINT:a PAR_A PAR_C{:RESULT=new Print(new Literal("",new TipoExp(Tipos.STRING),aleft+1,aright+1),aleft+1,aright+1);:} 
-	;
+
 BLOQUE::=
 	LLAV_A CUERPOINTERNO:l LLAV_C{:RESULT=l;:}
 	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
+	;
+LLAMADAS::=
+	ID:i PAR_A PAR_C{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),new LinkedList<Expresion>(),new LinkedList<Expresion>());:}
+	|ID:i PAR_A LISTAEXPRESION:l PAR_C{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),l,new LinkedList<Expresion>());:}
+	|ID:i PAR_A PAR_C LCORCHETES:c{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),new LinkedList<Expresion>(),c);:}
+	|ID:i PAR_A LISTAEXPRESION:l PAR_C LCORCHETES:c{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),l,c);:}
 	;
 /*
 ░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
@@ -212,4 +227,28 @@ LCORCHETES::=
 	|COR_A:a EXP:e COR_C LCORCHETES:l{:l.addFirst(new AccesoUnico(e,aleft+1,aright+1));RESULT=l;:}
 	|COR_A:a COR_A EXP:e COR_C COR_C
 	|COR_A:a COR_A EXP:e COR_C COR_C LCORCHETES
+	;
+
+DECFUNCION::=
+	ID:i IGUAL:g FUNCTION PAR_A LISTAPARAMETROS:p PAR_C BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	|ID:i IGUAL:g FUNCTION PAR_A PAR_C BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID IGUAL PAR_A LISTAPARAMETROS PAR_C IGUALMAYOR BLOQUE
+	;
+LISTAPARAMETROS::=
+	LISTAPARAMETROS:l COMA ID:i{:l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
+	|ID:i{:LinkedList<Object>l=new LinkedList<>();l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
+	|ID:a IGUAL EXP:e{:LinkedList<Object>l=new LinkedList<>();l.add(new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
+	|LISTAPARAMETROS:l COMA ID:a IGUAL EXP:e{:l.add(new  DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
+	;
+LISTAEXPRESION::=
+	LISTAEXPRESION:l COMA EXP:e{:l.add(e);RESULT=l;:}
+	|EXP:e{:LinkedList<Expresion>l=new LinkedList<>();l.add(e);RESULT=l;:}
+	|DEFAULT:e{:LinkedList<Expresion>l=new LinkedList<>();l.add(new Default(eleft+1,eright+1));RESULT=l;:}
+	|LISTAEXPRESION:l COMA DEFAULT:i{:l.add(new Default(ileft+1,iright+1));RESULT=l;:}
+	;
+RETORNOS::=
+	RETURN:r EXP:e{:RESULT=new Return(e,rleft+1,rright+1);:}
+	|RETURN:r EXP:e PYCOMA{:RESULT=new Return(e,rleft+1,rright+1);:}
+	|RETURN:r{:RESULT=new Return(null,rleft+1,rright+1);:}
+	|RETURN:r PYCOMA{:RESULT=new Return(null,rleft+1,rright+1);:}
 	;

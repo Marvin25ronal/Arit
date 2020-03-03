@@ -6,6 +6,7 @@
 package Entorno;
 
 import Objetos.Array;
+import Objetos.Funcion;
 import Objetos.Lista;
 import Objetos.Matrix;
 import Objetos.Vector;
@@ -35,6 +36,14 @@ public class Entorno {
             }
         }
         return false;
+    }
+
+    public Entorno getGlobal() {
+        Entorno ant = null;
+        for (Entorno e = this; e != null; e = e.getPadre()) {
+            ant = e;
+        }
+        return ant;
     }
 
     private Entorno getPadre() {
@@ -69,7 +78,7 @@ public class Entorno {
         Stack<Entorno> pilaE = new Stack<>();
         for (Entorno aux = this; aux != null; aux = aux.getPadre()) {
             Entorno enuevo = new Entorno(null);
-            for (HashMap.Entry<String, Simbolo> env : this.tabla.entrySet()) {
+            for (HashMap.Entry<String, Simbolo> env : aux.tabla.entrySet()) {
                 if (env.getValue() instanceof Vector) {
                     Vector v = (Vector) env.getValue();
                     Vector nuevoV = new Vector(v.getId(), v.getTipo(), v.getTiposecundario(), Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), aux));
@@ -80,24 +89,24 @@ public class Entorno {
 
                 } else if (env.getValue() instanceof Matrix) {
 
+                } else if (env.getValue() instanceof Funcion) {
+                    Funcion f = (Funcion) env.getValue();
+                    Funcion fn = new Funcion(f.getSentencias(), f.getParametros(), f.getLinea(), f.getColumna(), f.getTipo(), f.getTiposecundario(), "Funcion_"+f.getId());
+                    enuevo.add(fn.getId(), fn);
                 }
             }
             pilaE.add(enuevo);
         }
         Entorno anterior = null;
-        Entorno aux;
-        Entorno primero = null;
-        boolean primerob = false;
+        Entorno aux = null;
+
         while (!pilaE.isEmpty()) {
             aux = pilaE.pop();
             aux.padre = anterior;
             anterior = aux;
-            if (primerob == false) {
-                primero = aux;
-                primerob = true;
-            }
+
         }
-        return primero;
+        return aux;
     }
 
 }

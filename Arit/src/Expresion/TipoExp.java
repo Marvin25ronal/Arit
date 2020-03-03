@@ -14,7 +14,7 @@ import Entorno.Entorno;
 public class TipoExp {
 
     public enum Tipos {
-        INTEGER, BOOLEAN, STRING, NUMERIC, NULO, VECTOR
+        INTEGER, BOOLEAN, STRING, NUMERIC, NULO, VECTOR,FUNCION
     }
     public Tipos tp;
 

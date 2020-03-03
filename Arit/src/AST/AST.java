@@ -8,6 +8,7 @@ package AST;
 import Control.Return;
 import Entorno.Entorno;
 import Expresion.Expresion;
+import Instruccion.DecFuncion;
 import java.util.LinkedList;
 import Instruccion.Instruccion;
 import Reportes.Errores;
@@ -40,8 +41,12 @@ public class AST {
     public Object ejecutar() {
         Entorno global = new Entorno(null);
         Globales.VarGlobales.getInstance().getConsola().append("Salida--------\n");
+        DeclararFunc(global);
         for (Nodo n : getAcciones()) {
             if (n instanceof Instruccion) {
+                if (n instanceof DecFuncion) {
+                    continue;
+                }
                 Object result = (((Instruccion) n).ejecutar(global));
                 if (result instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU(((Errores) result));
@@ -65,5 +70,13 @@ public class AST {
             }
         }
         return null;
+    }
+
+    private void DeclararFunc(Entorno e) {
+        for (Nodo n : getAcciones()) {
+            if (n instanceof DecFuncion) {
+                ((DecFuncion) n).ejecutar(e);
+            }
+        }
     }
 }
