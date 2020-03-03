@@ -20,7 +20,7 @@ public class Identificador implements Expresion {
     private int columna;
 
     public Identificador(String val, int linea, int columna) {
-        this.val = val;
+        this.val = val.toLowerCase();
         this.linea = linea;
         this.columna = columna;
     }
