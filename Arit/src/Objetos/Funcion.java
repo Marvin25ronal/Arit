@@ -54,30 +54,16 @@ public class Funcion extends Simbolo implements Instruccion {
                 } else if (result instanceof Break) {
                     Break b = (Break) result;
                     return new Errores(Errores.TipoError.SEMANTICO, "Instruccion Break y no se encuentra en un Switch ", b.linea(), b.columna());
+                }else if(result!=null){
+                    return result;
                 }
             } else if (n instanceof Expresion) {
                 Object result = ((Expresion) n).getValor(e);
                 if (result instanceof Errores) {
                     return result;
-                } else if (n instanceof Return) {
-                    if (((Return) n).getExp() == null) {
-                        return new Literal(new Nulo(linea, columna), new TipoExp(Tipos.NULO), linea, columna);
-                    }
-                    Object retorno = ((Return) n).getExp().getValor(e);
-                    TipoExp t = ((Return) n).getExp().getTipo(e);
-                    if (retorno instanceof Errores) {
-                        return retorno;
-                    } else if (retorno instanceof Literal) {
-                        Literal l = (Literal) retorno;
-                        LinkedList<Object> dimensiones = new LinkedList<>();
-                        dimensiones.add(l);
-                        return new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), dimensiones);
-                    } else if (t.isPrimitive(e)) {
-                        LinkedList<Object> dimensiones = new LinkedList<>();
-                        dimensiones.add(new Literal(retorno, t, linea, columna));
-                        return new Vector("", new TipoExp(Tipos.VECTOR), t, dimensiones);
-                    }
-                    return ((Return) n).getExp().getValor(e);
+                }else if(result!=null){
+                    return result;
+                    
                 }
             }
         }

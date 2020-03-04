@@ -66,8 +66,8 @@ public class Relacional extends Operacion {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
         if (max(top1, top2).isVector()) {
             if (top1.isVector() && top2.isVector()) {
                 return RelacionalVectoresVectores((Vector) valor1, (Vector) valor2, e);

@@ -72,13 +72,13 @@ public class DecFuncion implements Instruccion {
             if (parametros.get(i) instanceof Identificador) {
                 a = (Identificador) parametros.get(i);
             } else if (parametros.get(i) instanceof DecAsig) {
-                a = ((DecAsig) parametros.get(i)).id;
+                a = ((DecAsig) parametros.get(i)).getId();
             }
             for (int j = i + 1; j < parametros.size(); j++) {
                 if (parametros.get(j) instanceof Identificador) {
                     b = (Identificador) parametros.get(j);
                 } else if (parametros.get(j) instanceof DecAsig) {
-                    b = ((DecAsig) parametros.get(i)).id;
+                    b = ((DecAsig) parametros.get(j)).getId();
                 }
                 if (a.getVal().equals(b.getVal())) {
                     return false;

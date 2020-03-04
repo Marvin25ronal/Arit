@@ -91,8 +91,8 @@ public class Entorno {
 
                 } else if (env.getValue() instanceof Funcion) {
                     Funcion f = (Funcion) env.getValue();
-                    Funcion fn = new Funcion(f.getSentencias(), f.getParametros(), f.getLinea(), f.getColumna(), f.getTipo(), f.getTiposecundario(), "Funcion_"+f.getId());
-                    enuevo.add(fn.getId(), fn);
+                    Funcion fn = new Funcion(f.getSentencias(), f.getParametros(), f.getLinea(), f.getColumna(), f.getTipo(), f.getTiposecundario(),f.getId());
+                    enuevo.add("Funcion_"+fn.getId(), fn);
                 }
             }
             pilaE.add(enuevo);

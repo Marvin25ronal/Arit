@@ -38,9 +38,10 @@ public class Ternarias implements Expresion {
         if (con == null || con instanceof Errores) {
             return con;
         }
-        if (cond.getTipo(e).tp == Tipos.BOOLEAN) {
+        TipoExp cond=Globales.VarGlobales.getInstance().obtenerTipo(con, e);
+        if (cond.tp == Tipos.BOOLEAN) {
             return Boolean.parseBoolean(con.toString()) ? isTrue.getValor(e) : isFalse.getValor(e);
-        } else if (cond.getTipo(e).isVector()) {
+        } else if (cond.isVector()) {
             Literal l = (Literal) ((Vector) con).getDimensiones().get(0);
             if (l.getTipo(e).isBoolean()) {
                 return Boolean.parseBoolean(l.getValor(e).toString()) ? isTrue.getValor(e) : isFalse.getValor(e);

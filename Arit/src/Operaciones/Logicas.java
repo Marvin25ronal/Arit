@@ -28,8 +28,8 @@ public class Logicas extends Operacion {
         this.columna = columna;
     }
 
-    private boolean Correctos(Entorno e) {
-        return this.op1.getTipo(e).tp == Tipos.BOOLEAN && this.op2.getTipo(e).tp == Tipos.BOOLEAN;
+    private boolean Correctos(TipoExp t1,TipoExp t2) {
+        return t1.tp == Tipos.BOOLEAN && t2.tp == Tipos.BOOLEAN;
     }
 
     @Override
@@ -70,9 +70,7 @@ public class Logicas extends Operacion {
         } else if (op2 instanceof Errores) {
             return op2;
         }
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
-        TipoExp aux = max(top1, top2);
+        
         Object valor1 = op1.getValor(e);
         Object valor2 = op2.getValor(e);
         if (valor1 instanceof Errores) {
@@ -80,6 +78,9 @@ public class Logicas extends Operacion {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
+        TipoExp aux = max(top1, top2);
         if (aux == null) {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden comparar otros tipos que no sean booleanos", linea, columna);
         } else if (aux.isVector()) {
@@ -88,7 +89,7 @@ public class Logicas extends Operacion {
             }
             return top1.isVector() ? LogicasVector((Vector) valor1, top2, valor2, e) : LogicasVector((Vector) valor2, top1, valor1, e);
         }
-        if (Correctos(e)) {
+        if (Correctos(top1,top2)) {
             switch (op) {
                 case AND:
                     return new Literal((Boolean.parseBoolean(valor1.toString()) && (Boolean.parseBoolean(valor2.toString()))), new TipoExp(Tipos.BOOLEAN), linea, columna);

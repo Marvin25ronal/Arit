@@ -12,6 +12,7 @@ public class sym {
   public static final int DISTINTO = 15;
   public static final int FUNCTION = 32;
   public static final int POR = 20;
+  public static final int IGUALMAYOR = 45;
   public static final int CASE = 42;
   public static final int INTEGER = 33;
   public static final int CONTINUE = 41;
@@ -98,7 +99,8 @@ public class sym {
   "CONTINUE",
   "CASE",
   "DEFAULT",
-  "RETURN"
+  "RETURN",
+  "IGUALMAYOR"
   };
 }
 

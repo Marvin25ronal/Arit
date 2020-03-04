@@ -32,7 +32,8 @@ public class AccesoUnico implements Expresion {
     @Override
     public Object getValor(Entorno e) {
         Object i = getIndice().getValor(e);
-        if (getIndice().getTipo(e).tp == Tipos.VECTOR) {
+        TipoExp tipo=Globales.VarGlobales.getInstance().obtenerTipo(i, e);
+        if (tipo.tp == Tipos.VECTOR) {
             //solo tenga un valor
             Vector v = (Vector) i;
             if (v.getTiposecundario().tp != Tipos.INTEGER) {
@@ -45,7 +46,7 @@ public class AccesoUnico implements Expresion {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
             }
         }
-        if (getIndice().getTipo(e).tp != Tipos.INTEGER) {
+        if (tipo.tp != Tipos.INTEGER) {
             return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", getLinea(), getColumna());
         }
 

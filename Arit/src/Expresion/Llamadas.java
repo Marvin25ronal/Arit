@@ -10,6 +10,7 @@ import Expresion.TipoExp.Tipos;
 import Instruccion.DecAsig;
 import Instruccion.Print;
 import Objetos.Funcion;
+import Objetos.Lista;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
@@ -33,17 +34,19 @@ public class Llamadas implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
-        Entorno nuevoE = new Entorno(e.getGlobal());
+        //Entorno nuevoE = new Entorno(e.getGlobal());
         if (Nativa(id.getVal())) {
-            return HacerNativa(nuevoE);
+            return HacerNativa(e);
         } else {
-            if (nuevoE.ExisteVariable("Funcion_" + id.getVal())) {
-                Funcion f = (Funcion) nuevoE.get("Funcion_" + id.getVal());
+            if (e.ExisteVariable("Funcion_" + id.getVal())) {
+                Funcion f = (Funcion) e.get("Funcion_" + id.getVal());
                 if (f.getParametros().size() == parametros.size()) {
-                    Object pasar = PasarVariables(nuevoE, f);
+                    Object pasar = PasarVariables(e, f);
                     if (pasar instanceof Errores) {
                         return pasar;
                     }
+                    Entorno nuevoE = (Entorno) pasar;
+
                     return f.ejecutar(nuevoE);
                 } else {
                     return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta ", linea(), columna());
@@ -76,16 +79,63 @@ public class Llamadas implements Expresion {
     }
 
     private Object PasarVariables(Entorno e, Funcion f) {
+        Entorno enuevo = new Entorno(e.getGlobal());
         Object valor;
         for (int i = 0; i < parametros.size(); i++) {
             valor = parametros.get(i).getValor(e);
+            TipoExp tipo=Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
             if (valor instanceof Errores) {
                 return valor;
             }
             if (f.getParametros().get(i) instanceof DecAsig) {
-
+                DecAsig ndec = (DecAsig) f.getParametros().get(i);
+                Object res = ndec.ejecutar(enuevo);
+                if (res instanceof Errores) {
+                    return res;
+                }
+                if (!(valor instanceof Default)) {
+                    Identificador id = ndec.getId();
+                    Crear(valor, enuevo, id, e, i, true,tipo);
+                }
             } else if (f.getParametros().get(i) instanceof Identificador) {
+                Identificador id = (Identificador) f.getParametros().get(i);
+                Crear(valor, enuevo, id, e, i, false,tipo);
+            }
+        }
+        return enuevo;
+    }
 
+    private Object Crear(Object valor, Entorno enuevo, Identificador id, Entorno e, int i, boolean actualizar,TipoExp tipo) {
+        if (valor instanceof Literal) {
+            Literal l = (Literal) valor;
+            LinkedList<Object> datos = new LinkedList<>();
+            datos.add(l);
+            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), datos);
+            if (actualizar) {
+                enuevo.Actualizar(id.getVal(), nuevo);
+            } else {
+                enuevo.add(id.getVal(), nuevo);
+            }
+        } else if (valor instanceof Vector) {
+            Vector copia = (Vector) valor;
+            LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(copia.getDimensiones(), e);
+            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), copia.getTiposecundario(), lista);
+            if (actualizar) {
+                enuevo.Actualizar(id.getVal(), nuevo);
+            } else {
+                enuevo.add(id.getVal(), nuevo);
+            }
+        } else if (valor instanceof Lista) {
+
+        } else if (tipo.isPrimitive(e)) {
+            Literal l = new Literal(valor, tipo, linea(), columna());
+            LinkedList<Object> lista = new LinkedList<>();
+            lista.add(l);
+            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), lista);
+            if (actualizar) {
+                enuevo.Actualizar(id.getVal(), nuevo);
+            } else {
+                enuevo.add(id.getVal(), nuevo);
             }
         }
         return null;
@@ -104,7 +154,7 @@ public class Llamadas implements Expresion {
             Globales.VarGlobales.getInstance().setConsola(consola);
             return ((Literal) valor).getTipo(aux);
         }
-
+        Globales.VarGlobales.getInstance().setConsola(consola);
         return null;
     }
 

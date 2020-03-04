@@ -5,7 +5,10 @@
  */
 package Globales;
 
+import Entorno.Entorno;
 import Expresion.Literal;
+import Expresion.TipoExp;
+import Objetos.Nulo;
 import Objetos.Vector;
 import java.util.LinkedList;
 import Reportes.Errores;
@@ -71,7 +74,7 @@ public final class VarGlobales {
         return s.toString();
     }
 
-    public LinkedList<Object> clonarListaVector(LinkedList<Object> referencia, Entorno.Entorno e) {
+    public LinkedList<Object> clonarListaVector(LinkedList<Object> referencia, Entorno e) {
         LinkedList<Object> l = new LinkedList<>();
         for (int i = 0; i < referencia.size(); i++) {
             Literal aux = (Literal) referencia.get(i);
@@ -79,5 +82,24 @@ public final class VarGlobales {
             l.add(nueva);
         }
         return l;
+    }
+
+    public TipoExp obtenerTipo(Object t, Entorno e) {
+        if (t instanceof Literal) {
+            return ((Literal) t).getTipo(e);
+        } else if (t instanceof Vector) {
+            return ((Vector) t).getTipo();
+        } else if (t instanceof Nulo) {
+            return ((Nulo) t).getTipo(e);
+        } else if (t.getClass().getTypeName().equals(Double.class.getTypeName())) {
+            return new TipoExp(TipoExp.Tipos.NUMERIC);
+        } else if (t.getClass().getTypeName().equals(String.class.getTypeName())) {
+            return new TipoExp(TipoExp.Tipos.STRING);
+        } else if (t.getClass().getTypeName().equals(Integer.class.getTypeName())) {
+            return new TipoExp(TipoExp.Tipos.INTEGER);
+        } else if (t.getClass().getTypeName().equals(Boolean.class.getTypeName())) {
+            return new TipoExp(TipoExp.Tipos.BOOLEAN);
+        }
+        return null;
     }
 }

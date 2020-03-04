@@ -47,10 +47,11 @@ public class Unarias extends Operacion {
             return null;
         }
         Object valor = op1.getValor(e);
-        TipoExp tip = op1.getTipo(e);
+       
         if (valor instanceof Errores) {
             return valor;
         } else {
+             TipoExp tip = Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
             //comparamos vectores
             if (tip.tp == Tipos.VECTOR) {
                 if (op == Operador.NOT) {

@@ -24,9 +24,6 @@ public class Potencia extends Aritmeticas {
     }
 
     public Object ejecutar(Entorno e) {
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
-        TipoExp aux = max(top1, top2);
 
         //Comparar si son vectores, listas, matrices o array
         Object valor1 = op1.getValor(e);
@@ -36,6 +33,9 @@ public class Potencia extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
+        TipoExp aux = max(top1, top2);
         //esto para cuando la division trae algun numero raro
         if (aux.esNumero() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
             aux.tp = TipoExp.Tipos.NUMERIC;

@@ -37,7 +37,7 @@ public class AsignacionPosicion implements Instruccion {
     @Override
     public Object ejecutar(Entorno e) {
         Acceso ac = (Acceso) acc;
-        TipoExp tvalor = valor.getTipo(e);
+        
         if (ac.getIndices().size() == 1) {
             ac.setIncremento(true);
         }
@@ -48,6 +48,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         //me lo regresa en un vector de 1
         Object val = valor.getValor(e);
+        TipoExp tvalor = Globales.VarGlobales.getInstance().obtenerTipo(val, e);
         if (val instanceof Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Errores) val);
             return null;
