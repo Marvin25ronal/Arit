@@ -7,6 +7,7 @@ package Expresion;
 
 import Entorno.Entorno;
 import Entorno.Simbolo;
+import Objetos.Lista;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
@@ -53,6 +54,25 @@ public class Acceso implements Expresion {
 
             }
             return vector;
+        }else if(s instanceof Lista){
+            Object lista=s;
+            for(Expresion exp: getIndices()){
+                if(exp instanceof AccesoUnico){
+                    AccesoUnico aux=(AccesoUnico)exp;
+                    aux.setObjeto(lista);
+                    aux.setIncremento(incremento);
+                    lista=aux.getValor(e);
+                }else if(exp instanceof AccesoDoble){
+                    AccesoDoble aux=(AccesoDoble)exp;
+                    aux.setObjeto(lista);
+                    aux.setIncremento(incremento);
+                    lista=aux.getValor(e);
+                }
+                if(lista instanceof Errores){
+                    return lista;
+                }
+            }
+            return lista;
         }
         return null;
 

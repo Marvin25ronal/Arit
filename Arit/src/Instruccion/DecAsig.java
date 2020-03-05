@@ -12,6 +12,7 @@ import Expresion.Identificador;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Lista;
 import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
@@ -39,7 +40,7 @@ public class DecAsig implements Instruccion {
     public Object ejecutar(Entorno e) {
         if (getValor() == null) {
             Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No se pudo declarar", getLinea(), getColumna()));
-             return null;
+            return null;
         }
         Object setvalor = getValor().getValor(e);
         if (setvalor instanceof Errores) {
@@ -54,7 +55,7 @@ public class DecAsig implements Instruccion {
             } else {
                 CrearVector_Nulo(e);
             }
-        } else if (isPrimitive(e)) {
+        } else if (t.isPrimitive(e)) {
             //se crea el arreglo con los nuevos valores
             /*
             Reglas--------------
@@ -76,9 +77,22 @@ public class DecAsig implements Instruccion {
                 } else {
                     CrearNuevoVector_Vector(e, setvalor, t);
                 }
+            } else if (t.isList()) {
+                if (e.ExisteVariable(getId().getVal())) {
+
+                } else {
+                    CrearListaNueva(e, setvalor);
+                }
             }
         }
         return null;
+    }
+
+    private void CrearListaNueva(Entorno e, Object lista) {
+        Lista l = (Lista) lista;
+        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
+        Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        e.add(id.getVal(), nueva);
     }
 
     private void CrearNuevoVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
@@ -146,6 +160,8 @@ public class DecAsig implements Instruccion {
 
     private boolean isPrimitive(Entorno e) {
         if (getValor().getTipo(e).tp == Tipos.VECTOR) {
+            return false;
+        }else if(getValor().getTipo(e).tp==Tipos.LISTA){
             return false;
         }
         return true;

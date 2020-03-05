@@ -8,6 +8,7 @@ package Globales;
 import Entorno.Entorno;
 import Expresion.Literal;
 import Expresion.TipoExp;
+import Objetos.Lista;
 import Objetos.Nulo;
 import Objetos.Vector;
 import java.util.LinkedList;
@@ -21,6 +22,20 @@ import javax.swing.JTextArea;
 public final class VarGlobales {
 
     /**
+     * @return the anterior
+     */
+    public Anterior getAnterior() {
+        return anterior;
+    }
+
+    /**
+     * @param anterior the anterior to set
+     */
+    public void setAnterior(Anterior anterior) {
+        this.anterior = anterior;
+    }
+
+    /**
      * @return the instancia
      */
     public static VarGlobales getInstancia() {
@@ -31,9 +46,11 @@ public final class VarGlobales {
     StringBuilder s = new StringBuilder();
     private JTextArea consola;
     private static VarGlobales instancia;
+    private Anterior anterior;
 
     private VarGlobales() {
         listaE = new LinkedList<>();
+        anterior = new Anterior(null, 0);
     }
 
     public void setConsola(JTextArea consola) {
@@ -78,7 +95,7 @@ public final class VarGlobales {
         LinkedList<Object> l = new LinkedList<>();
         for (int i = 0; i < referencia.size(); i++) {
             Literal aux = (Literal) referencia.get(i);
-            Literal nueva = new Literal(aux.getValor(e), aux.getTipo(e), aux.linea(), aux.columna());
+            Literal nueva = new Literal(aux.getValor(e), new TipoExp(aux.getTipo(e).tp), aux.linea(), aux.columna());
             l.add(nueva);
         }
         return l;
@@ -91,6 +108,8 @@ public final class VarGlobales {
             return ((Vector) t).getTipo();
         } else if (t instanceof Nulo) {
             return ((Nulo) t).getTipo(e);
+        } else if (t instanceof Lista) {
+            return new TipoExp(TipoExp.Tipos.LISTA);
         } else if (t.getClass().getTypeName().equals(Double.class.getTypeName())) {
             return new TipoExp(TipoExp.Tipos.NUMERIC);
         } else if (t.getClass().getTypeName().equals(String.class.getTypeName())) {
@@ -101,5 +120,25 @@ public final class VarGlobales {
             return new TipoExp(TipoExp.Tipos.BOOLEAN);
         }
         return null;
+    }
+
+    public LinkedList<Object> CopiarLista(Entorno e, LinkedList<Object> referencia) {
+        LinkedList<Object> nueva = new LinkedList<>();
+        Object temp = null;
+        for (int i = 0; i < referencia.size(); i++) {
+            temp = referencia.get(i);
+            if (temp instanceof Vector) {
+                Vector aux = (Vector) temp;
+                LinkedList<Object> element = clonarListaVector(aux.getDimensiones(), e);
+                Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(aux.getTiposecundario().tp), element);
+                nueva.add(nuevo);
+            } else if (temp instanceof Lista) {
+                Lista aux = (Lista) temp;
+                LinkedList<Object> element = CopiarLista(e, aux.getLista());
+                Lista nuevo = new Lista(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
+                nueva.add(nuevo);
+            }
+        }
+        return nueva;
     }
 }

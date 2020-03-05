@@ -7,6 +7,8 @@ package Expresion;
 
 import Entorno.Entorno;
 import Expresion.TipoExp.Tipos;
+import Objetos.Lista;
+import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
@@ -32,7 +34,10 @@ public class AccesoUnico implements Expresion {
     @Override
     public Object getValor(Entorno e) {
         Object i = getIndice().getValor(e);
-        TipoExp tipo=Globales.VarGlobales.getInstance().obtenerTipo(i, e);
+        if (i instanceof Errores) {
+            return i;
+        }
+        TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(i, e);
         if (tipo.tp == Tipos.VECTOR) {
             //solo tenga un valor
             Vector v = (Vector) i;
@@ -45,16 +50,13 @@ public class AccesoUnico implements Expresion {
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
             }
-        }
-        if (tipo.tp != Tipos.INTEGER) {
-            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", getLinea(), getColumna());
-        }
-
-        if (i instanceof Errores) {
-            return i;
+        } else if (tipo.tp != Tipos.INTEGER) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico el tipo es " + tipo.tp, getLinea(), getColumna());
         }
         if (getObjeto() instanceof Vector) {
             return AccesoVector(e);
+        } else if (getObjeto() instanceof Lista) {
+            return AccesoLista(e);
         }
         return null;
     }
@@ -144,7 +146,31 @@ public class AccesoUnico implements Expresion {
         inde--;
         LinkedList<Object> lista = new LinkedList<Object>();
         lista.add(v.getDimensiones().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(v);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
         return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+    }
+
+    private Object AccesoLista(Entorno e) {
+        Lista l = (Lista) getObjeto();
+        int inde = Integer.parseInt(getIndice().getValor(e).toString());
+        if (inde <= 0) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+        } else if (inde > l.getLista().size()) {
+            if (incremento) {
+                return AccesoListaIncremento(l, inde);
+            }
+            return new Errores(Errores.TipoError.SEMANTICO, "Se paso dle indice de la lista", getLinea(), getColumna());
+        }
+
+        inde--;
+        LinkedList<Object> lista = new LinkedList<>();
+        lista.add(l.getLista().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(l);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        return new Lista(lista, new TipoExp(Tipos.LISTA), null, "");
     }
 
     private Object AccesoVectorIncremento(Vector v, int inde) {
@@ -154,7 +180,23 @@ public class AccesoUnico implements Expresion {
         inde--;
         LinkedList<Object> lista = new LinkedList<>();
         lista.add(v.getDimensiones().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(v);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
         return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+    }
+
+    private Object AccesoListaIncremento(Lista l, int inde) {
+        for (int i = l.getLista().size(); i < inde; i++) {
+            l.getLista().add(new Literal(new Nulo(linea, columna), new TipoExp(Tipos.STRING), linea, columna));
+        }
+        inde--;
+        LinkedList<Object> lista = new LinkedList<>();
+        lista.add(l.getLista().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(l);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        return new Lista(lista, new TipoExp(Tipos.LISTA), null, "");
     }
 
     private Literal ObtenerDefault(TipoExp t) {

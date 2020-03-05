@@ -49,4 +49,10 @@ public class Literal implements Expresion {
         return this.columna;
     }
 
+    @Override
+    public String toString() {
+        return valor.toString();
+    }
+    
+
 }

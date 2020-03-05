@@ -6,6 +6,7 @@
 package Expresion;
 
 import Entorno.Entorno;
+import Entorno.Simbolo;
 import Expresion.TipoExp.Tipos;
 import Instruccion.DecAsig;
 import Instruccion.Print;
@@ -46,8 +47,19 @@ public class Llamadas implements Expresion {
                         return pasar;
                     }
                     Entorno nuevoE = (Entorno) pasar;
-
-                    return f.ejecutar(nuevoE);
+                    if (!dimensiones.isEmpty()) {
+                        Object resul = f.ejecutar(nuevoE);
+                        if (resul instanceof Errores) {
+                            return resul;
+                        } else {
+                            Entorno eaux = new Entorno(nuevoE);
+                            eaux.add("aux", (Simbolo) resul);
+                            Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+                            return nuevoA.getValor(eaux);
+                        }
+                    } else {
+                        return f.ejecutar(nuevoE);
+                    }
                 } else {
                     return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta ", linea(), columna());
                 }
@@ -61,8 +73,49 @@ public class Llamadas implements Expresion {
         switch (id.getVal().toLowerCase()) {
             case "print":
                 return HacerPrint(e);
+            case "c":
+            case "list":
+                return HacerLista(e);
+
         }
         return null;
+    }
+
+    private Object HacerLista(Entorno e) {
+        LinkedList<Object> elementos = new LinkedList<>();
+        Object aux = null;
+        for (int i = 0; i < parametros.size(); i++) {
+            aux = parametros.get(i).getValor(e);
+            if (aux instanceof Errores) {
+                return aux;
+            } else if (aux instanceof Literal) {
+                Literal l = (Literal) aux;
+                LinkedList<Object> nueval = new LinkedList<>();
+                nueval.add(l);
+                Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), nueval);
+                elementos.add(nuevo);
+            } else if (aux instanceof Vector) {
+                Vector v = (Vector) aux;
+                elementos.add(v);
+            } else if (aux instanceof Lista) {
+                Lista l = (Lista) aux;
+                /*if (l.getLista().size() > 1) {
+                    return new Errores(Errores.TipoError.SEMANTICO, "Las listas solo pueden contener un elemento en sus nodos", linea(), columna());
+                }*/
+                elementos.add(l);
+            } else if (Globales.VarGlobales.getInstance().obtenerTipo(aux, e).isPrimitive(e)) {
+                Literal l = new Literal(aux, new TipoExp(Globales.VarGlobales.getInstance().obtenerTipo(aux, e).tp), linea(), columna());
+                LinkedList<Object>valores=new LinkedList<>();
+                valores.add(l);
+                Vector nuevo=new Vector("", new TipoExp(Tipos.VECTOR),l.getTipo(e),valores);
+                elementos.add(nuevo);
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "Las listas no soportan este objeto", linea(), columna());
+            }
+
+        }
+        Lista nuevaLista = new Lista(elementos, new TipoExp(Tipos.LISTA), null, "");
+        return nuevaLista;
     }
 
     private Object HacerPrint(Entorno e) {
@@ -83,7 +136,7 @@ public class Llamadas implements Expresion {
         Object valor;
         for (int i = 0; i < parametros.size(); i++) {
             valor = parametros.get(i).getValor(e);
-            TipoExp tipo=Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
+            TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
             if (valor instanceof Errores) {
                 return valor;
             }
@@ -95,17 +148,17 @@ public class Llamadas implements Expresion {
                 }
                 if (!(valor instanceof Default)) {
                     Identificador id = ndec.getId();
-                    Crear(valor, enuevo, id, e, i, true,tipo);
+                    Crear(valor, enuevo, id, e, i, true, tipo);
                 }
             } else if (f.getParametros().get(i) instanceof Identificador) {
                 Identificador id = (Identificador) f.getParametros().get(i);
-                Crear(valor, enuevo, id, e, i, false,tipo);
+                Crear(valor, enuevo, id, e, i, false, tipo);
             }
         }
         return enuevo;
     }
 
-    private Object Crear(Object valor, Entorno enuevo, Identificador id, Entorno e, int i, boolean actualizar,TipoExp tipo) {
+    private Object Crear(Object valor, Entorno enuevo, Identificador id, Entorno e, int i, boolean actualizar, TipoExp tipo) {
         if (valor instanceof Literal) {
             Literal l = (Literal) valor;
             LinkedList<Object> datos = new LinkedList<>();
@@ -210,11 +263,16 @@ public class Llamadas implements Expresion {
         this.dimensiones = dimensiones;
     }
 
-    private boolean Nativa(String id) {
+    public boolean Nativa(String id) {
         switch (id.toLowerCase()) {
             case "print":
                 return true;
             case "typeof":
+                return true;
+            case "c":
+                return true;
+            case "list":
+                return true;
             default:
                 return false;
         }

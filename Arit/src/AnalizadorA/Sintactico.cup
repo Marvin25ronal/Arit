@@ -225,8 +225,8 @@ ACCESOARREGLO::=
 LCORCHETES::=
 	COR_A:a EXP:e COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.addFirst(new AccesoUnico(e,aleft+1,aright+1));RESULT=lista;:}
 	|COR_A:a EXP:e COR_C LCORCHETES:l{:l.addFirst(new AccesoUnico(e,aleft+1,aright+1));RESULT=l;:}
-	|COR_A:a COR_A EXP:e COR_C COR_C
-	|COR_A:a COR_A EXP:e COR_C COR_C LCORCHETES
+	|COR_A:a COR_A EXP:e COR_C COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.addFirst(new AccesoDoble(e,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a COR_A EXP:e COR_C COR_C LCORCHETES:l{:l.addFirst(new AccesoDoble(e,aleft+1,aright+1));RESULT=l;:}
 	;
 
 DECFUNCION::=
