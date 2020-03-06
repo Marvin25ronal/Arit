@@ -79,7 +79,7 @@ public class DecAsig implements Instruccion {
                 }
             } else if (t.isList()) {
                 if (e.ExisteVariable(getId().getVal())) {
-
+                    ReasignarLista_Lista(e,setvalor);
                 } else {
                     CrearListaNueva(e, setvalor);
                 }
@@ -87,7 +87,12 @@ public class DecAsig implements Instruccion {
         }
         return null;
     }
-
+    private void ReasignarLista_Lista(Entorno e,Object lista){
+        Lista l=(Lista)lista;
+         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
+        Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        e.Actualizar(id.getVal(), nueva);
+    }
     private void CrearListaNueva(Entorno e, Object lista) {
         Lista l = (Lista) lista;
         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
@@ -136,7 +141,7 @@ public class DecAsig implements Instruccion {
     private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
         Vector v = (Vector) setvalor;
         LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
-        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), datos);
         e.add(getId().getVal(), nuevo);
     }
 

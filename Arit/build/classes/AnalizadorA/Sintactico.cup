@@ -73,7 +73,8 @@ precedence left POR,DIV,MODULO,POTENCIA;
 precedence right NOT;
 precedence right UMENOS;
 precedence left COR_A, COR_C;
-precedence left PAR_A, PAR_C;
+//precedence left PAR_A, PAR_C;
+
 
 
 
@@ -249,7 +250,7 @@ LISTAEXPRESION::=
 RETORNOS::=
 	RETURN:r PAR_A EXP:e PAR_C{:RESULT=new Return(e,rleft+1,rright+1);:}
 	|RETURN:r PAR_A EXP:e  PAR_C PYCOMA{:RESULT=new Return(e,rleft+1,rright+1);:}
-	|RETURN:r{:RESULT=new Return(null,rleft+1,rright+1);:}
-	|RETURN:r PYCOMA{:RESULT=new Return(null,rleft+1,rright+1);:}
+	|RETURN:r{:RESULT=new Return(new Nulo(rleft+1,rright+1),rleft+1,rright+1);:}
+	|RETURN:r PYCOMA{:RESULT=new Return(new Nulo(rleft+1,rright+1),rleft+1,rright+1);:}
 	;
 

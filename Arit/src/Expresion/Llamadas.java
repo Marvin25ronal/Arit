@@ -12,10 +12,12 @@ import Instruccion.DecAsig;
 import Instruccion.Print;
 import Objetos.Funcion;
 import Objetos.Lista;
+import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
 import java.util.LinkedList;
 import javax.swing.JTextArea;
+import sun.misc.Queue;
 
 /**
  *
@@ -74,9 +76,193 @@ public class Llamadas implements Expresion {
             case "print":
                 return HacerPrint(e);
             case "c":
+                return HacerFuncionC(e);
             case "list":
                 return HacerLista(e);
 
+        }
+        return null;
+    }
+
+    private Object HacerFuncionC(Entorno e) {
+        TipoExp tipodominante = null;
+        TipoExp tipoObjeto = null;
+        LinkedList<Object> cola = new LinkedList<>();
+        for (int i = 0; i < parametros.size(); i++) {
+            Object aux = parametros.get(i).getValor(e);
+            if (aux instanceof Errores) {
+                return aux;
+            }
+            if (aux instanceof Vector) {
+                if (tipoObjeto == null) {
+                    tipoObjeto = new TipoExp(Tipos.VECTOR);
+                } else {
+                    if (!tipoObjeto.isList()) {
+                        tipoObjeto = new TipoExp(Tipos.VECTOR);
+                    }
+                }
+                tipodominante = TipoDominante(tipodominante, ((Vector) aux).getTiposecundario());
+            } else if (aux instanceof Lista) {
+
+                tipoObjeto = new TipoExp(Tipos.LISTA);
+                tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
+            } else {
+                tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
+            }
+            if (tipodominante == null) {
+                return new Errores(Errores.TipoError.SEMANTICO, "La funcion c no puede contener ese tipo de objetos en el parametro " + (i + 1), linea(), columna());
+            }
+            cola.add(aux);
+        }
+
+        //Parte para hacer el objeto
+        if (tipoObjeto == null) {
+            //es un vector
+            LinkedList<Object> valores = new LinkedList<>();
+            while (!cola.isEmpty()) {
+                Object objeto = cola.removeFirst();
+                if (objeto instanceof Literal) {
+                    Literal aux = (Literal) objeto;
+                    Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                } else {
+                    Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                }
+            }
+            if (!dimensiones.isEmpty()) {
+                Entorno eaux = new Entorno(e);
+                eaux.add("aux", (Simbolo) new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores));
+                Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+                return nuevoA.getValor(eaux);
+            }
+            return new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
+        } else if (tipoObjeto.isVector()) {
+            //es un vector con mas vectores
+            LinkedList<Object> valores = new LinkedList<>();
+            while (!cola.isEmpty()) {
+                Object objeto = cola.removeFirst();
+                if (objeto instanceof Literal) {
+                    Literal aux = (Literal) objeto;
+                    Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                } else if (objeto instanceof Vector) {
+                    Vector aux = (Vector) objeto;
+                    LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
+                    Literal laux = null;
+                    for (int i = 0; i < datospasando.size(); i++) {
+                        laux = (Literal) datospasando.get(i);
+                        laux.valor = CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e));
+                        laux.tipo = tipodominante;
+                        valores.add(datospasando.get(i));
+                    }
+                } else {
+                    Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                }
+            }
+            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
+            if (!dimensiones.isEmpty()) {
+                Entorno eaux = new Entorno(e);
+                eaux.add("aux", (Simbolo) nuevo);
+                Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+                return nuevoA.getValor(eaux);
+            }
+            return nuevo;
+        } else {
+            //es lista
+            LinkedList<Object> valores = new LinkedList<>();
+            while (!cola.isEmpty()) {
+                Object objeto = cola.removeFirst();
+                if (objeto instanceof Literal) {
+                    Literal aux = (Literal) objeto;
+                    Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                } else if (objeto instanceof Vector) {
+                    Vector aux = (Vector) objeto;
+                    LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
+                    Literal laux = null;
+                    for (int i = 0; i < datospasando.size(); i++) {
+                        laux = (Literal) datospasando.get(i);
+                        laux.valor = CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e));
+                        laux.tipo = tipodominante;
+                        valores.add(datospasando.get(i));
+                    }
+                } else if (objeto instanceof Lista) {
+                    Lista aux = (Lista) objeto;
+                    LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().CopiarLista(e, aux.getLista());
+                    for (int i = 0; i < datospasando.size(); i++) {
+                        valores.add(datospasando.get(i));
+                    }
+                } else {
+                    Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tipodominante, linea(), columna());
+                    valores.add(nueva);
+                }
+            }
+            Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, "");
+            if (!dimensiones.isEmpty()) {
+                Entorno eaux = new Entorno(e);
+                eaux.add("aux", (Simbolo) nueva);
+                Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+                return nuevoA.getValor(eaux);
+            }
+            return nueva;
+
+        }
+    }
+
+    private Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
+        if (null != tdestino.tp) {
+            switch (tdestino.tp) {
+                case STRING:
+                    if (valor instanceof Nulo) {
+                        return valor;
+                    } else {
+                        return valor.toString();
+                    }
+                case NUMERIC:
+                    if (valor instanceof Nulo) {
+                        return 0.0;
+                    } else if (torigen.tp == Tipos.BOOLEAN) {
+                        boolean b = Boolean.parseBoolean(valor.toString());
+                        return b ? 1.0 : 0.00;
+                    } else {
+                        return Double.parseDouble(valor.toString());
+                    }
+                case INTEGER:
+                    if (torigen.isBoolean()) {
+                        return Boolean.parseBoolean(valor.toString()) ? 1 : 0;
+                    }
+                    return valor instanceof Nulo ? 0 : Integer.parseInt(valor.toString());
+                case BOOLEAN:
+                    if (valor instanceof Nulo) {
+                        return false;
+                    } else {
+                        return Boolean.parseBoolean(valor.toString());
+                    }
+                case LISTA:
+                    return valor;
+                default:
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private TipoExp TipoDominante(TipoExp t, TipoExp nuevot) {
+        if (t == null) {
+            return nuevot;
+        }
+        if (t.isList() || nuevot.isList()) {
+            return new TipoExp(Tipos.LISTA);
+        } else if (t.isString() || nuevot.isString()) {
+            return new TipoExp(Tipos.STRING);
+        } else if (t.isNumeric() || nuevot.isNumeric()) {
+            return new TipoExp(Tipos.NUMERIC);
+        } else if (t.isInt() || nuevot.isInt()) {
+            return new TipoExp(Tipos.INTEGER);
+        } else if (t.isBoolean() || nuevot.isBoolean()) {
+            return new TipoExp(Tipos.BOOLEAN);
         }
         return null;
     }
@@ -99,22 +285,26 @@ public class Llamadas implements Expresion {
                 elementos.add(v);
             } else if (aux instanceof Lista) {
                 Lista l = (Lista) aux;
-                /*if (l.getLista().size() > 1) {
-                    return new Errores(Errores.TipoError.SEMANTICO, "Las listas solo pueden contener un elemento en sus nodos", linea(), columna());
-                }*/
                 elementos.add(l);
             } else if (Globales.VarGlobales.getInstance().obtenerTipo(aux, e).isPrimitive(e)) {
                 Literal l = new Literal(aux, new TipoExp(Globales.VarGlobales.getInstance().obtenerTipo(aux, e).tp), linea(), columna());
-                LinkedList<Object>valores=new LinkedList<>();
+                LinkedList<Object> valores = new LinkedList<>();
                 valores.add(l);
-                Vector nuevo=new Vector("", new TipoExp(Tipos.VECTOR),l.getTipo(e),valores);
+                Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), valores);
                 elementos.add(nuevo);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "Las listas no soportan este objeto", linea(), columna());
             }
 
         }
+
         Lista nuevaLista = new Lista(elementos, new TipoExp(Tipos.LISTA), null, "");
+        if (!dimensiones.isEmpty()) {
+            Entorno eaux = new Entorno(e);
+            eaux.add("aux", (Simbolo) nuevaLista);
+            Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+            return nuevoA.getValor(eaux);
+        }
         return nuevaLista;
     }
 
@@ -179,7 +369,15 @@ public class Llamadas implements Expresion {
                 enuevo.add(id.getVal(), nuevo);
             }
         } else if (valor instanceof Lista) {
-
+            Lista copia = (Lista) valor;
+            LinkedList<Object> lista = Globales.VarGlobales.getInstance().CopiarLista(e, copia.getLista());
+            Lista nueva = new Lista(lista, new TipoExp(Tipos.LISTA), null, id.getVal());
+            if (actualizar) {
+                //ambito venga default
+                enuevo.Actualizar(id.getVal(), nueva);
+            } else {
+                enuevo.add(id.getVal(), nueva);
+            }
         } else if (tipo.isPrimitive(e)) {
             Literal l = new Literal(valor, tipo, linea(), columna());
             LinkedList<Object> lista = new LinkedList<>();

@@ -137,6 +137,13 @@ public final class VarGlobales {
                 LinkedList<Object> element = CopiarLista(e, aux.getLista());
                 Lista nuevo = new Lista(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
                 nueva.add(nuevo);
+            }else if(temp instanceof Literal){
+                Literal pasando=(Literal)temp;
+                Literal nueval=new Literal(pasando.getValor(e),new TipoExp(pasando.getTipo(e).tp),pasando.linea(),pasando.columna());
+                LinkedList<Object>element=new LinkedList<>();
+                element.add(nueval);
+                Vector nuevo=new Vector("",new TipoExp(TipoExp.Tipos.VECTOR),new TipoExp(pasando.getTipo(e).tp),element);
+                nueva.add(nuevo);
             }
         }
         return nueva;

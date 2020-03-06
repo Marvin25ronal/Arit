@@ -59,6 +59,7 @@ public class Entorno {
             Simbolo encontrado = e.tabla.get(id.toLowerCase());
             if (encontrado != null) {
                 e.tabla.put(id.toLowerCase(), valor);
+                return;
             }
         }
 

@@ -63,7 +63,7 @@ public class Return implements Expresion {
     public Object getValor(Entorno e) {
 
         Object val = exp.getValor(e);
-        TipoExp t = exp.getTipo(e);
+        TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(val, e);
         if (val instanceof Literal) {
             Literal l = (Literal) val;
             LinkedList<Object> dimensiones = new LinkedList<>();
@@ -71,7 +71,7 @@ public class Return implements Expresion {
             return new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), dimensiones);
         } else if (val instanceof Errores) {
             return val;
-        } else if (exp.getTipo(e).isPrimitive(e)) {
+        } else if (t.isPrimitive(e)) {
             LinkedList<Object> dimensiones = new LinkedList<>();
             dimensiones.add(new Literal(val, t, linea, columna));
             return new Vector("", new TipoExp(Tipos.VECTOR), t, dimensiones);

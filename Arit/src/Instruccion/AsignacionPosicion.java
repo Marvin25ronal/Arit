@@ -91,6 +91,9 @@ public class AsignacionPosicion implements Instruccion {
         Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         Lista metiendo = (Lista) ant.getAnterior();
         Vector apasar = (Vector) val;
+        if(apasar.getDimensiones().size()>1){
+            return new Errores(Errores.TipoError.SEMANTICO,"La lista solo puede contener un vector en su nodo de tamanio 1 ", linea, columna);
+        }
         LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
         Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), apasar.getTiposecundario(), valoresnuevos);
         metiendo.getLista().set(ant.getIndice(), nuevo);
