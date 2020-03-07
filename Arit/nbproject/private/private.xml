@@ -4,42 +4,29 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Resta.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Identificador.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Operacion.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Logicas.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Funcion.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/DecFuncion.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Globales/Anterior.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/Continue.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Llamadas.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/Instruccion.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Globales/VarGlobales.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Array.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AnalizadorA/parser.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/Break.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Unarias.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/AccesoUnico.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Ternarias.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/Return.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/Switch.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/Else.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Vector.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Default.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Logicas.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/IF.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Globales/Anterior.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Llamadas.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Acceso4.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Globales/VarGlobales.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/CrearMatriz.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/AccesoDoble.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Relacional.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/TipoExp.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Relacional.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Suma.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Expresion.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Literal.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Operaciones/Aritmeticas.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/AST/AST.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/Acceso.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/AsignacionPosicion.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Entorno/Entorno.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/Print.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Instruccion/DecAsig.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Matrix.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/FuncionC.java</file>
             <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/arit/Editor.java</file>
-            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Objetos/Lista.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Control/ElseIf.java</file>
+            <file>file:/E:/Datos/GitHub/Arit/Arit/Arit/src/Expresion/AccesoUnico.java</file>
         </group>
     </open-files>
 </project-private>

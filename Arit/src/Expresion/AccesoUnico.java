@@ -8,6 +8,7 @@ package Expresion;
 import Entorno.Entorno;
 import Expresion.TipoExp.Tipos;
 import Objetos.Lista;
+import Objetos.Matrix;
 import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
@@ -57,6 +58,8 @@ public class AccesoUnico implements Expresion {
             return AccesoVector(e);
         } else if (getObjeto() instanceof Lista) {
             return AccesoLista(e);
+        } else if (getObjeto() instanceof Matrix) {
+            return AccesoMatriz(e);
         }
         return null;
     }
@@ -130,6 +133,28 @@ public class AccesoUnico implements Expresion {
      */
     public void setObjeto(Object objeto) {
         this.objeto = objeto;
+    }
+
+    private Object AccesoMatriz(Entorno e) {
+        Matrix matriz = (Matrix) getObjeto();
+        int inde = Integer.parseInt(getIndice().getValor(e).toString());
+        if (inde <= 0) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+        } else if (inde > matriz.getColumna() * matriz.getFila()) {
+            return new Errores(Errores.TipoError.SEMANTICO, "se paso del indice de la matriz", linea, columna);
+        }
+        inde--;
+        for (int i = 0; i < matriz.getColumna(); i++) {
+            for (int j = 0; j < matriz.getFila(); j++) {
+                if (inde == 0) {
+                    return matriz.getColumnas().get(i).get(j);
+                }
+                inde--;
+            }
+        }
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(matriz);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        return null;
     }
 
     private Object AccesoVector(Entorno e) {

@@ -37,7 +37,7 @@ public class IF implements Instruccion {
 
     @Override
     public Object ejecutar(Entorno e) {
-        
+
         Object ifacutal = condicion.getValor(e);
         if (ifacutal instanceof Errores) {
             return ifacutal;
@@ -46,11 +46,11 @@ public class IF implements Instruccion {
             Vector v = (Vector) ifacutal;
             Literal l = (Literal) v.getDimensiones().get(0);
             ifacutal = l.getValor(e);
-            if(l.getTipo(e).isBoolean()){
+            if (l.getTipo(e).isBoolean()) {
                 return ejecutarIF(e, ifacutal);
-            }else{
-              Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO,"Los elementos del vector no son booleanos", linea, columna));
-              return null;
+            } else {
+                Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Los elementos del vector no son booleanos", linea, columna));
+                return null;
             }
         }
         if (condicion.getTipo(e).isBoolean()) {
@@ -59,7 +59,7 @@ public class IF implements Instruccion {
             Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "La condicion no es booleana", linea, columna));
             return null;
         }
-      
+
     }
 
     private Object ejecutarIF(Entorno e, Object ifacutal) {
@@ -96,14 +96,22 @@ public class IF implements Instruccion {
                     if (ifacutal instanceof Errores) {
                         Globales.VarGlobales.getInstance().AgregarEU((Errores) ifacutal);
                         continue;
-                    }
-                    if (!((ElseIf) n).getCondicion().getTipo(e).isBoolean()) {
+                    } else if (ifacutal instanceof Vector) {
+                        //condicion = (Expresion) ((Vector) ifacutal).getDimensiones().get(0);
+                        Vector v = (Vector) ifacutal;
+                        Literal l = (Literal) v.getDimensiones().get(0);
+                        if (l.getTipo(e).isBoolean()) {
+                            ifacutal = l.getValor(e);
+                        } else {
+                            return new Errores(Errores.TipoError.SEMANTICO, "La condicion del else if no es de tipo booleana", linea, columna);
+                        }
+                    } else if (!((ElseIf) n).getCondicion().getTipo(e).isBoolean()) {
                         Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "La condicion no es booleana del else if", ((ElseIf) n).getLinea(), ((ElseIf) n).getColumna()));
                         continue;
                     }
                 } else if (n instanceof Else) {
                     ifacutal = true;
-                   // System.out.println("eNTRO");
+                    // System.out.println("eNTRO");
                 }
                 if (Boolean.parseBoolean(ifacutal.toString()) && entro == false) {
                     entro = true;

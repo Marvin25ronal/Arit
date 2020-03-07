@@ -118,9 +118,22 @@ public class Relacional extends Operacion {
                         return new Literal(a >= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
                     case MENOR_IGUAL:
                         return new Literal(a <= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    default:
+                        return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion con " + op.toString(), linea, columna);
                 }
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "No se puede comparar operadores que no sean numero", linea, columna);
+            }
+        } else if (top1.isBoolean() && top2.isBoolean()) {
+            boolean a = Boolean.parseBoolean(valor1.toString());
+            boolean b = Boolean.parseBoolean(valor2.toString());
+            switch (op) {
+                case IGUAL_IGUAL:
+                    return new Literal(a == b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                case DISTINTO:
+                    return new Literal(a != b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                default:
+                    return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion con " + op.toString(), linea, columna);
             }
         }
         return null;

@@ -13,6 +13,7 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Objetos.Lista;
+import Objetos.Matrix;
 import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
@@ -79,20 +80,42 @@ public class DecAsig implements Instruccion {
                 }
             } else if (t.isList()) {
                 if (e.ExisteVariable(getId().getVal())) {
-                    ReasignarLista_Lista(e,setvalor);
+                    ReasignarLista_Lista(e, setvalor);
                 } else {
                     CrearListaNueva(e, setvalor);
+                }
+            } else if (t.isMatrix()) {
+                if (e.ExisteVariable(getId().getVal())) {
+                    ReasignarMatriz_Matriz(e, setvalor);
+                } else {
+                    CrearMatrizNueva(e, setvalor);
                 }
             }
         }
         return null;
     }
-    private void ReasignarLista_Lista(Entorno e,Object lista){
-        Lista l=(Lista)lista;
-         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
+
+    private void ReasignarMatriz_Matriz(Entorno e, Object matriz) {
+        Matrix m = (Matrix) matriz;
+        LinkedList<LinkedList<Object>> valores = Globales.VarGlobales.getInstance().CopiarMatrix(e, m.getColumnas());
+        Matrix nueva = new Matrix(valores, new TipoExp(Tipos.MATRIX), new TipoExp(m.getTiposecundario().tp), id.getVal(), m.getColumna(), m.getFila());
+        e.Actualizar(id.getVal(), nueva);
+    }
+
+    private void CrearMatrizNueva(Entorno e, Object matriz) {
+        Matrix m = (Matrix) matriz;
+        LinkedList<LinkedList<Object>> valores = Globales.VarGlobales.getInstance().CopiarMatrix(e, m.getColumnas());
+        Matrix nueva = new Matrix(valores, new TipoExp(Tipos.MATRIX), new TipoExp(m.getTiposecundario().tp), id.getVal(), m.getColumna(), m.getFila());
+        e.add(id.getVal(), m);
+    }
+
+    private void ReasignarLista_Lista(Entorno e, Object lista) {
+        Lista l = (Lista) lista;
+        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
         Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
         e.Actualizar(id.getVal(), nueva);
     }
+
     private void CrearListaNueva(Entorno e, Object lista) {
         Lista l = (Lista) lista;
         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
@@ -127,15 +150,13 @@ public class DecAsig implements Instruccion {
 
     private void ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
         //Verificar si es un vector
-        Simbolo s = e.get(getId().getVal());
-        if (s.getTipo().tp == Tipos.VECTOR) {
-            LinkedList<Object> datos = new LinkedList<>();
-            Literal nueva = new Literal(setvalor, t, getLinea(), getColumna());
-            datos.add(nueva);
-            Vector v = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
-            e.Actualizar(getId().getVal(), v);
+        
+        LinkedList<Object> datos = new LinkedList<>();
+        Literal nueva = new Literal(setvalor, t, getLinea(), getColumna());
+        datos.add(nueva);
+        Vector v = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        e.Actualizar(getId().getVal(), v);
 
-        }
     }
 
     private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
@@ -166,7 +187,7 @@ public class DecAsig implements Instruccion {
     private boolean isPrimitive(Entorno e) {
         if (getValor().getTipo(e).tp == Tipos.VECTOR) {
             return false;
-        }else if(getValor().getTipo(e).tp==Tipos.LISTA){
+        } else if (getValor().getTipo(e).tp == Tipos.LISTA) {
             return false;
         }
         return true;

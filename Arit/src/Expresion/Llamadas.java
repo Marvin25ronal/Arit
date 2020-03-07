@@ -79,6 +79,8 @@ public class Llamadas implements Expresion {
                 return HacerFuncionC(e);
             case "list":
                 return HacerLista(e);
+            case "matrix":
+                return new CrearMatriz(parametros, dimensiones, linea(), columna()).Ejecutar(e);
 
         }
         return null;
@@ -470,6 +472,8 @@ public class Llamadas implements Expresion {
             case "c":
                 return true;
             case "list":
+                return true;
+            case "matrix":
                 return true;
             default:
                 return false;
