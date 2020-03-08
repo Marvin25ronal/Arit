@@ -14,7 +14,7 @@ import Entorno.Entorno;
 public class TipoExp {
 
     public enum Tipos {
-        INTEGER, BOOLEAN, STRING, NUMERIC, NULO, VECTOR,FUNCION
+        INTEGER, BOOLEAN, STRING, NUMERIC, NULO, VECTOR, FUNCION, LISTA, MATRIX
     }
     public Tipos tp;
 
@@ -50,11 +50,22 @@ public class TipoExp {
         return tp == Tipos.VECTOR;
     }
 
+    public boolean isList() {
+        return tp == Tipos.LISTA;
+    }
+
     public boolean isPrimitive(Entorno e) {
         if (tp == Tipos.VECTOR) {
             return false;
+        } else if (tp == Tipos.LISTA) {
+            return false;
+        } else if (tp == Tipos.MATRIX) {
+            return false;
         }
         return true;
+    }
+    public boolean isMatrix(){
+        return tp==Tipos.MATRIX;
     }
 
 }

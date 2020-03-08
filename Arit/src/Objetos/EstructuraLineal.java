@@ -14,7 +14,7 @@ import java.util.LinkedList;
  *
  * @author marvi
  */
-public class Vector extends Simbolo {
+public class EstructuraLineal extends Simbolo {
 
     /**
      * @return the tam
@@ -31,7 +31,7 @@ public class Vector extends Simbolo {
     /**
      * @return the id
      */
-    public Vector(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
+    public EstructuraLineal(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
         super(tipo, tipoprimitivo, id);
         this.dimensiones = dimensiones;
 
@@ -57,16 +57,33 @@ public class Vector extends Simbolo {
     @Override
     public String toString() {
         StringBuilder cadena = new StringBuilder();
-        cadena.append("[");
-        for (int i = 0; i < dimensiones.size(); i++) {
-            Literal l = (Literal) dimensiones.get(i);
-            cadena.append(l.valor);
-            if (i < dimensiones.size() - 1) {
-                cadena.append(",");
+        if (getTipo().isVector()) {
+            cadena.append("[");
+            for (int i = 0; i < dimensiones.size(); i++) {
+                Literal l = (Literal) dimensiones.get(i);
+                cadena.append(l.getValor());
+                if (i < dimensiones.size() - 1) {
+                    cadena.append(",");
+                }
             }
+            cadena.append("]");
+            // return cadena.toString();
+        } else if (getTipo().isList()) {
+
+            cadena.append("{");
+            for (int i = 0; i < getDimensiones().size(); i++) {
+                Object aux = getDimensiones().get(i);
+                cadena.append(aux.toString());
+                //s.append(",");
+                if (i < dimensiones.size() - 1) {
+                    cadena.append(",");
+                }
+            }
+            cadena.append("}");
+            //return cadena.toString(); //To change body of generated methods, choose Tools | Templates.
         }
-        cadena.append("]");
         return cadena.toString();
+
     }
 
     /**

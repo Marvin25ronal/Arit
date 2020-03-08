@@ -7,9 +7,9 @@ package Entorno;
 
 import Objetos.Array;
 import Objetos.Funcion;
-import Objetos.Lista;
+
 import Objetos.Matrix;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -37,6 +37,13 @@ public class Entorno {
         }
         return false;
     }
+    public boolean ExisteEnEntorno(String id){
+        Simbolo en=this.tabla.get(id.toLowerCase());
+        if(en!=null){
+            return true;
+        }
+        return false;
+    }
 
     public Entorno getGlobal() {
         Entorno ant = null;
@@ -59,6 +66,7 @@ public class Entorno {
             Simbolo encontrado = e.tabla.get(id.toLowerCase());
             if (encontrado != null) {
                 e.tabla.put(id.toLowerCase(), valor);
+                return;
             }
         }
 
@@ -74,39 +82,5 @@ public class Entorno {
         return null;
     }
 
-    public Entorno Copiar() {
-        Stack<Entorno> pilaE = new Stack<>();
-        for (Entorno aux = this; aux != null; aux = aux.getPadre()) {
-            Entorno enuevo = new Entorno(null);
-            for (HashMap.Entry<String, Simbolo> env : aux.tabla.entrySet()) {
-                if (env.getValue() instanceof Vector) {
-                    Vector v = (Vector) env.getValue();
-                    Vector nuevoV = new Vector(v.getId(), v.getTipo(), v.getTiposecundario(), Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), aux));
-                    enuevo.add(nuevoV.getId(), nuevoV);
-                } else if (env.getValue() instanceof Lista) {
-
-                } else if (env.getValue() instanceof Array) {
-
-                } else if (env.getValue() instanceof Matrix) {
-
-                } else if (env.getValue() instanceof Funcion) {
-                    Funcion f = (Funcion) env.getValue();
-                    Funcion fn = new Funcion(f.getSentencias(), f.getParametros(), f.getLinea(), f.getColumna(), f.getTipo(), f.getTiposecundario(), "Funcion_"+f.getId());
-                    enuevo.add(fn.getId(), fn);
-                }
-            }
-            pilaE.add(enuevo);
-        }
-        Entorno anterior = null;
-        Entorno aux = null;
-
-        while (!pilaE.isEmpty()) {
-            aux = pilaE.pop();
-            aux.padre = anterior;
-            anterior = aux;
-
-        }
-        return aux;
-    }
-
+   
 }

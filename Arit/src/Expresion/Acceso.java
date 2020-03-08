@@ -7,7 +7,9 @@ package Expresion;
 
 import Entorno.Entorno;
 import Entorno.Simbolo;
-import Objetos.Vector;
+
+import Objetos.Matrix;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -36,7 +38,9 @@ public class Acceso implements Expresion {
         Object s = getId().getValor(e);
         if (s instanceof Errores) {
             return s;
-        } else if (s instanceof Vector) {
+        }
+        Simbolo sim=(Simbolo)s;
+        if (sim.getTipo().isVector()) {
             Object vector = s;
             for (Expresion exp : getIndices()) {
                 if (exp instanceof AccesoUnico) {
@@ -46,6 +50,8 @@ public class Acceso implements Expresion {
                     vector = aux.getValor(e);
                 } else if (exp instanceof AccesoDoble) {
                     return new Errores(Errores.TipoError.SEMANTICO, "El vector no se puede invocar con acceso doble", getLinea(), getColumna());
+                } else if (exp instanceof Acceso4) {
+                    return new Errores(Errores.TipoError.SEMANTICO, "El vector no se puede invocar con un acceso 4", linea, columna);
                 }
                 if (vector instanceof Errores) {
                     return vector;
@@ -53,6 +59,46 @@ public class Acceso implements Expresion {
 
             }
             return vector;
+        } else if (sim.getTipo().isList()) {
+            Object lista = s;
+            for (Expresion exp : getIndices()) {
+                if (exp instanceof AccesoUnico) {
+                    AccesoUnico aux = (AccesoUnico) exp;
+                    aux.setObjeto(lista);
+                    aux.setIncremento(incremento);
+                    lista = aux.getValor(e);
+                } else if (exp instanceof AccesoDoble) {
+                    AccesoDoble aux = (AccesoDoble) exp;
+                    aux.setObjeto(lista);
+                    aux.setIncremento(incremento);
+                    lista = aux.getValor(e);
+                } else if (exp instanceof Acceso4) {
+                    return new Errores(Errores.TipoError.SEMANTICO, "La lista no tiene acceso de tipo 4", linea, columna);
+                }
+                if (lista instanceof Errores) {
+                    return lista;
+                }
+            }
+            return lista;
+        } else if (s instanceof Matrix) {
+            Object matrix = s;
+            for (Expresion exp : getIndices()) {
+                if (exp instanceof AccesoUnico) {
+                    AccesoUnico aux = (AccesoUnico) exp;
+                    aux.setObjeto(matrix);
+                    matrix = aux.getValor(e);
+                } else if (exp instanceof AccesoDoble) {
+                    return new Errores(Errores.TipoError.SEMANTICO, "La matriz no tiene acceso de tipo 2", linea, columna);
+                } else if (exp instanceof Acceso4) {
+                    Acceso4 aux = (Acceso4) exp;
+                    aux.setObjeto(matrix);
+                    matrix = aux.getValor(e);
+                }
+                if (matrix instanceof Errores) {
+                    return matrix;
+                }
+            }
+            return matrix;
         }
         return null;
 
@@ -62,8 +108,8 @@ public class Acceso implements Expresion {
     public TipoExp getTipo(Entorno e) {
         Simbolo s = e.get(id.getVal());
         if (s != null) {
-            if (s instanceof Vector) {
-                return ((Vector) s).getTipo();
+            if (s instanceof EstructuraLineal) {
+                return ((EstructuraLineal) s).getTipo();
             }
         }
         return null;

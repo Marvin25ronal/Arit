@@ -9,6 +9,7 @@ import AST.Nodo;
 import Entorno.Entorno;
 import Entorno.Simbolo;
 import Expresion.Identificador;
+import Expresion.Llamadas;
 import Expresion.TipoExp;
 import Objetos.Funcion;
 import Reportes.Errores;
@@ -39,6 +40,11 @@ public class DecFuncion implements Instruccion {
         //Verificar si los parametros no son iguales
         //Verificar si existe la funcion
         //Insertar
+        Llamadas l = new Llamadas(null, null, null);
+        if (l.Nativa(id.getVal().toLowerCase())) {
+            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No se puede declarar la funcion porque es nativa ", linea, columna));
+            return null;
+        }
         if (ParametrosNoRepetidos(e)) {
             if ((e.ExisteVariable("Funcion_" + id.getVal())) == false) {
                 Funcion nueva = new Funcion(sentencias, parametros, linea, columna, new TipoExp(TipoExp.Tipos.FUNCION), null, id.getVal());
@@ -55,30 +61,19 @@ public class DecFuncion implements Instruccion {
         return null;
     }
 
-    /*private Object ConvertirParametros(Entorno e) {
-        LinkedList<Simbolo> s = new LinkedList<>();
-        for(int i=0;i<parametros.size();i++){
-            Object aux=parametros.get(i);
-            if(aux instanceof DecAsig){
-                
-            }else if(aux instanceof Identificador){
-                
-            }
-        }
-    }*/
     private boolean ParametrosNoRepetidos(Entorno e) {
         Identificador a = null, b = null;
         for (int i = 0; i < parametros.size(); i++) {
             if (parametros.get(i) instanceof Identificador) {
                 a = (Identificador) parametros.get(i);
             } else if (parametros.get(i) instanceof DecAsig) {
-                a = ((DecAsig) parametros.get(i)).id;
+                a = ((DecAsig) parametros.get(i)).getId();
             }
             for (int j = i + 1; j < parametros.size(); j++) {
                 if (parametros.get(j) instanceof Identificador) {
                     b = (Identificador) parametros.get(j);
                 } else if (parametros.get(j) instanceof DecAsig) {
-                    b = ((DecAsig) parametros.get(i)).id;
+                    b = ((DecAsig) parametros.get(j)).getId();
                 }
                 if (a.getVal().equals(b.getVal())) {
                     return false;

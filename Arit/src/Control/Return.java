@@ -7,8 +7,13 @@ package Control;
 
 import Entorno.Entorno;
 import Expresion.Expresion;
+import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Nulo;
+import Objetos.EstructuraLineal;
+import Reportes.Errores;
+import java.util.LinkedList;
 
 /**
  *
@@ -56,25 +61,44 @@ public class Return implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
-        return this;
+
+        Object val = exp.getValor(e);
+        TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(val, e);
+        if (val instanceof Literal) {
+            Literal l = (Literal) val;
+            LinkedList<Object> dimensiones = new LinkedList<>();
+            dimensiones.add(l);
+            return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), l.getTipo(e), dimensiones);
+        } else if (val instanceof Errores) {
+            return val;
+        } else if (t.isPrimitive(e)) {
+            LinkedList<Object> dimensiones = new LinkedList<>();
+            dimensiones.add(new Literal(val, t, linea, columna));
+            return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), t, dimensiones);
+        } else if (val != null) {
+            return val;
+        }
+        return null;
+
     }
 
     @Override
-    public TipoExp getTipo(Entorno e) {
+    public TipoExp getTipo(Entorno e
+    ) {
         if (exp == null) {
             return new TipoExp(Tipos.NULO);
         }
-        return exp.getTipo(e); 
+        return exp.getTipo(e);
     }
 
     @Override
     public int linea() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.linea;
     }
 
     @Override
     public int columna() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.columna;
     }
 
     /**

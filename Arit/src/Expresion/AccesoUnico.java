@@ -6,8 +6,12 @@
 package Expresion;
 
 import Entorno.Entorno;
+import Entorno.Simbolo;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+
+import Objetos.Matrix;
+import Objetos.Nulo;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -32,9 +36,13 @@ public class AccesoUnico implements Expresion {
     @Override
     public Object getValor(Entorno e) {
         Object i = getIndice().getValor(e);
-        if (getIndice().getTipo(e).tp == Tipos.VECTOR) {
+        if (i instanceof Errores) {
+            return i;
+        }
+        TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(i, e);
+        if (tipo.tp == Tipos.VECTOR) {
             //solo tenga un valor
-            Vector v = (Vector) i;
+            EstructuraLineal v = (EstructuraLineal) i;
             if (v.getTiposecundario().tp != Tipos.INTEGER) {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector no es de tipo INTEGER", linea, columna);
             }
@@ -44,16 +52,16 @@ public class AccesoUnico implements Expresion {
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
             }
+        } else if (tipo.tp != Tipos.INTEGER) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico el tipo es " + tipo.tp, getLinea(), getColumna());
         }
-        if (getIndice().getTipo(e).tp != Tipos.INTEGER) {
-            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico", getLinea(), getColumna());
-        }
-
-        if (i instanceof Errores) {
-            return i;
-        }
-        if (getObjeto() instanceof Vector) {
+        Simbolo s = (Simbolo) getObjeto();
+        if (s.getTipo().isVector()) {
             return AccesoVector(e);
+        } else if (s.getTipo().isList()) {
+            return AccesoLista(e);
+        } else if (s.getTipo().isMatrix()) {
+            return AccesoMatriz(e);
         }
         return null;
     }
@@ -129,8 +137,30 @@ public class AccesoUnico implements Expresion {
         this.objeto = objeto;
     }
 
+    private Object AccesoMatriz(Entorno e) {
+        Matrix matriz = (Matrix) getObjeto();
+        int inde = Integer.parseInt(getIndice().getValor(e).toString());
+        if (inde <= 0) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+        } else if (inde > matriz.getColumna() * matriz.getFila()) {
+            return new Errores(Errores.TipoError.SEMANTICO, "se paso del indice de la matriz", linea, columna);
+        }
+        inde--;
+        for (int i = 0; i < matriz.getColumna(); i++) {
+            for (int j = 0; j < matriz.getFila(); j++) {
+                if (inde == 0) {
+                    return matriz.getColumnas().get(i).get(j);
+                }
+                inde--;
+            }
+        }
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(matriz);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        return null;
+    }
+
     private Object AccesoVector(Entorno e) {
-        Vector v = (Vector) getObjeto();
+        EstructuraLineal v = (EstructuraLineal) getObjeto();
         int inde = Integer.parseInt(getIndice().getValor(e).toString());
         if (inde <= 0) {
             return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", getLinea(), getColumna());
@@ -143,17 +173,62 @@ public class AccesoUnico implements Expresion {
         inde--;
         LinkedList<Object> lista = new LinkedList<Object>();
         lista.add(v.getDimensiones().get(inde));
-        return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(v);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        return new EstructuraLineal(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
     }
 
-    private Object AccesoVectorIncremento(Vector v, int inde) {
+    private Object AccesoLista(Entorno e) {
+        EstructuraLineal l = (EstructuraLineal) getObjeto();
+        int inde = Integer.parseInt(getIndice().getValor(e).toString());
+        if (inde <= 0) {
+            return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+        } else if (inde > l.getDimensiones().size()) {
+            if (incremento) {
+                return AccesoListaIncremento(l, inde);
+            }
+            return new Errores(Errores.TipoError.SEMANTICO, "Se paso del indice de la lista", getLinea(), getColumna());
+        }
+
+        inde--;
+        LinkedList<Object> lista = new LinkedList<>();
+        lista.add(l.getDimensiones().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(l);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        //return new Lista(lista, new TipoExp(Tipos.LISTA), null, "");
+        return new EstructuraLineal("", new TipoExp(Tipos.LISTA), null, lista);
+    }
+
+    private Object AccesoVectorIncremento(EstructuraLineal v, int inde) {
         for (int i = v.getTam(); i < inde; i++) {
             v.getDimensiones().add(ObtenerDefault(v.getTiposecundario()));
         }
         inde--;
         LinkedList<Object> lista = new LinkedList<>();
         lista.add(v.getDimensiones().get(inde));
-        return new Vector(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(v);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        return new EstructuraLineal(v.getId(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), lista);
+    }
+
+    private Object AccesoListaIncremento(EstructuraLineal l, int inde) {
+        for (int i = l.getDimensiones().size(); i < inde; i++) {
+            LinkedList<Object> li=new LinkedList<>();
+            li.add(new Literal(new Nulo(linea, columna), new TipoExp(Tipos.STRING), linea, columna));
+            EstructuraLineal v=new EstructuraLineal("",new TipoExp(Tipos.VECTOR),new TipoExp(Tipos.STRING), li);
+            l.getDimensiones().add(v);
+        }
+        inde--;
+        LinkedList<Object> lista = new LinkedList<>();
+        lista.add(l.getDimensiones().get(inde));
+        Globales.VarGlobales.getInstance().getAnterior().setAnterior(l);
+        Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+        Globales.VarGlobales.getInstance().getAnterior().setAcceso(1);
+        //return new Lista(lista, new TipoExp(Tipos.LISTA), null, "");
+        return new EstructuraLineal("", new TipoExp(Tipos.LISTA), null, lista);
     }
 
     private Literal ObtenerDefault(TipoExp t) {

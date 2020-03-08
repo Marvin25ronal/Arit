@@ -10,7 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -66,13 +66,13 @@ public class Relacional extends Operacion {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
         if (max(top1, top2).isVector()) {
             if (top1.isVector() && top2.isVector()) {
-                return RelacionalVectoresVectores((Vector) valor1, (Vector) valor2, e);
+                return RelacionalVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
-            return top1.isVector() ? RelacionalVector((Vector) valor1, top2, valor2, e, true) : RelacionalVector((Vector) valor2, top1, valor1, e, false);
+            return top1.isVector() ? RelacionalVector((EstructuraLineal) valor1, top2, valor2, e, true) : RelacionalVector((EstructuraLineal) valor2, top1, valor1, e, false);
         }
         if (top1.isNulo() && top2.isNulo()) {
             switch (op) {
@@ -118,15 +118,28 @@ public class Relacional extends Operacion {
                         return new Literal(a >= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
                     case MENOR_IGUAL:
                         return new Literal(a <= b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    default:
+                        return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion con " + op.toString(), linea, columna);
                 }
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "No se puede comparar operadores que no sean numero", linea, columna);
+            }
+        } else if (top1.isBoolean() && top2.isBoolean()) {
+            boolean a = Boolean.parseBoolean(valor1.toString());
+            boolean b = Boolean.parseBoolean(valor2.toString());
+            switch (op) {
+                case IGUAL_IGUAL:
+                    return new Literal(a == b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                case DISTINTO:
+                    return new Literal(a != b, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                default:
+                    return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion con " + op.toString(), linea, columna);
             }
         }
         return null;
     }
 
-    private Object RelacionalVector(Vector v, TipoExp tipoexp, Object valor, Entorno e, boolean primero) {
+    private Object RelacionalVector(EstructuraLineal v, TipoExp tipoexp, Object valor, Entorno e, boolean primero) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> nuevo = new LinkedList<>();
         Literal l;
@@ -139,11 +152,11 @@ public class Relacional extends Operacion {
             }
             nuevo.add(aux);
         }
-        Vector nuevov = new Vector("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), nuevo);
+        EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), nuevo);
         return nuevov;
     }
 
-    private Object RelacionalVectoresVectores(Vector v1, Vector v2, Entorno e) {
+    private Object RelacionalVectoresVectores(EstructuraLineal v1, EstructuraLineal v2, Entorno e) {
         LinkedList<Object> a = Globales.VarGlobales.getInstance().clonarListaVector(v1.getDimensiones(), e);
         LinkedList<Object> b = Globales.VarGlobales.getInstance().clonarListaVector(v2.getDimensiones(), e);
         LinkedList<Object> nuevos = new LinkedList<>();
@@ -156,7 +169,7 @@ public class Relacional extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (a.size() == 1) {
             for (int i = 0; i < b.size(); i++) {
@@ -166,7 +179,7 @@ public class Relacional extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (b.size() == 1) {
             for (int i = 0; i < a.size(); i++) {
@@ -176,7 +189,7 @@ public class Relacional extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden hacer operaciones relacionales con  vectores que no sean de un elemento o igual elementos", linea, columna);

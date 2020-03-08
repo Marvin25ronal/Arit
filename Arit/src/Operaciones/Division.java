@@ -9,7 +9,7 @@ import Entorno.Entorno;
 import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -24,9 +24,7 @@ public class Division extends Aritmeticas {
     }
 
     public Object ejecutar(Entorno e) {
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
-        TipoExp aux = max(top1, top2);
+        
 
         //Comparar si son vectores, listas, matrices o array
         Object valor1 = op1.getValor(e);
@@ -36,6 +34,9 @@ public class Division extends Aritmeticas {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
+        TipoExp aux = max(top1, top2);
         //esto para cuando la division trae algun numero raro
         if (aux.esNumero() && (Double.parseDouble(valor1.toString()) % 1 != 0 || Double.parseDouble(valor2.toString()) % 1 != 0)) {
             aux.tp = TipoExp.Tipos.NUMERIC;
@@ -50,9 +51,9 @@ public class Division extends Aritmeticas {
             //Caso 1 solo uno es vector
             //Caso 2 ambos son vectores
             if (top1.isVector() && top2.isVector()) {
-                return DivisionVectoresVectores((Vector) valor1, (Vector) valor2, e);
+                return DivisionVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
-            return top1.isVector() ? DivisionVectores((Vector) valor1, top2, valor2, e, true) : DivisionVectores((Vector) valor2, top1, valor1, e, false);
+            return top1.isVector() ? DivisionVectores((EstructuraLineal) valor1, top2, valor2, e, true) : DivisionVectores((EstructuraLineal) valor2, top1, valor1, e, false);
         }
 
         switch (aux.tp) {
@@ -67,7 +68,7 @@ public class Division extends Aritmeticas {
         }
 
     }
-    private Object DivisionVectores(Vector v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
+    private Object DivisionVectores(EstructuraLineal v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -80,11 +81,11 @@ public class Division extends Aritmeticas {
             }
             NuevoVal.add(aux);
         }
-        Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
         return nuevo;
     }
 
-    private Object DivisionVectoresVectores(Vector v1, Vector v2, Entorno e) {
+    private Object DivisionVectoresVectores(EstructuraLineal v1, EstructuraLineal v2, Entorno e) {
         LinkedList<Object> a = Globales.VarGlobales.getInstance().clonarListaVector(v1.getDimensiones(), e);
         LinkedList<Object> b = Globales.VarGlobales.getInstance().clonarListaVector(v2.getDimensiones(), e);
         LinkedList<Object> nuevos = new LinkedList<>();
@@ -97,7 +98,7 @@ public class Division extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (a.size() == 1) {
             for (int i = 0; i < b.size(); i++) {
@@ -107,7 +108,7 @@ public class Division extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (b.size() == 1) {
             for (int i = 0; i < a.size(); i++) {
@@ -117,7 +118,7 @@ public class Division extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden division vectores que no sean de un elemento o igual elementos", linea, columna);

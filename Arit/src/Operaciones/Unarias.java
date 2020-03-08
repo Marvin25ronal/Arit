@@ -10,7 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -47,16 +47,17 @@ public class Unarias extends Operacion {
             return null;
         }
         Object valor = op1.getValor(e);
-        TipoExp tip = op1.getTipo(e);
+       
         if (valor instanceof Errores) {
             return valor;
         } else {
+             TipoExp tip = Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
             //comparamos vectores
             if (tip.tp == Tipos.VECTOR) {
                 if (op == Operador.NOT) {
-                    return NotVectores((Vector) valor, e);
+                    return NotVectores((EstructuraLineal) valor, e);
                 } else {
-                    return MenosVectores((Vector) valor, e);
+                    return MenosVectores((EstructuraLineal) valor, e);
                 }
             } else {
                 if (tip.esNumero() && (Double.parseDouble(valor.toString()) % 1 != 0)) {
@@ -88,7 +89,7 @@ public class Unarias extends Operacion {
 
     }
 
-    private Object MenosVectores(Vector v, Entorno e) {
+    private Object MenosVectores(EstructuraLineal v, Entorno e) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -102,11 +103,11 @@ public class Unarias extends Operacion {
             }
             NuevoVal.add(aux);
         }
-        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
         return nuevo;
     }
 
-    private Object NotVectores(Vector v, Entorno e) {
+    private Object NotVectores(EstructuraLineal v, Entorno e) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -120,7 +121,7 @@ public class Unarias extends Operacion {
             }
             NuevoVal.add(aux);
         }
-        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
         return nuevo;
     }
 

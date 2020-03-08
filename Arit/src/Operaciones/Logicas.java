@@ -10,7 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -28,8 +28,8 @@ public class Logicas extends Operacion {
         this.columna = columna;
     }
 
-    private boolean Correctos(Entorno e) {
-        return this.op1.getTipo(e).tp == Tipos.BOOLEAN && this.op2.getTipo(e).tp == Tipos.BOOLEAN;
+    private boolean Correctos(TipoExp t1,TipoExp t2) {
+        return t1.tp == Tipos.BOOLEAN && t2.tp == Tipos.BOOLEAN;
     }
 
     @Override
@@ -70,9 +70,7 @@ public class Logicas extends Operacion {
         } else if (op2 instanceof Errores) {
             return op2;
         }
-        TipoExp top1 = op1.getTipo(e);
-        TipoExp top2 = op2.getTipo(e);
-        TipoExp aux = max(top1, top2);
+        
         Object valor1 = op1.getValor(e);
         Object valor2 = op2.getValor(e);
         if (valor1 instanceof Errores) {
@@ -80,15 +78,18 @@ public class Logicas extends Operacion {
         } else if (valor2 instanceof Errores) {
             return valor2;
         }
+        TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
+        TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
+        TipoExp aux = max(top1, top2);
         if (aux == null) {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden comparar otros tipos que no sean booleanos", linea, columna);
         } else if (aux.isVector()) {
             if (top1.isVector() && top2.isVector()) {
-                return LogicasVectoresVectores((Vector) valor1, (Vector) valor2, e);
+                return LogicasVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
-            return top1.isVector() ? LogicasVector((Vector) valor1, top2, valor2, e) : LogicasVector((Vector) valor2, top1, valor1, e);
+            return top1.isVector() ? LogicasVector((EstructuraLineal) valor1, top2, valor2, e) : LogicasVector((EstructuraLineal) valor2, top1, valor1, e);
         }
-        if (Correctos(e)) {
+        if (Correctos(top1,top2)) {
             switch (op) {
                 case AND:
                     return new Literal((Boolean.parseBoolean(valor1.toString()) && (Boolean.parseBoolean(valor2.toString()))), new TipoExp(Tipos.BOOLEAN), linea, columna);
@@ -101,7 +102,7 @@ public class Logicas extends Operacion {
         return null;
     }
 
-    private Object LogicasVectoresVectores(Vector v1, Vector v2, Entorno e) {
+    private Object LogicasVectoresVectores(EstructuraLineal v1, EstructuraLineal v2, Entorno e) {
         LinkedList<Object> a = Globales.VarGlobales.getInstance().clonarListaVector(v1.getDimensiones(), e);
         LinkedList<Object> b = Globales.VarGlobales.getInstance().clonarListaVector(v2.getDimensiones(), e);
         LinkedList<Object> nuevos = new LinkedList<>();
@@ -114,7 +115,7 @@ public class Logicas extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (a.size() == 1) {
             for (int i = 0; i < b.size(); i++) {
@@ -124,7 +125,7 @@ public class Logicas extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (b.size() == 1) {
             for (int i = 0; i < a.size(); i++) {
@@ -134,14 +135,14 @@ public class Logicas extends Operacion {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden hacer operaciones logicas  vectores que no sean de un elemento o igual elementos", linea, columna);
         }
     }
 
-    private Object LogicasVector(Vector v, TipoExp tipoexp, Object valor, Entorno e) {
+    private Object LogicasVector(EstructuraLineal v, TipoExp tipoexp, Object valor, Entorno e) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> nuevo = new LinkedList<>();
         Literal l;
@@ -154,7 +155,7 @@ public class Logicas extends Operacion {
             }
             nuevo.add(aux);
         }
-        Vector nuevov = new Vector("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), nuevo);
+        EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), nuevo);
         return nuevov;
     }
 
