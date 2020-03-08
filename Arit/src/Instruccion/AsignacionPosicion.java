@@ -14,6 +14,7 @@ import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Globales.Anterior;
 import Objetos.Lista;
+import Objetos.Matrix;
 import Objetos.Nulo;
 import Objetos.Vector;
 import Reportes.Errores;
@@ -57,7 +58,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         //me lo regresa en un vector de 1
 
-        Simbolo s = (Simbolo) ac.getId().getValor(e);
+        Simbolo s = (Simbolo) Globales.VarGlobales.getInstance().getAnterior().getAnterior();
         if (s instanceof Vector) {
             if (tvalor.isPrimitive(e)) {
                 return ReasignarVector_Primitivo(e, val, tvalor, (Vector) obj);
@@ -76,6 +77,16 @@ public class AsignacionPosicion implements Instruccion {
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "La lista no puede contener ese tipo de objetos ", linea, columna);
             }
+        } else if (s instanceof Matrix) {
+            ///se que si el anterior es matriz el resultado simpre va a ser un vector
+            ///se puede modificar unicacmente ese vector
+            if (tvalor.isPrimitive(e)) {
+                return ReasignarMatriz_Primitivo(e,val,tvalor);
+            }else if(tvalor.isVector()){
+                
+            }else{
+                return new Errores(Errores.TipoError.SEMANTICO,"La matriz no puede contener ese tipo de objetos ", linea, columna);
+            }
         }
 
         /*
@@ -91,15 +102,15 @@ public class AsignacionPosicion implements Instruccion {
         Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         Lista metiendo = (Lista) ant.getAnterior();
         Vector apasar = (Vector) val;
-        if(apasar.getDimensiones().size()>1){
-            return new Errores(Errores.TipoError.SEMANTICO,"La lista solo puede contener un vector en su nodo de tamanio 1 ", linea, columna);
+        if (apasar.getDimensiones().size() > 1) {
+            return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un vector en su nodo de tamanio 1 ", linea, columna);
         }
         LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
         Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), apasar.getTiposecundario(), valoresnuevos);
         metiendo.getLista().set(ant.getIndice(), nuevo);
         return null;
     }
-
+    
     private Object ReasignarLista_Lista(Entorno e, Object val, TipoExp t) {
         Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         if (ant.getAcceso() == 1) {
@@ -133,7 +144,11 @@ public class AsignacionPosicion implements Instruccion {
         }
 
     }
-
+    private Object ReasignarMatriz_Primitivo(Entorno e,Object setvalor,TipoExp t){
+        Anterior ant=(Anterior)Globales.VarGlobales.getInstance().getAnterior();
+        Vector v=(Vector)ant.getAnterior();
+        return  null;
+    }
     private Object ReasignarLista_Primitivo(Entorno e, Object setvalor, TipoExp t) {
         Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         if (ant.getAnterior() instanceof Lista) {
@@ -157,7 +172,13 @@ public class AsignacionPosicion implements Instruccion {
         TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
         ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, setvalor, t);
         ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
-        CastearVector(nuevot, e);
+        Simbolo s = e.get(((Acceso) acc).getId().getVal());
+        if ((s instanceof Vector)) {
+            CastearVector(nuevot, e);
+        } else {
+
+            CastearVector(nuevot, e, (Vector) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
+        }
         return null;
     }
 
@@ -170,7 +191,13 @@ public class AsignacionPosicion implements Instruccion {
                 TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, aux.getTipo(e));
                 ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, aux.valor, aux.getTipo(e));
                 ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
-                CastearVector(nuevot, e);
+                Simbolo s = e.get(((Acceso) acc).getId().getVal());
+                if ((s instanceof Vector)) {
+                    CastearVector(nuevot, e);
+                } else {
+
+                    CastearVector(nuevot, e, (Vector) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
+                }
 
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector solo puede contener vectores de tamanio 1", linea, columna);
@@ -182,6 +209,7 @@ public class AsignacionPosicion implements Instruccion {
     }
 
     private void CastearVector(TipoExp t, Entorno e) {
+
         Vector v = (Vector) e.get(((Acceso) acc).getId().getVal());
         Literal aux;
         for (int i = 0; i < v.getDimensiones().size(); i++) {

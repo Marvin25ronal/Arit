@@ -186,7 +186,7 @@ public class AccesoUnico implements Expresion {
             if (incremento) {
                 return AccesoListaIncremento(l, inde);
             }
-            return new Errores(Errores.TipoError.SEMANTICO, "Se paso dle indice de la lista", getLinea(), getColumna());
+            return new Errores(Errores.TipoError.SEMANTICO, "Se paso del indice de la lista", getLinea(), getColumna());
         }
 
         inde--;
