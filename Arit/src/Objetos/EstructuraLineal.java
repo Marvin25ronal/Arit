@@ -61,7 +61,7 @@ public class EstructuraLineal extends Simbolo {
             cadena.append("[");
             for (int i = 0; i < dimensiones.size(); i++) {
                 Literal l = (Literal) dimensiones.get(i);
-                cadena.append(l.valor);
+                cadena.append(l.getValor());
                 if (i < dimensiones.size() - 1) {
                     cadena.append(",");
                 }

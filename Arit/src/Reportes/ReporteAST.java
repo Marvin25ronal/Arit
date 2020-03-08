@@ -79,7 +79,7 @@ public class ReporteAST {
   
 
     private void TraducirLiteral(Nodo raiz, int padre) {
-        nombrenodo("{TOKEN} " + ((Literal) raiz).valor.toString(), padre);
+        nombrenodo("{TOKEN} " + ((Literal) raiz).getValor().toString(), padre);
     }
 
     private void nombrenodo(String nombre, int padre) {

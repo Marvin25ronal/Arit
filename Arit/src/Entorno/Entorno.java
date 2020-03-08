@@ -37,6 +37,13 @@ public class Entorno {
         }
         return false;
     }
+    public boolean ExisteEnEntorno(String id){
+        Simbolo en=this.tabla.get(id.toLowerCase());
+        if(en!=null){
+            return true;
+        }
+        return false;
+    }
 
     public Entorno getGlobal() {
         Entorno ant = null;

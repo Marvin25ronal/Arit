@@ -14,10 +14,66 @@ import Objetos.Nulo;
  */
 public class Literal implements Expresion {
 
-    public Object valor;
-    public TipoExp tipo;
-    int linea;
-    int columna;
+    /**
+     * @return the valor
+     */
+    public Object getValor() {
+        return valor;
+    }
+
+    /**
+     * @param valor the valor to set
+     */
+    public void setValor(Object valor) {
+        this.valor = valor;
+    }
+
+    /**
+     * @return the tipo
+     */
+    public TipoExp getTipo() {
+        return tipo;
+    }
+
+    /**
+     * @param tipo the tipo to set
+     */
+    public void setTipo(TipoExp tipo) {
+        this.tipo = tipo;
+    }
+
+    /**
+     * @return the linea
+     */
+    public int getLinea() {
+        return linea;
+    }
+
+    /**
+     * @param linea the linea to set
+     */
+    public void setLinea(int linea) {
+        this.linea = linea;
+    }
+
+    /**
+     * @return the columna
+     */
+    public int getColumna() {
+        return columna;
+    }
+
+    /**
+     * @param columna the columna to set
+     */
+    public void setColumna(int columna) {
+        this.columna = columna;
+    }
+
+    private Object valor;
+    private TipoExp tipo;
+    private int linea;
+    private int columna;
 
     public Literal(Object valor, TipoExp tipo, int linea, int columna) {
         this.valor = valor;
@@ -31,27 +87,27 @@ public class Literal implements Expresion {
         /*if (valor instanceof Nulo) {
             return ((Nulo) valor).getValor(e);
         }*/
-        return this.valor;
+        return this.getValor();
     }
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        return this.tipo;
+        return this.getTipo();
     }
 
     @Override
     public int linea() {
-        return this.linea;
+        return this.getLinea();
     }
 
     @Override
     public int columna() {
-        return this.columna;
+        return this.getColumna();
     }
 
     @Override
     public String toString() {
-        return valor.toString();
+        return getValor().toString();
     }
     
 

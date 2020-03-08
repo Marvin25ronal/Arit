@@ -14,6 +14,7 @@ import Objetos.Funcion;
 
 import Objetos.Nulo;
 import Objetos.EstructuraLineal;
+import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 import javax.swing.JTextArea;
@@ -153,8 +154,8 @@ public class Llamadas implements Expresion {
                     Literal laux = null;
                     for (int i = 0; i < datospasando.size(); i++) {
                         laux = (Literal) datospasando.get(i);
-                        laux.valor = CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e));
-                        laux.tipo = tipodominante;
+                        laux.setValor(CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e)));
+                        laux.setTipo(tipodominante);
                         valores.add(datospasando.get(i));
                     }
                 } else {
@@ -186,8 +187,8 @@ public class Llamadas implements Expresion {
                     Literal laux = null;
                     for (int i = 0; i < datospasando.size(); i++) {
                         laux = (Literal) datospasando.get(i);
-                        laux.valor = CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e));
-                        laux.tipo = tipodominante;
+                        laux.setValor(CastearValor(tipodominante, laux.getValor(e), laux.getTipo(e)));
+                        laux.setTipo(tipodominante);
                         valores.add(datospasando.get(i));
                     }
                 } else if (tipodo.isList()) {
@@ -332,7 +333,7 @@ public class Llamadas implements Expresion {
             }
             if (f.getParametros().get(i) instanceof DecAsig) {
                 DecAsig ndec = (DecAsig) f.getParametros().get(i);
-                Object res = ndec.ejecutar(enuevo);
+                Object res = ndec.EjecutarFuncion(e,enuevo);
                 if (res instanceof Errores) {
                     return res;
                 }
@@ -379,6 +380,15 @@ public class Llamadas implements Expresion {
             } else {
                 enuevo.add(id.getVal(), nueva);
             }
+        } else if (tipo.isMatrix()) {
+            Matrix copia = (Matrix) valor;
+            LinkedList<LinkedList<Object>> matriz = Globales.VarGlobales.getInstance().CopiarMatrix(e, copia.getColumnas());
+            Matrix nueva = new Matrix(matriz, new TipoExp(Tipos.MATRIX), new TipoExp(copia.getTiposecundario().tp), id.getVal(), copia.getColumna(), copia.getFila());
+            if(actualizar){
+                enuevo.Actualizar(id.getVal(), nueva);
+            }else{
+                enuevo.add(id.getVal(), nueva);
+            }
         } else if (tipo.isPrimitive(e)) {
             Literal l = new Literal(valor, tipo, linea(), columna());
             LinkedList<Object> lista = new LinkedList<>();
@@ -395,7 +405,7 @@ public class Llamadas implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        
+
         return null;
     }
 

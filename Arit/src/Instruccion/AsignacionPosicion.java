@@ -56,9 +56,16 @@ public class AsignacionPosicion implements Instruccion {
             return null;
         }
         //me lo regresa en un vector de 1
-
         Simbolo s = (Simbolo) obj;
-        if (s.getTipo().isVector()) {
+        if (((Simbolo) ac.getId().getValor(e)) instanceof Matrix) {
+            if (tvalor.isPrimitive(e)) {
+                return ReasignarMatriz_Primitivo(e, val, tvalor, (EstructuraLineal) s);
+            } else if (tvalor.isVector()) {
+                return ReasignarMatriz_Vector(e, val, tvalor, (EstructuraLineal) s);
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede contener ese tipo de elementos", linea, columna);
+            }
+        } else if (s.getTipo().isVector()) {
             if (tvalor.isPrimitive(e)) {
                 return ReasignarVector_Primitivo(e, val, tvalor, (EstructuraLineal) obj);
             } else if (tvalor.isVector()) {
@@ -76,18 +83,7 @@ public class AsignacionPosicion implements Instruccion {
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "La lista no puede contener ese tipo de objetos ", linea, columna);
             }
-        } else if (s instanceof Matrix) {
-            ///se que si el anterior es matriz el resultado simpre va a ser un vector
-            ///se puede modificar unicacmente ese vector
-            if (tvalor.isPrimitive(e)) {
-                return ReasignarMatriz_Primitivo(e, val, tvalor);
-            } else if (tvalor.isVector()) {
-
-            } else {
-                return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede contener ese tipo de objetos ", linea, columna);
-            }
         }
-
         /*
         //da problema mejor se clona y hacemos esto distinto
         Existe la variable
@@ -129,9 +125,79 @@ public class AsignacionPosicion implements Instruccion {
             LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
             lista.setDimensiones(valoresnuevos);
         }
-        
-        
         return null;
+    }
+
+    private Object ReasignarMatriz_Primitivo(Entorno e, Object val, TipoExp t, EstructuraLineal vector) {
+        Acceso ac = (Acceso) acc;
+        Matrix origen = (Matrix) ac.getId().getValor(e);
+        //primero tengo que ver cual es el tipo dominante 
+        TipoExp dominante = TipoDominanteMatriz(origen.getTiposecundario(), t);
+        for (int i = 0; i < vector.getDimensiones().size(); i++) {
+            Object valor = CastearValor(dominante, val, origen.getTiposecundario());
+            Literal nueva = (Literal) vector.getDimensiones().get(i);
+            nueva.setValor(valor);
+            nueva.setTipo(new TipoExp(dominante.tp));
+            //vector.getDimensiones().set(i, nueva);
+        }
+        if (dominante.tp != origen.getTiposecundario().tp) {
+            CastearMatriz(origen, e, dominante);
+        }
+        return null;
+    }
+
+    private Object ReasignarMatriz_Vector(Entorno e, Object val, TipoExp t, EstructuraLineal vecto) {
+        Acceso ac = (Acceso) acc;
+        Matrix origen = (Matrix) ac.getId().getValor(e);
+        EstructuraLineal vector = (EstructuraLineal) vecto;
+        EstructuraLineal metiendo = (EstructuraLineal) val;
+        //si tiene un elemento no puede contener mas de un elemento el metiendo
+        TipoExp dominante = TipoDominanteMatriz(origen.getTiposecundario(), metiendo.getTiposecundario());
+        if (vector.getDimensiones().size() == 1) {
+            //tipo 4 o tipo 1
+            if (metiendo.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector en esa posicion no puede contener mas de un elemento ", linea, columna);
+            }
+            Literal l = (Literal) vector.getDimensiones().get(0);
+            Literal lmetiendo = (Literal) metiendo.getDimensiones().get(0);
+            l.setTipo(new TipoExp(dominante.tp));
+            l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
+
+        } else {
+            //tip 2,3
+            if (metiendo.getDimensiones().size() == vector.getDimensiones().size()) {
+                for (int i = 0; i < metiendo.getDimensiones().size(); i++) {
+                    Literal l = (Literal) vector.getDimensiones().get(i);
+                    Literal lmetiendo = (Literal) metiendo.getDimensiones().get(i);
+                    l.setTipo(new TipoExp(dominante.tp));
+                    l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
+                }
+            } else if (metiendo.getDimensiones().size() == 1) {
+                for (int i = 0; i < metiendo.getDimensiones().size(); i++) {
+                    Literal l = (Literal) vector.getDimensiones().get(i);
+                    Literal lmetiendo = (Literal) metiendo.getDimensiones().get(0);
+                    l.setTipo(new TipoExp(dominante.tp));
+                    l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
+                }
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "El vector tiene que ser de tamanio 1 o del mismo tamanio de la columna fila", linea, columna);
+            }
+        }
+        if (dominante.tp != origen.getTiposecundario().tp) {
+            CastearMatriz(origen, e, dominante);
+        }
+        return null;
+    }
+
+    private void CastearMatriz(Matrix m, Entorno e, TipoExp tipo) {
+        for (int i = 0; i < m.getColumna(); i++) {
+            for (int j = 0; j < m.getFila(); j++) {
+                EstructuraLineal v = (EstructuraLineal) m.getColumnas().get(i).get(j);
+                Literal l = (Literal) v.getDimensiones().get(0);
+                l.setValor(CastearValor(tipo, l.getValor(), l.getTipo()));
+                l.setTipo(new TipoExp(tipo.tp));
+            }
+        }
     }
 
     private Object ReasignarLista_Lista(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
@@ -165,12 +231,6 @@ public class AsignacionPosicion implements Instruccion {
 
     }
 
-    private Object ReasignarMatriz_Primitivo(Entorno e, Object setvalor, TipoExp t) {
-        Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
-        EstructuraLineal v = (EstructuraLineal) ant.getAnterior();
-        return null;
-    }
-
     private Object ReasignarLista_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal lista) {
         if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
             //el contenido va en una lista
@@ -197,8 +257,8 @@ public class AsignacionPosicion implements Instruccion {
 
     private Object ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal v) {
         TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
-        ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, setvalor, t);
-        ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
+        ((Literal) v.getDimensiones().get(0)).setValor(CastearValor(nuevot, setvalor, t));
+        ((Literal) v.getDimensiones().get(0)).setTipo(nuevot);
         Simbolo s = e.get(((Acceso) acc).getId().getVal());
         if ((s.getTipo().isVector())) {
             CastearVector(nuevot, e);
@@ -215,8 +275,8 @@ public class AsignacionPosicion implements Instruccion {
                 LinkedList<Object> listaAux = Globales.VarGlobales.getInstance().clonarListaVector(set.getDimensiones(), e);
                 Literal aux = (Literal) listaAux.get(0);//--Retorna un arreglo con un elemento que es una literal
                 TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, aux.getTipo(e));
-                ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, aux.valor, aux.getTipo(e));
-                ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
+                ((Literal) v.getDimensiones().get(0)).setValor(CastearValor(nuevot, aux.getValor(), aux.getTipo(e)));
+                ((Literal) v.getDimensiones().get(0)).setTipo(nuevot);
                 Simbolo s = e.get(((Acceso) acc).getId().getVal());
                 if ((s instanceof EstructuraLineal)) {
                     CastearVector(nuevot, e);
@@ -240,21 +300,21 @@ public class AsignacionPosicion implements Instruccion {
         Literal aux;
         for (int i = 0; i < v.getDimensiones().size(); i++) {
             aux = (Literal) v.getDimensiones().get(i);
-            aux.valor = CastearValor(t, aux.getValor(e), aux.getTipo(e));
-            aux.tipo = t;
+            aux.setValor(CastearValor(t, aux.getValor(e), aux.getTipo(e)));
+            aux.setTipo(t);
         }
     }
 
     private void CastearVector(TipoExp t, Entorno e, EstructuraLineal r) {
         EstructuraLineal v = r;
-        if(!v.getTipo().isVector()){
+        if (!v.getTipo().isVector()) {
             return;
         }
         Literal aux;
         for (int i = 0; i < v.getDimensiones().size(); i++) {
             aux = (Literal) v.getDimensiones().get(i);
-            aux.valor = CastearValor(t, aux.getValor(e), aux.getTipo(e));
-            aux.tipo = t;
+            aux.setValor(CastearValor(t, aux.getValor(e), aux.getTipo(e)));
+            aux.setTipo(t);
         }
     }
 
@@ -305,6 +365,21 @@ public class AsignacionPosicion implements Instruccion {
         } else if (tul.tp == Tipos.INTEGER || li.getTipo(e).tp == Tipos.INTEGER) {
             return new TipoExp(Tipos.INTEGER);
         } else if (tul.tp == Tipos.BOOLEAN && li.getTipo(e).tp == Tipos.BOOLEAN) {
+            return new TipoExp(Tipos.BOOLEAN);
+        }
+        return null;
+    }
+
+    private TipoExp TipoDominanteMatriz(TipoExp tul, TipoExp tiob) {
+        if (tul.tp == Tipos.NULO || tiob.tp == Tipos.NULO) {
+            return new TipoExp(Tipos.STRING);
+        } else if (tul.tp == Tipos.STRING || tiob.tp == Tipos.STRING) {
+            return new TipoExp(Tipos.STRING);
+        } else if (tul.tp == Tipos.NUMERIC || tiob.tp == Tipos.NUMERIC) {
+            return new TipoExp(Tipos.NUMERIC);
+        } else if (tul.tp == Tipos.INTEGER || tiob.tp == Tipos.INTEGER) {
+            return new TipoExp(Tipos.INTEGER);
+        } else if (tul.tp == Tipos.BOOLEAN && tiob.tp == Tipos.BOOLEAN) {
             return new TipoExp(Tipos.BOOLEAN);
         }
         return null;

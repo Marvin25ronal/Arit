@@ -94,6 +94,62 @@ public class DecAsig implements Instruccion {
         }
         return null;
     }
+    public Object EjecutarFuncion(Entorno variables,Entorno declarar){
+        if (getValor() == null) {
+            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No se pudo declarar", getLinea(), getColumna()));
+            return null;
+        }
+        Object setvalor = getValor().getValor(variables);
+        if (setvalor instanceof Errores) {
+            Globales.VarGlobales.getInstance().AgregarEU((Errores) setvalor);
+            return null;
+        }
+        TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(setvalor, variables);
+        if (t.tp == Tipos.NULO) {
+            //cuando es nulo
+            if (declarar.ExisteEnEntorno(getId().getVal())) {
+                ReasignarVector_Nulo(declarar);
+            } else {
+                CrearVector_Nulo(declarar);
+            }
+        } else if (t.isPrimitive(variables)) {
+            //se crea el arreglo con los nuevos valores
+            /*
+            Reglas--------------
+            primero ver si no existe antes para reasignar valor
+            agregarla a la tabla
+             */
+            if (declarar.ExisteEnEntorno(getId().getVal())) {
+                //se reasigna
+                ReasignarVector_Primitivo(declarar, setvalor, t);
+            } else {
+                //arreglo nuevo
+                CrearNuevoVector_Primitivo(declarar, setvalor, t);
+            }
+        } else {
+            //el vector va a cambiar cuando son una lista de valores
+            if (t.isVector()) {
+                if (variables.ExisteEnEntorno(getId().getVal())) {
+                    ReasignarVector_Vector(declarar, setvalor, t);
+                } else {
+                    CrearNuevoVector_Vector(declarar, setvalor, t);
+                }
+            } else if (t.isList()) {
+                if (variables.ExisteEnEntorno(getId().getVal())) {
+                    ReasignarLista_Lista(declarar, setvalor);
+                } else {
+                    CrearListaNueva(declarar, setvalor);
+                }
+            } else if (t.isMatrix()) {
+                if (variables.ExisteEnEntorno(getId().getVal())) {
+                    ReasignarMatriz_Matriz(declarar, setvalor);
+                } else {
+                    CrearMatrizNueva(declarar, setvalor);
+                }
+            }
+        }
+        return null;
+    }
 
     private void ReasignarMatriz_Matriz(Entorno e, Object matriz) {
         Matrix m = (Matrix) matriz;

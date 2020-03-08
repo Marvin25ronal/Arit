@@ -104,7 +104,7 @@ public class CrearMatriz {
             LinkedList<Object> nueva = new LinkedList<>();
             for (int j = 0; j < fil; j++) {
                 Literal aux = (Literal) valores.get(k);
-                Literal nuevaL = new Literal(aux.getValor(e), new TipoExp(aux.getTipo(e).tp), aux.linea, aux.columna);
+                Literal nuevaL = new Literal(aux.getValor(e), new TipoExp(aux.getTipo(e).tp), aux.getLinea(), aux.getColumna());
                 LinkedList<Object> nlist = new LinkedList<>();
                 nlist.add(nuevaL);
                 EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), aux.getTipo(e), nlist);
