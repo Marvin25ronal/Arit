@@ -13,10 +13,9 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Globales.Anterior;
-import Objetos.Lista;
 import Objetos.Matrix;
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -58,22 +57,22 @@ public class AsignacionPosicion implements Instruccion {
         }
         //me lo regresa en un vector de 1
 
-        Simbolo s = (Simbolo) Globales.VarGlobales.getInstance().getAnterior().getAnterior();
-        if (s instanceof Vector) {
+        Simbolo s = (Simbolo) obj;
+        if (s.getTipo().isVector()) {
             if (tvalor.isPrimitive(e)) {
-                return ReasignarVector_Primitivo(e, val, tvalor, (Vector) obj);
+                return ReasignarVector_Primitivo(e, val, tvalor, (EstructuraLineal) obj);
             } else if (tvalor.isVector()) {
-                return ReasignarVector_Vector(e, val, tvalor, (Vector) obj);
+                return ReasignarVector_Vector(e, val, tvalor, (EstructuraLineal) obj);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector no puede contener ese tipo de objetos ", linea, columna);
             }
-        } else if (s instanceof Lista) {
+        } else if (s.getTipo().isList()) {
             if (tvalor.isPrimitive(e)) {
-                return ReasignarLista_Primitivo(e, val, tvalor);
+                return ReasignarLista_Primitivo(e, val, tvalor, (EstructuraLineal) obj);
             } else if (tvalor.isList()) {
-                return ReasignarLista_Lista(e, val, tvalor);
+                return ReasignarLista_Lista(e, val, tvalor, (EstructuraLineal) obj);
             } else if (tvalor.isVector()) {
-                return ReasignarLista_Vector(e, val, tvalor);
+                return ReasignarLista_Vector(e, val, tvalor, (EstructuraLineal) obj);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "La lista no puede contener ese tipo de objetos ", linea, columna);
             }
@@ -81,11 +80,11 @@ public class AsignacionPosicion implements Instruccion {
             ///se que si el anterior es matriz el resultado simpre va a ser un vector
             ///se puede modificar unicacmente ese vector
             if (tvalor.isPrimitive(e)) {
-                return ReasignarMatriz_Primitivo(e,val,tvalor);
-            }else if(tvalor.isVector()){
-                
-            }else{
-                return new Errores(Errores.TipoError.SEMANTICO,"La matriz no puede contener ese tipo de objetos ", linea, columna);
+                return ReasignarMatriz_Primitivo(e, val, tvalor);
+            } else if (tvalor.isVector()) {
+
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede contener ese tipo de objetos ", linea, columna);
             }
         }
 
@@ -98,93 +97,120 @@ public class AsignacionPosicion implements Instruccion {
         return null;
     }
 
-    private Object ReasignarLista_Vector(Entorno e, Object val, TipoExp t) {
-        Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
+    private Object ReasignarLista_Vector(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
+        /*Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         Lista metiendo = (Lista) ant.getAnterior();
-        Vector apasar = (Vector) val;
+        EstructuraLineal apasar = (EstructuraLineal) val;
         if (apasar.getDimensiones().size() > 1) {
             return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un vector en su nodo de tamanio 1 ", linea, columna);
         }
         LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
-        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), apasar.getTiposecundario(), valoresnuevos);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), apasar.getTiposecundario(), valoresnuevos);
         metiendo.getLista().set(ant.getIndice(), nuevo);
+         */
+
+        EstructuraLineal apasar = (EstructuraLineal) val;
+
+        if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
+            //acceso 1
+            if (apasar.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un vector en su nodo de tamanio 1", linea, columna);
+            }
+            EstructuraLineal lista2 = (EstructuraLineal) lista.getDimensiones().get(0);
+            lista2.getDimensiones().clear();
+            lista2.setTipo(new TipoExp(Tipos.VECTOR));
+            lista2.setTiposecundario(new TipoExp(t.tp));
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
+            lista2.setDimensiones(valoresnuevos);
+        } else {
+            lista.getDimensiones().clear();
+            lista.setTipo(new TipoExp(Tipos.VECTOR));
+            lista.setTiposecundario(new TipoExp(t.tp));
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
+            lista.setDimensiones(valoresnuevos);
+        }
+        
+        
         return null;
     }
-    
-    private Object ReasignarLista_Lista(Entorno e, Object val, TipoExp t) {
-        Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
+
+    private Object ReasignarLista_Lista(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
+        Anterior ant = Globales.VarGlobales.getInstance().getAnterior();
+
         if (ant.getAcceso() == 1) {
-            if (ant.getAnterior() instanceof Lista) {
-                Lista metiendo = (Lista) ant.getAnterior();
-                Lista apasar = (Lista) val;
-                if (apasar.getLista().size() > 1) {
-                    return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un elemento en su nodo ", linea, columna);
-                }
-                LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getLista());
-                Lista nueva = new Lista(valoresnuevos, new TipoExp(Tipos.LISTA), null, "");
-                metiendo.getLista().set(ant.getIndice(), nueva);
-                return null;
-            } else {
-                //es vector tira error porque no se puede meter lista en vectores
-                return new Errores(Errores.TipoError.SEMANTICO, "No se puede meter en un vector una lista", linea, columna);
+            EstructuraLineal lista2 = (EstructuraLineal) lista.getDimensiones().get(0);
+            //Lista metiendo = (Lista) ant.getAnterior();
+            EstructuraLineal apasar = (EstructuraLineal) val;
+            if (apasar.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un elemento en su nodo ", linea, columna);
             }
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getDimensiones());
+            lista2.getDimensiones().clear();
+            lista2.setTipo(new TipoExp(Tipos.LISTA));
+            lista2.setDimensiones(valoresnuevos);
+            //EstructuraLineal nueva = new Lista(valoresnuevos, new TipoExp(Tipos.LISTA), null, "");
+            //metiendo.getLista().set(ant.getIndice(), nueva);
+            return null;
+
         } else {
             //acceso 2 no tiene restricciones
-            if (ant.getAnterior() instanceof Lista) {
-                Lista metiendo = (Lista) ant.getAnterior();
-                Lista apasar = (Lista) val;
-                LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getLista());
-                Lista nueva = new Lista(valoresnuevos, new TipoExp(Tipos.LISTA), null, "");
-                metiendo.getLista().set(ant.getIndice(), nueva);
-                return null;
-            } else {
-                //es vector
-                return new Errores(Errores.TipoError.SEMANTICO, "No se puede meter en un vector una lista", linea, columna);
-            }
+            EstructuraLineal apasar = (EstructuraLineal) val;
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getDimensiones());
+            lista.getDimensiones().clear();
+            lista.setTipo(new TipoExp(Tipos.LISTA));
+            lista.setDimensiones(valoresnuevos);
+            return null;
+
         }
 
     }
-    private Object ReasignarMatriz_Primitivo(Entorno e,Object setvalor,TipoExp t){
-        Anterior ant=(Anterior)Globales.VarGlobales.getInstance().getAnterior();
-        Vector v=(Vector)ant.getAnterior();
-        return  null;
-    }
-    private Object ReasignarLista_Primitivo(Entorno e, Object setvalor, TipoExp t) {
+
+    private Object ReasignarMatriz_Primitivo(Entorno e, Object setvalor, TipoExp t) {
         Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
-        if (ant.getAnterior() instanceof Lista) {
-            Lista l = (Lista) ant.getAnterior();
-            LinkedList<Object> objetos = new LinkedList<>();
-            objetos.add(new Literal(setvalor, t, linea, columna));
-            l.getLista().set(ant.getIndice(), new Vector("", new TipoExp(Tipos.VECTOR), t, objetos));
-            return null;
-        } else if (ant.getAnterior() instanceof Vector) {
-            Vector v = (Vector) ant.getAnterior();
-            Literal nueva = new Literal(setvalor, t, linea, columna);
-            v.getDimensiones().set(ant.getIndice(), nueva);
-            TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
-            CastearVector(nuevot, e, v);
-            return null;
-        }
+        EstructuraLineal v = (EstructuraLineal) ant.getAnterior();
         return null;
     }
 
-    private Object ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t, Vector v) {
+    private Object ReasignarLista_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal lista) {
+        if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
+            //el contenido va en una lista
+            //sacar el elemento
+            EstructuraLineal aux = (EstructuraLineal) lista.getDimensiones().get(0);
+            aux.getDimensiones().clear();
+            aux.setTipo(new TipoExp(Tipos.VECTOR));
+            LinkedList<Object> objetos = new LinkedList<>();
+            objetos.add(new Literal(setvalor, t, linea, columna));
+            aux.setDimensiones(objetos);
+            aux.setTiposecundario(new TipoExp(t.tp));
+        } else {
+            //el contenido es puro
+            lista.getDimensiones().clear();
+            lista.setTipo(new TipoExp(Tipos.VECTOR));
+            LinkedList<Object> objetos = new LinkedList<>();
+            objetos.add(new Literal(setvalor, t, linea, columna));
+            lista.setDimensiones(objetos);
+            lista.setTiposecundario(new TipoExp(t.tp));
+        }
+
+        return null;
+    }
+
+    private Object ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal v) {
         TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
         ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, setvalor, t);
         ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
         Simbolo s = e.get(((Acceso) acc).getId().getVal());
-        if ((s instanceof Vector)) {
+        if ((s.getTipo().isVector())) {
             CastearVector(nuevot, e);
         } else {
-
-            CastearVector(nuevot, e, (Vector) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
+            CastearVector(nuevot, e, (EstructuraLineal) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
         }
         return null;
     }
 
-    private Object ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t, Vector v) {
-        if (setvalor instanceof Vector) {
-            Vector set = (Vector) setvalor;
+    private Object ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t, EstructuraLineal v) {
+        if (setvalor instanceof EstructuraLineal) {
+            EstructuraLineal set = (EstructuraLineal) setvalor;
             if (set.getDimensiones().size() == 1) {
                 LinkedList<Object> listaAux = Globales.VarGlobales.getInstance().clonarListaVector(set.getDimensiones(), e);
                 Literal aux = (Literal) listaAux.get(0);//--Retorna un arreglo con un elemento que es una literal
@@ -192,11 +218,11 @@ public class AsignacionPosicion implements Instruccion {
                 ((Literal) v.getDimensiones().get(0)).valor = CastearValor(nuevot, aux.valor, aux.getTipo(e));
                 ((Literal) v.getDimensiones().get(0)).tipo = nuevot;
                 Simbolo s = e.get(((Acceso) acc).getId().getVal());
-                if ((s instanceof Vector)) {
+                if ((s instanceof EstructuraLineal)) {
                     CastearVector(nuevot, e);
                 } else {
 
-                    CastearVector(nuevot, e, (Vector) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
+                    CastearVector(nuevot, e, (EstructuraLineal) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
                 }
 
             } else {
@@ -210,7 +236,7 @@ public class AsignacionPosicion implements Instruccion {
 
     private void CastearVector(TipoExp t, Entorno e) {
 
-        Vector v = (Vector) e.get(((Acceso) acc).getId().getVal());
+        EstructuraLineal v = (EstructuraLineal) e.get(((Acceso) acc).getId().getVal());
         Literal aux;
         for (int i = 0; i < v.getDimensiones().size(); i++) {
             aux = (Literal) v.getDimensiones().get(i);
@@ -219,8 +245,11 @@ public class AsignacionPosicion implements Instruccion {
         }
     }
 
-    private void CastearVector(TipoExp t, Entorno e, Vector r) {
-        Vector v = r;
+    private void CastearVector(TipoExp t, Entorno e, EstructuraLineal r) {
+        EstructuraLineal v = r;
+        if(!v.getTipo().isVector()){
+            return;
+        }
         Literal aux;
         for (int i = 0; i < v.getDimensiones().size(); i++) {
             aux = (Literal) v.getDimensiones().get(i);

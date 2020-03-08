@@ -9,7 +9,7 @@ import Entorno.Entorno;
 import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -45,9 +45,9 @@ public class Multiplicacion extends Aritmeticas {
             //Caso 1 solo uno es vector
             //Caso 2 ambos son vectores
             if (top1.isVector() && top2.isVector()) {
-                return MulVectoresVectores((Vector) valor1, (Vector) valor2, e);
+                return MulVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
-            return top1.isVector() ? MulVectores((Vector) valor1, top2, valor2, e, true) : MulVectores((Vector) valor2, top1, valor1, e, false);
+            return top1.isVector() ? MulVectores((EstructuraLineal) valor1, top2, valor2, e, true) : MulVectores((EstructuraLineal) valor2, top1, valor1, e, false);
         }
         switch (aux.tp) {
             case NULO:
@@ -62,7 +62,7 @@ public class Multiplicacion extends Aritmeticas {
 
     }
 
-    private Object MulVectores(Vector v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
+    private Object MulVectores(EstructuraLineal v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -75,11 +75,11 @@ public class Multiplicacion extends Aritmeticas {
             }
             NuevoVal.add(aux);
         }
-        Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
         return nuevo;
     }
 
-    private Object MulVectoresVectores(Vector v1, Vector v2, Entorno e) {
+    private Object MulVectoresVectores(EstructuraLineal v1, EstructuraLineal v2, Entorno e) {
         LinkedList<Object> a = Globales.VarGlobales.getInstance().clonarListaVector(v1.getDimensiones(), e);
         LinkedList<Object> b = Globales.VarGlobales.getInstance().clonarListaVector(v2.getDimensiones(), e);
         LinkedList<Object> nuevos = new LinkedList<>();
@@ -92,7 +92,7 @@ public class Multiplicacion extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (a.size() == 1) {
             for (int i = 0; i < b.size(); i++) {
@@ -102,7 +102,7 @@ public class Multiplicacion extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (b.size() == 1) {
             for (int i = 0; i < a.size(); i++) {
@@ -112,7 +112,7 @@ public class Multiplicacion extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden multiplicar vectores que no sean de un elemento o igual elementos", linea, columna);

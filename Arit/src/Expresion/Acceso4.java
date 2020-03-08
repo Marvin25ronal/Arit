@@ -8,7 +8,7 @@ package Expresion;
 import Entorno.Entorno;
 import Expresion.TipoExp.Tipos;
 import Objetos.Matrix;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -51,7 +51,7 @@ public class Acceso4 implements Expresion {
         }
         TipoExp tfila = Globales.VarGlobales.getInstance().obtenerTipo(objcol, e);
         if (tfila.isVector()) {
-            Vector v = (Vector) objcol;
+            EstructuraLineal v = (EstructuraLineal) objcol;
             if (v.getTiposecundario().isInt()) {
                 if (v.getDimensiones().size() > 1) {
                     return new Errores(Errores.TipoError.SEMANTICO, "El vector de la columna tiene mas de un elemento", linea, columna);
@@ -73,12 +73,12 @@ public class Acceso4 implements Expresion {
         }
         LinkedList<Object> elementos = new LinkedList<>();
         for (int i = 0; i < matriz.getFila(); i++) {
-            Vector v = (Vector) matriz.getColumnas().get(indiCol).get(i);
+            EstructuraLineal v = (EstructuraLineal) matriz.getColumnas().get(indiCol).get(i);
             elementos.add(v.getDimensiones().getFirst());
         }
         Globales.VarGlobales.getInstance().getAnterior().setAnterior(matriz);
         //Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
-        return new Vector("", new TipoExp(Tipos.VECTOR), new TipoExp(matriz.getTiposecundario().tp), elementos);
+        return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(matriz.getTiposecundario().tp), elementos);
     }
 
     private Object Acceso2(Entorno e) {
@@ -88,7 +88,7 @@ public class Acceso4 implements Expresion {
         }
         TipoExp tfila = Globales.VarGlobales.getInstance().obtenerTipo(objfila, e);
         if (tfila.isVector()) {
-            Vector v = (Vector) objfila;
+            EstructuraLineal v = (EstructuraLineal) objfila;
             if (v.getTiposecundario().isInt()) {
                 if (v.getDimensiones().size() > 1) {
                     return new Errores(Errores.TipoError.SEMANTICO, "El vector de la fila tiene mas de un elemento", linea, columna);
@@ -110,11 +110,11 @@ public class Acceso4 implements Expresion {
         }
         LinkedList<Object> elementos = new LinkedList<>();
         for (int i = 0; i < matriz.getColumna(); i++) {
-            Vector v = (Vector) matriz.getColumnas().get(i).get(indiFila);
+            EstructuraLineal v = (EstructuraLineal) matriz.getColumnas().get(i).get(indiFila);
             elementos.add(v.getDimensiones().getFirst());
         }
         Globales.VarGlobales.getInstance().getAnterior().setAnterior(matriz);
-        return new Vector("", new TipoExp(Tipos.VECTOR), new TipoExp(matriz.getTiposecundario().tp), elementos);
+        return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(matriz.getTiposecundario().tp), elementos);
     }
 
     private Object Acceso1(Entorno e) {
@@ -128,7 +128,7 @@ public class Acceso4 implements Expresion {
         TipoExp tfila = Globales.VarGlobales.getInstance().obtenerTipo(objfila, e);
         TipoExp tcol = Globales.VarGlobales.getInstance().obtenerTipo(objcol, e);
         if (tfila.isVector()) {
-            Vector v = (Vector) objfila;
+            EstructuraLineal v = (EstructuraLineal) objfila;
             if (v.getTiposecundario().isInt()) {
                 if (v.getDimensiones().size() != 1) {
                     return new Errores(Errores.TipoError.SEMANTICO, "El vector de la fila tiene mas de un elemento", linea, columna);
@@ -142,7 +142,7 @@ public class Acceso4 implements Expresion {
             return new Errores(Errores.TipoError.SEMANTICO, "El indice de la fila no es de tipo INTEGER ", linea, columna);
         }
         if (tcol.isVector()) {
-            Vector v = (Vector) objcol;
+            EstructuraLineal v = (EstructuraLineal) objcol;
             if (v.getTiposecundario().isInt()) {
                 if (v.getDimensiones().size() != 1) {
                     return new Errores(Errores.TipoError.SEMANTICO, "El vector de la columna tiene mas de un elemento", linea, columna);

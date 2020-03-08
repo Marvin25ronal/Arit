@@ -11,7 +11,7 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -68,13 +68,13 @@ public class Return implements Expresion {
             Literal l = (Literal) val;
             LinkedList<Object> dimensiones = new LinkedList<>();
             dimensiones.add(l);
-            return new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), dimensiones);
+            return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), l.getTipo(e), dimensiones);
         } else if (val instanceof Errores) {
             return val;
         } else if (t.isPrimitive(e)) {
             LinkedList<Object> dimensiones = new LinkedList<>();
             dimensiones.add(new Literal(val, t, linea, columna));
-            return new Vector("", new TipoExp(Tipos.VECTOR), t, dimensiones);
+            return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), t, dimensiones);
         } else if (val != null) {
             return val;
         }

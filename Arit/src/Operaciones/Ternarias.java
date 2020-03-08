@@ -10,7 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 
 /**
@@ -38,11 +38,11 @@ public class Ternarias implements Expresion {
         if (con == null || con instanceof Errores) {
             return con;
         }
-        TipoExp cond=Globales.VarGlobales.getInstance().obtenerTipo(con, e);
+        TipoExp cond = Globales.VarGlobales.getInstance().obtenerTipo(con, e);
         if (cond.tp == Tipos.BOOLEAN) {
             return Boolean.parseBoolean(con.toString()) ? isTrue.getValor(e) : isFalse.getValor(e);
         } else if (cond.isVector()) {
-            Literal l = (Literal) ((Vector) con).getDimensiones().get(0);
+            Literal l = (Literal) ((EstructuraLineal) con).getDimensiones().get(0);
             if (l.getTipo(e).isBoolean()) {
                 return Boolean.parseBoolean(l.getValor(e).toString()) ? isTrue.getValor(e) : isFalse.getValor(e);
             } else {
@@ -56,22 +56,7 @@ public class Ternarias implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        Entorno aux=e.Copiar();
-        Object condicion = cond.getValor(aux);
-        if (condicion instanceof Errores) {
-            return null;
-        } else if (condicion == null) {
-            return null;
-        } else if (condicion instanceof Vector) {
-            Literal l = (Literal) ((Vector) condicion).getDimensiones().get(0);
-            if (l.getTipo(aux).isBoolean()) {
-                return Boolean.parseBoolean(l.getValor(aux).toString()) ? isTrue.getTipo(aux) : isFalse.getTipo(aux);
-            } else {
-                return null;
-            }
-        } else {
-            return (boolean) condicion ? isTrue.getTipo(aux) : isFalse.getTipo(aux);
-        }
+        return null;
     }
 
     @Override

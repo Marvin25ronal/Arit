@@ -12,10 +12,10 @@ import Expresion.Identificador;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Lista;
+
 import Objetos.Matrix;
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -110,16 +110,20 @@ public class DecAsig implements Instruccion {
     }
 
     private void ReasignarLista_Lista(Entorno e, Object lista) {
-        Lista l = (Lista) lista;
-        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
-        Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        //Lista l = (Lista) lista;
+        EstructuraLineal l = (EstructuraLineal) lista;
+        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getDimensiones());
+        //Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        EstructuraLineal nueva = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.LISTA), null, valores);
         e.Actualizar(id.getVal(), nueva);
     }
 
     private void CrearListaNueva(Entorno e, Object lista) {
-        Lista l = (Lista) lista;
-        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getLista());
-        Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        //Lista l = (Lista) lista;
+        EstructuraLineal l = (EstructuraLineal) lista;
+        LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getDimensiones());
+        //Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
+        EstructuraLineal nueva = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.LISTA), null, valores);
         e.add(id.getVal(), nueva);
     }
 
@@ -127,7 +131,7 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(setvalor, t, getLinea(), getColumna());
         datos.add(nueva);
-        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
         e.add(getId().getVal(), nuevo);
     }
 
@@ -135,7 +139,7 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
         datos.add(nueva);
-        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
         e.add(getId().getVal(), nuevo);
     }
 
@@ -144,33 +148,33 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
         datos.add(nueva);
-        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
         e.Actualizar(getId().getVal(), nuevo);
     }
 
     private void ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t) {
         //Verificar si es un vector
-        
+
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(setvalor, t, getLinea(), getColumna());
         datos.add(nueva);
-        Vector v = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        EstructuraLineal v = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
         e.Actualizar(getId().getVal(), v);
 
     }
 
     private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
-        Vector v = (Vector) setvalor;
+        EstructuraLineal v = (EstructuraLineal) setvalor;
         LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
-        Vector nuevo = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), datos);
         e.add(getId().getVal(), nuevo);
     }
 
     private void ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t) {
         //a un vector solo se le puede asignar un vector
-        Vector aux = (Vector) setvalor;
+        EstructuraLineal aux = (EstructuraLineal) setvalor;
         LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
-        Vector v = new Vector(getId().getVal(), new TipoExp(Tipos.VECTOR), aux.getTiposecundario(), datos);
+        EstructuraLineal v = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), aux.getTiposecundario(), datos);
         e.Actualizar(getId().getVal(), v);
     }
 

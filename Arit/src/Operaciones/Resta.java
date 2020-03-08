@@ -10,7 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -44,9 +44,9 @@ public class Resta extends Aritmeticas {
         }
         if (aux.tp == Tipos.VECTOR) {
             if (top1.isVector() && top2.isVector()) {
-                return RestaVectoresVectores((Vector) valor1, (Vector) valor2, e);
+                return RestaVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
-            return top1.isVector() ? RestaVectores((Vector) valor1, top2, valor2, e, true) : RestaVectores((Vector) valor2, top1, valor1, e, false);
+            return top1.isVector() ? RestaVectores((EstructuraLineal) valor1, top2, valor2, e, true) : RestaVectores((EstructuraLineal) valor2, top1, valor1, e, false);
         }
         switch (aux.tp) {
             case NULO:
@@ -61,7 +61,7 @@ public class Resta extends Aritmeticas {
 
     }
 
-    private Object RestaVectores(Vector v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
+    private Object RestaVectores(EstructuraLineal v, TipoExp tipoexp, Object valorsumando, Entorno e, boolean primero) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -74,11 +74,11 @@ public class Resta extends Aritmeticas {
             }
             NuevoVal.add(aux);
         }
-        Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
+        EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v.getTiposecundario(), tipoexp), NuevoVal);
         return nuevo;
     }
 
-    private Object RestaVectoresVectores(Vector v1, Vector v2, Entorno e) {
+    private Object RestaVectoresVectores(EstructuraLineal v1, EstructuraLineal v2, Entorno e) {
         LinkedList<Object> a = Globales.VarGlobales.getInstance().clonarListaVector(v1.getDimensiones(), e);
         LinkedList<Object> b = Globales.VarGlobales.getInstance().clonarListaVector(v2.getDimensiones(), e);
         LinkedList<Object> nuevos = new LinkedList<>();
@@ -91,7 +91,7 @@ public class Resta extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (a.size() == 1) {
             for (int i = 0; i < b.size(); i++) {
@@ -101,7 +101,7 @@ public class Resta extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else if (b.size() == 1) {
             for (int i = 0; i < a.size(); i++) {
@@ -111,7 +111,7 @@ public class Resta extends Aritmeticas {
                 }
                 nuevos.add(res);
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), max(v1.getTiposecundario(), v2.getTiposecundario()), nuevos);
             return nuevo;
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "No se pueden restar vectores que no sean de un elemento o igual elementos", linea, columna);

@@ -8,10 +8,10 @@ package Expresion;
 import Entorno.Entorno;
 import Entorno.Simbolo;
 import Expresion.TipoExp.Tipos;
-import Objetos.Lista;
+
 import Objetos.Matrix;
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -47,13 +47,14 @@ public class CrearMatriz {
             } else if (ncol instanceof Errores) {
                 return ncol;
             }
-            if (datos instanceof Lista) {
+
+            TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(datos, e);
+            if (tipo.isList()) {
                 return new Errores(Errores.TipoError.SEMANTICO, "La matriz solo puede contener numeros primitivos y vectores", linea, columna);
             }
-            TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(datos, e);
             if (!tfila.isInt() || !tcol.isInt()) {
                 if (tfila.isVector()) {
-                    Vector fila = (Vector) nrow;
+                    EstructuraLineal fila = (EstructuraLineal) nrow;
                     if (fila.getDimensiones().size() == 1) {
                         if (fila.getTiposecundario().isInt()) {
                             nrow = fila.getDimensiones().get(0);
@@ -65,7 +66,7 @@ public class CrearMatriz {
                     }
                 }
                 if (tcol.isVector()) {
-                    Vector col = (Vector) ncol;
+                    EstructuraLineal col = (EstructuraLineal) ncol;
                     if (col.getDimensiones().size() == 1) {
                         if (col.getTiposecundario().isInt()) {
                             ncol = col.getDimensiones().get(0);
@@ -96,7 +97,7 @@ public class CrearMatriz {
             return new Errores(Errores.TipoError.SEMANTICO, "Los valores tienen que ser mayor de 0", linea, columna);
         }
         LinkedList<LinkedList<Object>> matriz = new LinkedList<>();
-        Vector v = (Vector) valor;
+        EstructuraLineal v = (EstructuraLineal) valor;
         LinkedList<Object> valores = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         int k = 0;
         for (int i = 0; i < col; i++) {
@@ -106,7 +107,7 @@ public class CrearMatriz {
                 Literal nuevaL = new Literal(aux.getValor(e), new TipoExp(aux.getTipo(e).tp), aux.linea, aux.columna);
                 LinkedList<Object> nlist = new LinkedList<>();
                 nlist.add(nuevaL);
-                Vector nuevov = new Vector("", new TipoExp(Tipos.VECTOR), aux.getTipo(e), nlist);
+                EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), aux.getTipo(e), nlist);
                 nueva.add(nuevov);
                 k++;
                 if (k == valores.size()) {
@@ -133,7 +134,7 @@ public class CrearMatriz {
                 Literal nueval = new Literal(valor, tipo, linea, columna);
                 LinkedList<Object> lista = new LinkedList<>();
                 lista.add(nueval);
-                Vector nuevov = new Vector("", new TipoExp(Tipos.VECTOR), tipo, lista);
+                EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), tipo, lista);
                 nueva.add(nuevov);
             }
             matriz.add(nueva);

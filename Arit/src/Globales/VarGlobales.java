@@ -6,12 +6,13 @@
 package Globales;
 
 import Entorno.Entorno;
+import Entorno.Simbolo;
 import Expresion.Literal;
 import Expresion.TipoExp;
-import Objetos.Lista;
+
 import Objetos.Matrix;
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import java.util.LinkedList;
 import Reportes.Errores;
 import javax.swing.JTextArea;
@@ -105,12 +106,15 @@ public final class VarGlobales {
     public TipoExp obtenerTipo(Object t, Entorno e) {
         if (t instanceof Literal) {
             return ((Literal) t).getTipo(e);
-        } else if (t instanceof Vector) {
-            return ((Vector) t).getTipo();
+        } else if (t instanceof EstructuraLineal) {
+            Simbolo s = (Simbolo) t;
+            if (s.getTipo().isVector()) {
+                return ((EstructuraLineal) t).getTipo();
+            } else if (s.getTipo().isList()) {
+                return new TipoExp(TipoExp.Tipos.LISTA);
+            }
         } else if (t instanceof Nulo) {
             return ((Nulo) t).getTipo(e);
-        } else if (t instanceof Lista) {
-            return new TipoExp(TipoExp.Tipos.LISTA);
         } else if (t instanceof Matrix) {
             return new TipoExp(TipoExp.Tipos.MATRIX);
         } else if (t.getClass().getTypeName().equals(Double.class.getTypeName())) {
@@ -130,22 +134,23 @@ public final class VarGlobales {
         Object temp = null;
         for (int i = 0; i < referencia.size(); i++) {
             temp = referencia.get(i);
-            if (temp instanceof Vector) {
-                Vector aux = (Vector) temp;
-                LinkedList<Object> element = clonarListaVector(aux.getDimensiones(), e);
-                Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(aux.getTiposecundario().tp), element);
-                nueva.add(nuevo);
-            } else if (temp instanceof Lista) {
-                Lista aux = (Lista) temp;
-                LinkedList<Object> element = CopiarLista(e, aux.getLista());
-                Lista nuevo = new Lista(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
-                nueva.add(nuevo);
-            } else if (temp instanceof Literal) {
+            if (temp instanceof Literal) {
                 Literal pasando = (Literal) temp;
                 Literal nueval = new Literal(pasando.getValor(e), new TipoExp(pasando.getTipo(e).tp), pasando.linea(), pasando.columna());
                 LinkedList<Object> element = new LinkedList<>();
                 element.add(nueval);
-                Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(pasando.getTipo(e).tp), element);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(pasando.getTipo(e).tp), element);
+                nueva.add(nuevo);
+            } else if (((Simbolo) temp).getTipo().isVector()) {
+                EstructuraLineal aux = (EstructuraLineal) temp;
+                LinkedList<Object> element = clonarListaVector(aux.getDimensiones(), e);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(aux.getTiposecundario().tp), element);
+                nueva.add(nuevo);
+            } else if (((Simbolo) temp).getTipo().isList()) {
+                EstructuraLineal aux = (EstructuraLineal) temp;
+                LinkedList<Object> element = CopiarLista(e, aux.getDimensiones());
+                //EstructuraLineal nuevo = new Est(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
+                EstructuraLineal nuevo=new EstructuraLineal("",new TipoExp(TipoExp.Tipos.LISTA),null, element);
                 nueva.add(nuevo);
             }
         }
@@ -156,12 +161,12 @@ public final class VarGlobales {
         LinkedList<LinkedList<Object>> nuvamatrix = new LinkedList<>();
         for (int i = 0; i < referencia.size(); i++) {
             LinkedList<Object> aux = referencia.get(i);
-            
+
             LinkedList<Object> Nuevascol = new LinkedList<>();
             for (int j = 0; j < aux.size(); j++) {
-                Vector v = (Vector) aux.get(j);
+                EstructuraLineal v = (EstructuraLineal) aux.get(j);
                 LinkedList<Object> nv = clonarListaVector(v.getDimensiones(), e);
-                Vector nuevo = new Vector("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(v.getTiposecundario().tp), nv);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(v.getTiposecundario().tp), nv);
                 Nuevascol.add(nuevo);
             }
             nuvamatrix.add(Nuevascol);

@@ -7,9 +7,9 @@ package Expresion;
 
 import Entorno.Entorno;
 import Entorno.Simbolo;
-import Objetos.Lista;
+
 import Objetos.Matrix;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -38,7 +38,9 @@ public class Acceso implements Expresion {
         Object s = getId().getValor(e);
         if (s instanceof Errores) {
             return s;
-        } else if (s instanceof Vector) {
+        }
+        Simbolo sim=(Simbolo)s;
+        if (sim.getTipo().isVector()) {
             Object vector = s;
             for (Expresion exp : getIndices()) {
                 if (exp instanceof AccesoUnico) {
@@ -57,7 +59,7 @@ public class Acceso implements Expresion {
 
             }
             return vector;
-        } else if (s instanceof Lista) {
+        } else if (sim.getTipo().isList()) {
             Object lista = s;
             for (Expresion exp : getIndices()) {
                 if (exp instanceof AccesoUnico) {
@@ -106,8 +108,8 @@ public class Acceso implements Expresion {
     public TipoExp getTipo(Entorno e) {
         Simbolo s = e.get(id.getVal());
         if (s != null) {
-            if (s instanceof Vector) {
-                return ((Vector) s).getTipo();
+            if (s instanceof EstructuraLineal) {
+                return ((EstructuraLineal) s).getTipo();
             }
         }
         return null;

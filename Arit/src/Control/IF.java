@@ -11,7 +11,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Instruccion.Instruccion;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -41,9 +41,9 @@ public class IF implements Instruccion {
         Object ifacutal = condicion.getValor(e);
         if (ifacutal instanceof Errores) {
             return ifacutal;
-        } else if (ifacutal instanceof Vector) {
+        } else if (ifacutal instanceof EstructuraLineal) {
             //condicion = (Expresion) ((Vector) ifacutal).getDimensiones().get(0);
-            Vector v = (Vector) ifacutal;
+            EstructuraLineal v = (EstructuraLineal) ifacutal;
             Literal l = (Literal) v.getDimensiones().get(0);
             ifacutal = l.getValor(e);
             if (l.getTipo(e).isBoolean()) {
@@ -96,9 +96,9 @@ public class IF implements Instruccion {
                     if (ifacutal instanceof Errores) {
                         Globales.VarGlobales.getInstance().AgregarEU((Errores) ifacutal);
                         continue;
-                    } else if (ifacutal instanceof Vector) {
+                    } else if (ifacutal instanceof EstructuraLineal) {
                         //condicion = (Expresion) ((Vector) ifacutal).getDimensiones().get(0);
-                        Vector v = (Vector) ifacutal;
+                        EstructuraLineal v = (EstructuraLineal) ifacutal;
                         Literal l = (Literal) v.getDimensiones().get(0);
                         if (l.getTipo(e).isBoolean()) {
                             ifacutal = l.getValor(e);

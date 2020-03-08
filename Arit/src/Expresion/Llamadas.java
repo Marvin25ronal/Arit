@@ -11,9 +11,9 @@ import Expresion.TipoExp.Tipos;
 import Instruccion.DecAsig;
 import Instruccion.Print;
 import Objetos.Funcion;
-import Objetos.Lista;
+
 import Objetos.Nulo;
-import Objetos.Vector;
+import Objetos.EstructuraLineal;
 import Reportes.Errores;
 import java.util.LinkedList;
 import javax.swing.JTextArea;
@@ -95,7 +95,8 @@ public class Llamadas implements Expresion {
             if (aux instanceof Errores) {
                 return aux;
             }
-            if (aux instanceof Vector) {
+            tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
+            if (tipodominante.isVector()) {
                 if (tipoObjeto == null) {
                     tipoObjeto = new TipoExp(Tipos.VECTOR);
                 } else {
@@ -103,12 +104,10 @@ public class Llamadas implements Expresion {
                         tipoObjeto = new TipoExp(Tipos.VECTOR);
                     }
                 }
-                tipodominante = TipoDominante(tipodominante, ((Vector) aux).getTiposecundario());
-            } else if (aux instanceof Lista) {
+                tipodominante = TipoDominante(tipodominante, ((EstructuraLineal) aux).getTiposecundario());
+            } else if (tipodominante.isList()) {
 
                 tipoObjeto = new TipoExp(Tipos.LISTA);
-                tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
-            } else {
                 tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
             }
             if (tipodominante == null) {
@@ -134,11 +133,11 @@ public class Llamadas implements Expresion {
             }
             if (!dimensiones.isEmpty()) {
                 Entorno eaux = new Entorno(e);
-                eaux.add("aux", (Simbolo) new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores));
+                eaux.add("aux", (Simbolo) new EstructuraLineal("", new TipoExp(Tipos.VECTOR), tipodominante, valores));
                 Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
                 return nuevoA.getValor(eaux);
             }
-            return new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
+            return new EstructuraLineal("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
         } else if (tipoObjeto.isVector()) {
             //es un vector con mas vectores
             LinkedList<Object> valores = new LinkedList<>();
@@ -148,8 +147,8 @@ public class Llamadas implements Expresion {
                     Literal aux = (Literal) objeto;
                     Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
                     valores.add(nueva);
-                } else if (objeto instanceof Vector) {
-                    Vector aux = (Vector) objeto;
+                } else if (objeto instanceof EstructuraLineal) {
+                    EstructuraLineal aux = (EstructuraLineal) objeto;
                     LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
                     Literal laux = null;
                     for (int i = 0; i < datospasando.size(); i++) {
@@ -163,7 +162,7 @@ public class Llamadas implements Expresion {
                     valores.add(nueva);
                 }
             }
-            Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
+            EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), tipodominante, valores);
             if (!dimensiones.isEmpty()) {
                 Entorno eaux = new Entorno(e);
                 eaux.add("aux", (Simbolo) nuevo);
@@ -176,12 +175,13 @@ public class Llamadas implements Expresion {
             LinkedList<Object> valores = new LinkedList<>();
             while (!cola.isEmpty()) {
                 Object objeto = cola.removeFirst();
+                TipoExp tipodo = Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
                 if (objeto instanceof Literal) {
                     Literal aux = (Literal) objeto;
                     Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
                     valores.add(nueva);
-                } else if (objeto instanceof Vector) {
-                    Vector aux = (Vector) objeto;
+                } else if (tipodo.isVector()) {
+                    EstructuraLineal aux = (EstructuraLineal) objeto;
                     LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
                     Literal laux = null;
                     for (int i = 0; i < datospasando.size(); i++) {
@@ -190,9 +190,9 @@ public class Llamadas implements Expresion {
                         laux.tipo = tipodominante;
                         valores.add(datospasando.get(i));
                     }
-                } else if (objeto instanceof Lista) {
-                    Lista aux = (Lista) objeto;
-                    LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().CopiarLista(e, aux.getLista());
+                } else if (tipodo.isList()) {
+                    EstructuraLineal aux = (EstructuraLineal) objeto;
+                    LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().CopiarLista(e, aux.getDimensiones());
                     for (int i = 0; i < datospasando.size(); i++) {
                         valores.add(datospasando.get(i));
                     }
@@ -201,7 +201,8 @@ public class Llamadas implements Expresion {
                     valores.add(nueva);
                 }
             }
-            Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, "");
+            EstructuraLineal nueva = new EstructuraLineal("", new TipoExp(Tipos.LISTA), null, valores);
+            //Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, "");
             if (!dimensiones.isEmpty()) {
                 Entorno eaux = new Entorno(e);
                 eaux.add("aux", (Simbolo) nueva);
@@ -280,27 +281,24 @@ public class Llamadas implements Expresion {
                 Literal l = (Literal) aux;
                 LinkedList<Object> nueval = new LinkedList<>();
                 nueval.add(l);
-                Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), nueval);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), l.getTipo(e), nueval);
                 elementos.add(nuevo);
-            } else if (aux instanceof Vector) {
-                Vector v = (Vector) aux;
+            } else if (aux instanceof EstructuraLineal) {
+                EstructuraLineal v = (EstructuraLineal) aux;
                 elementos.add(v);
-            } else if (aux instanceof Lista) {
-                Lista l = (Lista) aux;
-                elementos.add(l);
             } else if (Globales.VarGlobales.getInstance().obtenerTipo(aux, e).isPrimitive(e)) {
                 Literal l = new Literal(aux, new TipoExp(Globales.VarGlobales.getInstance().obtenerTipo(aux, e).tp), linea(), columna());
                 LinkedList<Object> valores = new LinkedList<>();
                 valores.add(l);
-                Vector nuevo = new Vector("", new TipoExp(Tipos.VECTOR), l.getTipo(e), valores);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), l.getTipo(e), valores);
                 elementos.add(nuevo);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "Las listas no soportan este objeto", linea(), columna());
             }
 
         }
-
-        Lista nuevaLista = new Lista(elementos, new TipoExp(Tipos.LISTA), null, "");
+        EstructuraLineal nuevaLista = new EstructuraLineal("", new TipoExp(Tipos.LISTA), null, elementos);
+        //Lista nuevaLista = new Lista(elementos, new TipoExp(Tipos.LISTA), null, "");
         if (!dimensiones.isEmpty()) {
             Entorno eaux = new Entorno(e);
             eaux.add("aux", (Simbolo) nuevaLista);
@@ -355,25 +353,26 @@ public class Llamadas implements Expresion {
             Literal l = (Literal) valor;
             LinkedList<Object> datos = new LinkedList<>();
             datos.add(l);
-            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), datos);
+            EstructuraLineal nuevo = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), datos);
             if (actualizar) {
                 enuevo.Actualizar(id.getVal(), nuevo);
             } else {
                 enuevo.add(id.getVal(), nuevo);
             }
-        } else if (valor instanceof Vector) {
-            Vector copia = (Vector) valor;
+        } else if (tipo.isVector()) {
+            EstructuraLineal copia = (EstructuraLineal) valor;
             LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(copia.getDimensiones(), e);
-            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), copia.getTiposecundario(), lista);
+            EstructuraLineal nuevo = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.VECTOR), copia.getTiposecundario(), lista);
             if (actualizar) {
                 enuevo.Actualizar(id.getVal(), nuevo);
             } else {
                 enuevo.add(id.getVal(), nuevo);
             }
-        } else if (valor instanceof Lista) {
-            Lista copia = (Lista) valor;
-            LinkedList<Object> lista = Globales.VarGlobales.getInstance().CopiarLista(e, copia.getLista());
-            Lista nueva = new Lista(lista, new TipoExp(Tipos.LISTA), null, id.getVal());
+        } else if (tipo.isList()) {
+            EstructuraLineal copia = (EstructuraLineal) valor;
+            LinkedList<Object> lista = Globales.VarGlobales.getInstance().CopiarLista(e, copia.getDimensiones());
+            //Lista nueva = new Lista(lista, new TipoExp(Tipos.LISTA), null, id.getVal());
+            EstructuraLineal nueva = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.LISTA), null, lista);
             if (actualizar) {
                 //ambito venga default
                 enuevo.Actualizar(id.getVal(), nueva);
@@ -384,7 +383,7 @@ public class Llamadas implements Expresion {
             Literal l = new Literal(valor, tipo, linea(), columna());
             LinkedList<Object> lista = new LinkedList<>();
             lista.add(l);
-            Vector nuevo = new Vector(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), lista);
+            EstructuraLineal nuevo = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.VECTOR), l.getTipo(e), lista);
             if (actualizar) {
                 enuevo.Actualizar(id.getVal(), nuevo);
             } else {
@@ -396,18 +395,7 @@ public class Llamadas implements Expresion {
 
     @Override
     public TipoExp getTipo(Entorno e) {
-        Entorno aux = e.Copiar();
-        JTextArea consola = Globales.VarGlobales.getInstance().getConsola();
-        Globales.VarGlobales.getInstance().setConsola(new JTextArea());
-        Object valor = getValor(aux);
-        if (valor instanceof Vector) {
-            Globales.VarGlobales.getInstance().setConsola(consola);
-            return new TipoExp(Tipos.VECTOR);
-        } else if (valor instanceof Literal) {
-            Globales.VarGlobales.getInstance().setConsola(consola);
-            return ((Literal) valor).getTipo(aux);
-        }
-        Globales.VarGlobales.getInstance().setConsola(consola);
+        
         return null;
     }
 
