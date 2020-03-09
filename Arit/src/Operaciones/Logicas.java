@@ -40,7 +40,9 @@ public class Logicas extends Operacion {
     }
 
     private TipoExp tipoDominante(TipoExp t1, TipoExp t2) {
-        if (t1.isVector() || t2.isVector()) {
+        if (t1.isMatrix() || t2.isMatrix()) {
+            return new TipoExp(Tipos.MATRIX);
+        } else if (t1.isVector() || t2.isVector()) {
             return new TipoExp(Tipos.VECTOR);
         } else if (t1.isString() || t2.isString()) {
             return null;
@@ -279,6 +281,7 @@ public class Logicas extends Operacion {
     public int columna() {
         return this.columna;
     }
+
     public Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
         if (null != tdestino.tp) {
             switch (tdestino.tp) {

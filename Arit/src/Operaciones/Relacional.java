@@ -36,7 +36,11 @@ public class Relacional extends Operacion {
     }
 
     private TipoExp tipoDominante(TipoExp t1, TipoExp t2) {
-        if (t1.isVector() || t2.isVector()) {
+        if (t1.isMatrix() || t2.isMatrix()) {
+            return new TipoExp(Tipos.MATRIX);
+        } else if (t1.isList() || t2.isList()) {
+            return new TipoExp(Tipos.LISTA);
+        } else if (t1.isVector() || t2.isVector()) {
             return new TipoExp(Tipos.VECTOR);
         }
         return new TipoExp(Tipos.BOOLEAN);
