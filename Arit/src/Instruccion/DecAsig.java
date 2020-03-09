@@ -162,7 +162,7 @@ public class DecAsig implements Instruccion {
         Matrix m = (Matrix) matriz;
         LinkedList<LinkedList<Object>> valores = Globales.VarGlobales.getInstance().CopiarMatrix(e, m.getColumnas());
         Matrix nueva = new Matrix(valores, new TipoExp(Tipos.MATRIX), new TipoExp(m.getTiposecundario().tp), id.getVal(), m.getColumna(), m.getFila());
-        e.add(id.getVal(), m);
+        e.add(id.getVal(), nueva);
     }
 
     private void ReasignarLista_Lista(Entorno e, Object lista) {

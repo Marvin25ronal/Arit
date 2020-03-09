@@ -11,6 +11,8 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Objetos.EstructuraLineal;
+import Objetos.Matrix;
+import Objetos.Nulo;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -73,6 +75,19 @@ public class Relacional extends Operacion {
                 return RelacionalVectoresVectores((EstructuraLineal) valor1, (EstructuraLineal) valor2, e);
             }
             return top1.isVector() ? RelacionalVector((EstructuraLineal) valor1, top2, valor2, e, true) : RelacionalVector((EstructuraLineal) valor2, top1, valor1, e, false);
+        } else if (max(top1, top2).isMatrix()) {
+            //suma de matriz con matrices
+            if (top1.isMatrix() && top2.isMatrix()) {
+                return RelacionalMatriz_Matriz((Matrix) valor1, (Matrix) valor2, e);
+            } //con un vector
+            else if (top1.isVector() || top2.isVector()) //con un primitivo
+            {
+                return top1.isMatrix() ? RelacionalMatriz_Vector((Matrix) valor1, (EstructuraLineal) valor2, e) : RelacionalMatriz_Vector((Matrix) valor2, (EstructuraLineal) valor1, e);
+            } else if (top1.isPrimitive(e) || top2.isPrimitive(e)) {
+                return top1.isMatrix() ? RelacionalMatriz_Primitivo((Matrix) valor1, valor2, e) : RelacionalMatriz_Primitivo((Matrix) valor2, valor1, e);
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede hacer relacionales con ese tipo de objeto " + top1.toString() + top2.toString(), linea, columna);
+            }
         }
         if (top1.isNulo() && top2.isNulo()) {
             switch (op) {
@@ -137,6 +152,94 @@ public class Relacional extends Operacion {
             }
         }
         return null;
+    }
+
+    private Object RelacionalMatriz_Primitivo(Matrix a, Object b, Entorno e) {
+        LinkedList<LinkedList<Object>> columnas = new LinkedList<>();
+        TipoExp tipoO = Globales.VarGlobales.getInstance().obtenerTipo(b, e);
+        TipoExp dominante = max(a.getTiposecundario(), tipoO);
+        Literal lb = new Literal(b, tipoO, linea, this.columna);
+        for (int i = 0; i < a.getColumna(); i++) {
+            LinkedList<Object> filas = new LinkedList<>();
+            for (int j = 0; j < a.getFila(); j++) {
+                EstructuraLineal va = (EstructuraLineal) a.getColumnas().get(i).get(j);
+                Object res = new Relacional((Expresion) va.getDimensiones().get(0), (Expresion) lb, op, linea, columna).getValor(e);
+                if (res instanceof Errores) {
+                    return res;
+                }
+                TipoExp origen = Globales.VarGlobales.getInstance().obtenerTipo(res, e);
+                res = CastearValor(dominante, res, origen);
+                Literal nueva = new Literal(res, dominante, linea, columna);
+                LinkedList<Object> dato = new LinkedList<>();
+                dato.add(nueva);
+                EstructuraLineal vector = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(dominante.tp), dato);
+                filas.add(vector);
+            }
+            columnas.add(filas);
+        }
+        Matrix nm = new Matrix(columnas, new TipoExp(Tipos.MATRIX), dominante, "", a.getColumna(), a.getFila());
+        return nm;
+    }
+
+    private Object RelacionalMatriz_Vector(Matrix a, EstructuraLineal b, Entorno e) {
+        if (b.getDimensiones().size() == 1) {
+            LinkedList<LinkedList<Object>> columnas = new LinkedList<>();
+            TipoExp dominante = max(a.getTiposecundario(), b.getTiposecundario());
+            Literal lb = (Literal) b.getDimensiones().get(0);
+            for (int i = 0; i < a.getColumna(); i++) {
+                LinkedList<Object> filas = new LinkedList<>();
+                for (int j = 0; j < a.getFila(); j++) {
+                    EstructuraLineal va = (EstructuraLineal) a.getColumnas().get(i).get(j);
+                    Object res = new Relacional((Expresion) va.getDimensiones().get(0), (Expresion) lb, op, linea, columna).getValor(e);
+                    if (res instanceof Errores) {
+                        return res;
+                    }
+                    TipoExp origen = Globales.VarGlobales.getInstance().obtenerTipo(res, e);
+                    res = CastearValor(dominante, res, origen);
+                    Literal nueva = new Literal(res, dominante, linea, columna);
+                    LinkedList<Object> dato = new LinkedList<>();
+                    dato.add(nueva);
+                    EstructuraLineal vector = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(dominante.tp), dato);
+                    filas.add(vector);
+                }
+                columnas.add(filas);
+            }
+            Matrix nm = new Matrix(columnas, new TipoExp(Tipos.MATRIX), dominante, "", a.getColumna(), a.getFila());
+            return nm;
+        } else {
+            return new Errores(Errores.TipoError.SEMANTICO, "El vector tiene que tener un elemento ", linea, columna);
+        }
+    }
+
+    private Object RelacionalMatriz_Matriz(Matrix a, Matrix b, Entorno e) {
+        //tienen que ser del mismo tam
+        if ((a.getColumna() == b.getColumna()) && (a.getFila() == b.getFila())) {
+            LinkedList<LinkedList<Object>> columnas = new LinkedList<>();
+            TipoExp dominante = max(a.getTiposecundario(), b.getTiposecundario());
+            for (int i = 0; i < a.getColumna(); i++) {
+                LinkedList<Object> filas = new LinkedList<>();
+                for (int j = 0; j < a.getFila(); j++) {
+                    EstructuraLineal va = (EstructuraLineal) a.getColumnas().get(i).get(j);
+                    EstructuraLineal vb = (EstructuraLineal) b.getColumnas().get(i).get(j);
+                    Object res = new Relacional((Expresion) va.getDimensiones().get(0), (Expresion) vb.getDimensiones().get(0), op, linea, columna).getValor(e);
+                    if (res instanceof Errores) {
+                        return res;
+                    }
+                    TipoExp origen = Globales.VarGlobales.getInstance().obtenerTipo(res, e);
+                    res = CastearValor(dominante, res, origen);
+                    Literal nueva = new Literal(res, dominante, linea, columna);
+                    LinkedList<Object> dato = new LinkedList<>();
+                    dato.add(nueva);
+                    EstructuraLineal vector = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(dominante.tp), dato);
+                    filas.add(vector);
+                }
+                columnas.add(filas);
+            }
+            Matrix nm = new Matrix(columnas, new TipoExp(Tipos.MATRIX), dominante, "", a.getColumna(), a.getFila());
+            return nm;
+        } else {
+            return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer relacionales matrices que no sean del mismo tamaño", linea, columna);
+        }
     }
 
     private Object RelacionalVector(EstructuraLineal v, TipoExp tipoexp, Object valor, Entorno e, boolean primero) {
@@ -222,4 +325,39 @@ public class Relacional extends Operacion {
         return this.columna;
     }
 
+    public Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
+        if (null != tdestino.tp) {
+            switch (tdestino.tp) {
+                case STRING:
+                    if (valor instanceof Nulo) {
+                        return valor;
+                    } else {
+                        return valor.toString();
+                    }
+                case NUMERIC:
+                    if (valor instanceof Nulo) {
+                        return 0.0;
+                    } else if (torigen.tp == Tipos.BOOLEAN) {
+                        boolean b = Boolean.parseBoolean(valor.toString());
+                        return b ? 1.0 : 0.00;
+                    } else {
+                        return Double.parseDouble(valor.toString());
+                    }
+                case INTEGER:
+                    if (torigen.isBoolean()) {
+                        return Boolean.parseBoolean(valor.toString()) ? 1 : 0;
+                    }
+                    return valor instanceof Nulo ? 0 : Integer.parseInt(valor.toString());
+                case BOOLEAN:
+                    if (valor instanceof Nulo) {
+                        return false;
+                    } else {
+                        return Boolean.parseBoolean(valor.toString());
+                    }
+                default:
+                    break;
+            }
+        }
+        return null;
+    }
 }
