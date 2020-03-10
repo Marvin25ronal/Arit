@@ -82,6 +82,8 @@ public class Llamadas implements Expresion {
                 return HacerLista(e);
             case "matrix":
                 return new CrearMatriz(parametros, dimensiones, linea(), columna()).Ejecutar(e);
+            case "array":
+                return new CrearArray(parametros, dimensiones, linea(), columna()).Ejecutar(e);
 
         }
         return null;
@@ -179,8 +181,13 @@ public class Llamadas implements Expresion {
                 TipoExp tipodo = Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
                 if (objeto instanceof Literal) {
                     Literal aux = (Literal) objeto;
-                    Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tipodominante, linea(), columna());
-                    valores.add(nueva);
+                    TipoExp tobjeto=Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
+                    Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tobjeto, linea(), columna());
+                    LinkedList<Object> l = new LinkedList<>();
+                    l.add(nueva);
+                    EstructuraLineal n = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), nueva.getTipo(), l);
+                    valores.add(n);
+                    
                 } else if (tipodo.isVector()) {
                     EstructuraLineal aux = (EstructuraLineal) objeto;
                     LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
@@ -198,8 +205,12 @@ public class Llamadas implements Expresion {
                         valores.add(datospasando.get(i));
                     }
                 } else {
-                    Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tipodominante, linea(), columna());
-                    valores.add(nueva);
+                    TipoExp tobjeto=Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
+                    Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tobjeto, linea(), columna());
+                    LinkedList<Object> l = new LinkedList<>();
+                    l.add(nueva);
+                    EstructuraLineal n = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), nueva.getTipo(), l);
+                    valores.add(n);
                 }
             }
             EstructuraLineal nueva = new EstructuraLineal("", new TipoExp(Tipos.LISTA), null, valores);
@@ -333,7 +344,7 @@ public class Llamadas implements Expresion {
             }
             if (f.getParametros().get(i) instanceof DecAsig) {
                 DecAsig ndec = (DecAsig) f.getParametros().get(i);
-                Object res = ndec.EjecutarFuncion(e,enuevo);
+                Object res = ndec.EjecutarFuncion(e, enuevo);
                 if (res instanceof Errores) {
                     return res;
                 }
@@ -384,9 +395,9 @@ public class Llamadas implements Expresion {
             Matrix copia = (Matrix) valor;
             LinkedList<LinkedList<Object>> matriz = Globales.VarGlobales.getInstance().CopiarMatrix(e, copia.getColumnas());
             Matrix nueva = new Matrix(matriz, new TipoExp(Tipos.MATRIX), new TipoExp(copia.getTiposecundario().tp), id.getVal(), copia.getColumna(), copia.getFila());
-            if(actualizar){
+            if (actualizar) {
                 enuevo.Actualizar(id.getVal(), nueva);
-            }else{
+            } else {
                 enuevo.add(id.getVal(), nueva);
             }
         } else if (tipo.isPrimitive(e)) {
@@ -472,6 +483,8 @@ public class Llamadas implements Expresion {
             case "list":
                 return true;
             case "matrix":
+                return true;
+            case "array":
                 return true;
             default:
                 return false;

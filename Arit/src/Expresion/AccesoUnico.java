@@ -8,6 +8,7 @@ package Expresion;
 import Entorno.Entorno;
 import Entorno.Simbolo;
 import Expresion.TipoExp.Tipos;
+import Objetos.Array;
 
 import Objetos.Matrix;
 import Objetos.Nulo;
@@ -21,11 +22,27 @@ import java.util.LinkedList;
  */
 public class AccesoUnico implements Expresion {
 
+    /**
+     * @return the array
+     */
+    public boolean isArray() {
+        return array;
+    }
+
+    /**
+     * @param array the array to set
+     */
+    public void setArray(boolean array) {
+        this.array = array;
+    }
+
     private Expresion indice;
     private int linea;
     private int columna;
     private Object objeto;
     private boolean incremento;
+    private boolean array;
+    private int IndiceArray;
 
     public AccesoUnico(Expresion indice, int linea, int columna) {
         this.indice = indice;
@@ -40,6 +57,7 @@ public class AccesoUnico implements Expresion {
             return i;
         }
         TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(i, e);
+
         if (tipo.tp == Tipos.VECTOR) {
             //solo tenga un valor
             EstructuraLineal v = (EstructuraLineal) i;
@@ -54,6 +72,9 @@ public class AccesoUnico implements Expresion {
             }
         } else if (tipo.tp != Tipos.INTEGER) {
             return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser de tipo numerico el tipo es " + tipo.tp, getLinea(), getColumna());
+        }
+        if (isArray()) {
+            return AccesoArray(e);
         }
         Simbolo s = (Simbolo) getObjeto();
         if (s.getTipo().isVector()) {
@@ -159,6 +180,33 @@ public class AccesoUnico implements Expresion {
         return null;
     }
 
+    private Object AccesoArray(Entorno e) {
+        if (getObjeto() instanceof Array) {
+            Array array = (Array) getObjeto();
+            int inde = Integer.parseInt(getIndice().getValor(e).toString());
+            if (inde <= 0) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+            } else if (inde > IndiceArray) {
+                return new Errores(Errores.TipoError.SEMANTICO, "Se paso del indice en el ARRAY ", linea, columna);
+            }
+            inde--;
+            Globales.VarGlobales.getInstance().getAnterior().setAnterior(array);
+            Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
+            return array.getArreglo().get(inde);
+        } else {
+            //lista
+            LinkedList<Object> lista = (LinkedList<Object>) getObjeto();
+            int inde = Integer.parseInt(getIndice().getValor(e).toString());
+            if (inde <= 0) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El indice tiene que ser mayor a 0", linea, columna);
+            } else if (inde > IndiceArray) {
+                return new Errores(Errores.TipoError.SEMANTICO, "Se paso del indice en el ARRAY ", linea, columna);
+            }
+            inde--;
+            return lista.get(inde);
+        }
+    }
+
     private Object AccesoVector(Entorno e) {
         EstructuraLineal v = (EstructuraLineal) getObjeto();
         int inde = Integer.parseInt(getIndice().getValor(e).toString());
@@ -216,9 +264,9 @@ public class AccesoUnico implements Expresion {
 
     private Object AccesoListaIncremento(EstructuraLineal l, int inde) {
         for (int i = l.getDimensiones().size(); i < inde; i++) {
-            LinkedList<Object> li=new LinkedList<>();
+            LinkedList<Object> li = new LinkedList<>();
             li.add(new Literal(new Nulo(linea, columna), new TipoExp(Tipos.STRING), linea, columna));
-            EstructuraLineal v=new EstructuraLineal("",new TipoExp(Tipos.VECTOR),new TipoExp(Tipos.STRING), li);
+            EstructuraLineal v = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), li);
             l.getDimensiones().add(v);
         }
         inde--;
@@ -258,6 +306,20 @@ public class AccesoUnico implements Expresion {
      */
     public void setIncremento(boolean incremento) {
         this.incremento = incremento;
+    }
+
+    /**
+     * @return the IndiceArray
+     */
+    public int getIndiceArray() {
+        return IndiceArray;
+    }
+
+    /**
+     * @param IndiceArray the IndiceArray to set
+     */
+    public void setIndiceArray(int IndiceArray) {
+        this.IndiceArray = IndiceArray;
     }
 
 }

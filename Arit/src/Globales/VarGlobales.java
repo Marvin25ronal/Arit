@@ -9,6 +9,7 @@ import Entorno.Entorno;
 import Entorno.Simbolo;
 import Expresion.Literal;
 import Expresion.TipoExp;
+import Objetos.Array;
 
 import Objetos.Matrix;
 import Objetos.Nulo;
@@ -115,6 +116,8 @@ public final class VarGlobales {
             }
         } else if (t instanceof Nulo) {
             return ((Nulo) t).getTipo(e);
+        } else if (t instanceof Array) {
+            return new TipoExp(TipoExp.Tipos.ARRAY);
         } else if (t instanceof Matrix) {
             return new TipoExp(TipoExp.Tipos.MATRIX);
         } else if (t.getClass().getTypeName().equals(Double.class.getTypeName())) {
@@ -150,7 +153,7 @@ public final class VarGlobales {
                 EstructuraLineal aux = (EstructuraLineal) temp;
                 LinkedList<Object> element = CopiarLista(e, aux.getDimensiones());
                 //EstructuraLineal nuevo = new Est(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
-                EstructuraLineal nuevo=new EstructuraLineal("",new TipoExp(TipoExp.Tipos.LISTA),null, element);
+                EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.LISTA), null, element);
                 nueva.add(nuevo);
             }
         }
@@ -172,5 +175,46 @@ public final class VarGlobales {
             nuvamatrix.add(Nuevascol);
         }
         return nuvamatrix;
+    }
+
+    public LinkedList<Object> CopiarArray(Entorno e, LinkedList<Object> referencia) {
+        LinkedList<Object> nueva = new LinkedList<>();
+        CopiarArray2(e, referencia, nueva);
+        return nueva;
+    }
+
+    private void CopiarArray2(Entorno e, LinkedList<Object> referencia, LinkedList<Object> padre) {
+        if (referencia.get(0) instanceof EstructuraLineal) {
+            //ya son estructuras
+            Object temp = null;
+            for (int i = 0; i < referencia.size(); i++) {
+                temp = referencia.get(i);
+                if (temp instanceof Literal) {
+                    Literal pasando = (Literal) temp;
+                    Literal nueval = new Literal(pasando.getValor(e), new TipoExp(pasando.getTipo(e).tp), pasando.linea(), pasando.columna());
+                    LinkedList<Object> element = new LinkedList<>();
+                    element.add(nueval);
+                    EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(pasando.getTipo(e).tp), element);
+                    padre.add(nuevo);
+                } else if (((Simbolo) temp).getTipo().isVector()) {
+                    EstructuraLineal aux = (EstructuraLineal) temp;
+                    LinkedList<Object> element = clonarListaVector(aux.getDimensiones(), e);
+                    EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.VECTOR), new TipoExp(aux.getTiposecundario().tp), element);
+                    padre.add(nuevo);
+                } else if (((Simbolo) temp).getTipo().isList()) {
+                    EstructuraLineal aux = (EstructuraLineal) temp;
+                    LinkedList<Object> element = CopiarLista(e, aux.getDimensiones());
+                    //EstructuraLineal nuevo = new Est(element, new TipoExp(TipoExp.Tipos.LISTA), null, "");
+                    EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(TipoExp.Tipos.LISTA), null, element);
+                    padre.add(nuevo);
+                }
+            }
+        } else {
+            for (int i = 0; i < referencia.size(); i++) {
+                LinkedList<Object> nueva = new LinkedList<>();
+                CopiarArray2(e, (LinkedList<Object>) referencia.get(i), nueva);
+                padre.add(nueva);
+            }
+        }
     }
 }

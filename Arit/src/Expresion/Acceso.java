@@ -7,6 +7,7 @@ package Expresion;
 
 import Entorno.Entorno;
 import Entorno.Simbolo;
+import Objetos.Array;
 
 import Objetos.Matrix;
 import Objetos.EstructuraLineal;
@@ -39,7 +40,7 @@ public class Acceso implements Expresion {
         if (s instanceof Errores) {
             return s;
         }
-        Simbolo sim=(Simbolo)s;
+        Simbolo sim = (Simbolo) s;
         if (sim.getTipo().isVector()) {
             Object vector = s;
             for (Expresion exp : getIndices()) {
@@ -99,6 +100,46 @@ public class Acceso implements Expresion {
                 }
             }
             return matrix;
+        } else if (s instanceof Array) {
+            //ver si tiene como minimo el tama;o final
+            Array array = (Array) s;
+            Object obj = array;
+            if (getIndices().size() >= array.getDimensiones().size()) {
+                int i;
+                Expresion exp;
+                int j = 0;
+                for (i = array.getDimensiones().size() - 1; i >= 0; i--) {
+                    exp = getIndices().get(i);
+                    if (exp instanceof AccesoUnico) {
+                        AccesoUnico aux = (AccesoUnico) exp;
+                        aux.setObjeto(obj);
+                        aux.setArray(true);
+                        aux.setIndiceArray(array.getDimensiones().get(j));
+                        j++;
+                        obj = aux.getValor(e);
+                    } else {
+                        return new Errores(Errores.TipoError.SEMANTICO, "El array solo tiene tipo de acceso 1", linea, columna);
+                    }
+                    if (obj instanceof Errores) {
+                        return obj;
+                    }
+                }
+                obj = ((LinkedList<Object>) obj).get(0);
+                if (getIndices().size() == array.getDimensiones().size()) {
+                    return obj;
+                }
+                LinkedList<Expresion> indices2 = new LinkedList<Expresion>();
+                for (int k = array.getDimensiones().size(); k < getIndices().size(); k++) {
+                    indices2.add(getIndices().get(k));
+                }
+                Entorno nuevoE = new Entorno(e);
+                nuevoE.add("aux", (Simbolo) obj);
+                Acceso n = new Acceso(new Identificador("aux", linea, columna), indices2, linea, columna);
+                return n.getValor(nuevoE);
+
+            } else {
+                return new Errores(Errores.TipoError.SEMANTICO, "El acceso al ARRAY tiene que ser de todas sus dimensiones ", linea, columna);
+            }
         }
         return null;
 

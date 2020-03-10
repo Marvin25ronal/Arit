@@ -85,6 +85,17 @@ public class EstructuraLineal extends Simbolo {
         return cadena.toString();
 
     }
+    public boolean ListaIgual(Entorno.Entorno e){
+        TipoExp t=null;
+        for(int i=0;i<dimensiones.size();i++){
+            if(t==null){
+                t=((Simbolo)dimensiones.get(i)).getTipo();
+            }else if(t.tp!=((Simbolo)dimensiones.get(i)).getTipo().tp){
+               return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * @return the dimension
