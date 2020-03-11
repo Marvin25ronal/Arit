@@ -107,7 +107,7 @@ public class CrearMatriz {
                 Literal nuevaL = new Literal(aux.getValor(e), new TipoExp(aux.getTipo(e).tp), aux.getLinea(), aux.getColumna());
                 LinkedList<Object> nlist = new LinkedList<>();
                 nlist.add(nuevaL);
-                EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), aux.getTipo(e), nlist);
+                EstructuraLineal nuevov = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(aux.getTipo().tp), nlist);
                 nueva.add(nuevov);
                 k++;
                 if (k == valores.size()) {
@@ -116,7 +116,7 @@ public class CrearMatriz {
             }
             matriz.add(nueva);
         }
-        Matrix m = new Matrix(matriz, new TipoExp(Tipos.MATRIX), tipo, "", col, fil);
+        Matrix m = new Matrix(matriz, new TipoExp(Tipos.MATRIX),new TipoExp(v.getTiposecundario().tp), "", col, fil);
         if (!dimensiones.isEmpty()) {
             Entorno eaux = new Entorno(e);
             eaux.add("aux", (Simbolo) m);

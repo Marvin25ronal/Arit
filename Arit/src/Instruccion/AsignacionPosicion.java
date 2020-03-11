@@ -13,6 +13,7 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Globales.Anterior;
+import Objetos.Array;
 import Objetos.Matrix;
 import Objetos.Nulo;
 import Objetos.EstructuraLineal;
@@ -64,6 +65,10 @@ public class AsignacionPosicion implements Instruccion {
                 return ReasignarMatriz_Vector(e, val, tvalor, (EstructuraLineal) s);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede contener ese tipo de elementos", linea, columna);
+            }
+        } else if (((Simbolo) ac.getId().getValor(e)) instanceof Array) {
+            if (tvalor.isPrimitive(e) || tvalor.isVector() || tvalor.isList()) {
+                return ReasignarArray(e, val, tvalor, (EstructuraLineal) s);
             }
         } else if (s.getTipo().isVector()) {
             if (tvalor.isPrimitive(e)) {
@@ -124,6 +129,30 @@ public class AsignacionPosicion implements Instruccion {
             lista.setTiposecundario(new TipoExp(t.tp));
             LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().clonarListaVector(apasar.getDimensiones(), e);
             lista.setDimensiones(valoresnuevos);
+        }
+        return null;
+    }
+
+    private Object ReasignarArray(Entorno e, Object val, TipoExp tvalor, EstructuraLineal s) {
+        Acceso ac = (Acceso) acc;
+        Array origen = (Array) ac.getId().getValor(e);
+        //actualizar tipo o no
+        if (tvalor.isList()) {
+            EstructuraLineal pasando = (EstructuraLineal) val;
+            s.setDimensiones(Globales.VarGlobales.getInstance().CopiarLista(e, pasando.getDimensiones()));
+            s.setTipo(new TipoExp(Tipos.LISTA));
+            //s.setTiposecundario(new TipoExp(pasando.getTiposecundario().tp));
+        } else if (tvalor.isVector()) {
+            EstructuraLineal pasando = (EstructuraLineal) val;
+            s.setDimensiones(Globales.VarGlobales.getInstance().clonarListaVector(pasando.getDimensiones(), e));
+            s.setTiposecundario(new TipoExp(s.getTiposecundario().tp));
+
+        } else if (tvalor.isPrimitive(e)) {
+            Literal nueva = new Literal(val, tvalor, linea, columna);
+            LinkedList<Object> nl = new LinkedList<>();
+            nl.add(nueva);
+            s.setDimensiones(nl);
+            s.setTiposecundario(tvalor);
         }
         return null;
     }

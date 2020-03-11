@@ -34,7 +34,13 @@ public class EstructuraLineal extends Simbolo {
     public EstructuraLineal(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
         super(tipo, tipoprimitivo, id);
         this.dimensiones = dimensiones;
-
+    }
+    public EstructuraLineal(TipoExp tiposecundario,Object valor,int linea,int columna){
+        super(new TipoExp(TipoExp.Tipos.VECTOR),tiposecundario,"");
+        this.dimensiones=new LinkedList<>();
+        Literal l=new Literal(valor, tiposecundario, linea, columna);
+        dimensiones.add(l);
+        
     }
 
     /**
@@ -84,6 +90,17 @@ public class EstructuraLineal extends Simbolo {
         }
         return cadena.toString();
 
+    }
+    public boolean ListaIgual(Entorno.Entorno e){
+        TipoExp t=null;
+        for(int i=0;i<dimensiones.size();i++){
+            if(t==null){
+                t=((Simbolo)dimensiones.get(i)).getTipo();
+            }else if(t.tp!=((Simbolo)dimensiones.get(i)).getTipo().tp){
+               return false;
+            }
+        }
+        return true;
     }
 
     /**

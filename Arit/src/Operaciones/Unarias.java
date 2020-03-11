@@ -11,6 +11,7 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
 import Objetos.EstructuraLineal;
+import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -47,17 +48,23 @@ public class Unarias extends Operacion {
             return null;
         }
         Object valor = op1.getValor(e);
-       
+
         if (valor instanceof Errores) {
             return valor;
         } else {
-             TipoExp tip = Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
+            TipoExp tip = Globales.VarGlobales.getInstance().obtenerTipo(valor, e);
             //comparamos vectores
             if (tip.tp == Tipos.VECTOR) {
                 if (op == Operador.NOT) {
                     return NotVectores((EstructuraLineal) valor, e);
                 } else {
                     return MenosVectores((EstructuraLineal) valor, e);
+                }
+            } else if (tip.isMatrix()) {
+                if (op == Operador.NOT) {
+                    return NotMatriz((Matrix) valor, e);
+                } else {
+                    return MenosMatriz((Matrix) valor, e);
                 }
             } else {
                 if (tip.esNumero() && (Double.parseDouble(valor.toString()) % 1 != 0)) {
@@ -89,14 +96,39 @@ public class Unarias extends Operacion {
 
     }
 
-    private Object MenosVectores(EstructuraLineal v, Entorno e) {
+    private Object NotMatriz(Matrix m, Entorno e) {
+        LinkedList<LinkedList<Object>> nuevosval = new LinkedList<>();
+        for (int i = 0; i < m.getColumna(); i++) {
+            LinkedList<Object> filas = new LinkedList<>();
+            for (int j = 0; j < m.getFila(); j++) {
+                EstructuraLineal va = (EstructuraLineal) m.getColumnas().get(i).get(j);
+                Object res = new Unarias((Expresion) va.getDimensiones().get(0), null, op, linea, columna).getValor(e);
+                if (res instanceof Errores) {
+                    ((Errores) res).setMensaje("No se pudo hacer Not con  la matriz, por los tipos que no son booleanos");
+                    return res;
+                }
+                TipoExp origen = Globales.VarGlobales.getInstance().obtenerTipo(res, e);
+                //res = CastearValor(dominante, res, origen);
+                Literal nueva = new Literal(res, new TipoExp(Tipos.BOOLEAN), linea, columna);
+                LinkedList<Object> dato = new LinkedList<>();
+                dato.add(nueva);
+                EstructuraLineal vector = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.BOOLEAN), dato);
+                filas.add(vector);
+            }
+            nuevosval.add(filas);
+        }
+        Matrix nm = new Matrix(nuevosval, new TipoExp(Tipos.MATRIX), new TipoExp(Tipos.BOOLEAN), "", m.getColumna(),m.getFila());
+        return nm;
+    }
+
+    private Object NotVectores(EstructuraLineal v, Entorno e) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
         Object aux = null;
         for (int i = 0; i < lista.size(); i++) {
             l = (Literal) lista.get(i);
-            aux = new Unarias(l,null, op, linea, columna).val(e);
+            aux = new Unarias(l, null, op, linea, columna).val(e);
             if (aux instanceof Errores) {
                 ((Errores) aux).setMensaje("No se pudo hacer Not con  el arreglo, por los tipos que no son booleanos");
                 return aux;
@@ -107,7 +139,7 @@ public class Unarias extends Operacion {
         return nuevo;
     }
 
-    private Object NotVectores(EstructuraLineal v, Entorno e) {
+    private Object MenosVectores(EstructuraLineal v, Entorno e) {
         LinkedList<Object> lista = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
         LinkedList<Object> NuevoVal = new LinkedList<>();
         Literal l = null;
@@ -116,13 +148,40 @@ public class Unarias extends Operacion {
             l = (Literal) lista.get(i);
             aux = new Multiplicacion(new Literal(-1, new TipoExp(Tipos.INTEGER), linea, columna), l, Operador.MULTIPLICACION, linea, columna).ejecutar(e);
             if (aux instanceof Errores) {
-                ((Errores) aux).setMensaje("No se pudo negar el arreglo, por los tipos que no son numericos");
+                ((Errores) aux).setMensaje("No se pudo negar la matriz, por los tipos que no son numericos");
                 return aux;
             }
             NuevoVal.add(aux);
         }
         EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), v.getTiposecundario(), NuevoVal);
         return nuevo;
+    }
+
+    private Object MenosMatriz(Matrix m, Entorno e) {
+        LinkedList<LinkedList<Object>> nuevosval = new LinkedList<>();
+        TipoExp ddd = null;
+        for (int i = 0; i < m.getColumna(); i++) {
+            LinkedList<Object> filas = new LinkedList<>();
+            for (int j = 0; j < m.getFila(); j++) {
+                EstructuraLineal va = (EstructuraLineal) m.getColumnas().get(i).get(j);
+                Object res = new Multiplicacion(new Literal(-1, new TipoExp(Tipos.INTEGER), linea, columna), (Expresion) va.getDimensiones().get(0), Operador.MULTIPLICACION, linea, columna).getValor(e);
+                if (res instanceof Errores) {
+                    ((Errores) res).setMensaje("No se pudo hacer Not con  la matriz, por los tipos que no son booleanos");
+                    return res;
+                }
+                TipoExp origen = Globales.VarGlobales.getInstance().obtenerTipo(res, e);
+                ddd = origen;
+                //res = CastearValor(dominante, res, origen);
+                Literal nueva = new Literal(res, origen, linea, columna);
+                LinkedList<Object> dato = new LinkedList<>();
+                dato.add(nueva);
+                EstructuraLineal vector = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), origen, dato);
+                filas.add(vector);
+            }
+            nuevosval.add(filas);
+        }
+        Matrix nm = new Matrix(nuevosval, new TipoExp(Tipos.MATRIX), ddd, "", m.getColumna(), m.getFila());
+        return nm;
     }
 
     @Override

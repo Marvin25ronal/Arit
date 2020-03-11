@@ -10,6 +10,7 @@ import Expresion.Expresion;
 import Expresion.Literal;
 import Expresion.TipoExp;
 import Expresion.TipoExp.Tipos;
+import Objetos.Nulo;
 import Reportes.Errores;
 
 /**
@@ -41,7 +42,11 @@ public class Aritmeticas extends Operacion {
         if (t1.esNumero() && t2.esNumero() && op == Operador.POTENCIA) {
             return new TipoExp(Tipos.NUMERIC);
         }
-        if (t1.isVector() || t2.isVector()) {
+        if (t1.isMatrix() || t2.isMatrix()) {
+            return new TipoExp(Tipos.MATRIX);
+        } else if (t1.isList() || t2.isList()) {
+            return new TipoExp(Tipos.LISTA);
+        } else if (t1.isVector() || t2.isVector()) {
             return new TipoExp(Tipos.VECTOR);
         } else if (t1.isString() || t2.isString()) {
             return new TipoExp(Tipos.STRING);
@@ -104,6 +109,42 @@ public class Aritmeticas extends Operacion {
     @Override
     public int columna() {
         return this.columna;
+    }
+
+    public Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
+        if (null != tdestino.tp) {
+            switch (tdestino.tp) {
+                case STRING:
+                    if (valor instanceof Nulo) {
+                        return valor;
+                    } else {
+                        return valor.toString();
+                    }
+                case NUMERIC:
+                    if (valor instanceof Nulo) {
+                        return 0.0;
+                    } else if (torigen.tp == Tipos.BOOLEAN) {
+                        boolean b = Boolean.parseBoolean(valor.toString());
+                        return b ? 1.0 : 0.00;
+                    } else {
+                        return Double.parseDouble(valor.toString());
+                    }
+                case INTEGER:
+                    if (torigen.isBoolean()) {
+                        return Boolean.parseBoolean(valor.toString()) ? 1 : 0;
+                    }
+                    return valor instanceof Nulo ? 0 : Integer.parseInt(valor.toString());
+                case BOOLEAN:
+                    if (valor instanceof Nulo) {
+                        return false;
+                    } else {
+                        return Boolean.parseBoolean(valor.toString());
+                    }
+                default:
+                    break;
+            }
+        }
+        return null;
     }
 
 }
