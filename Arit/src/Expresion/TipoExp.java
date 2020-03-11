@@ -65,7 +65,7 @@ public class TipoExp {
             return false;
         } else if (tp == Tipos.MATRIX) {
             return false;
-        }else if(tp==Tipos.ARRAY){
+        } else if (tp == Tipos.ARRAY) {
             return false;
         }
         return true;
@@ -73,6 +73,11 @@ public class TipoExp {
 
     public boolean isMatrix() {
         return tp == Tipos.MATRIX;
+    }
+
+    @Override
+    public String toString() {
+        return tp.toString();//To change body of generated methods, choose Tools | Templates.
     }
 
 }

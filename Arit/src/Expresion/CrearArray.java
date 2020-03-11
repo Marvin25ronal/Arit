@@ -117,6 +117,12 @@ public class CrearArray {
         LlenarLista(arreglo, metiendo);
 
         Array nuevo = new Array(new TipoExp(Tipos.ARRAY), tarreglo, "", arreglo, listad);
+        if (!dimensiones.isEmpty()) {
+            Entorno eaux = new Entorno(e);
+            eaux.add("aux", (Simbolo) nuevo);
+            Acceso nuevoA = new Acceso(new Identificador("aux", 0, 0), dimensiones, 0, 0);
+            return nuevoA.getValor(eaux);
+        }
         return nuevo;
     }
 

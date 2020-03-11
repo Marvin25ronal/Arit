@@ -34,7 +34,13 @@ public class EstructuraLineal extends Simbolo {
     public EstructuraLineal(String id, TipoExp tipo, TipoExp tipoprimitivo, LinkedList<Object> dimensiones) {
         super(tipo, tipoprimitivo, id);
         this.dimensiones = dimensiones;
-
+    }
+    public EstructuraLineal(TipoExp tiposecundario,Object valor,int linea,int columna){
+        super(new TipoExp(TipoExp.Tipos.VECTOR),tiposecundario,"");
+        this.dimensiones=new LinkedList<>();
+        Literal l=new Literal(valor, tiposecundario, linea, columna);
+        dimensiones.add(l);
+        
     }
 
     /**

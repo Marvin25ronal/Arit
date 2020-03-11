@@ -17,8 +17,7 @@ import Objetos.EstructuraLineal;
 import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
-import javax.swing.JTextArea;
-import sun.misc.Queue;
+import Expresion.Funciones.*;
 
 /**
  *
@@ -84,7 +83,26 @@ public class Llamadas implements Expresion {
                 return new CrearMatriz(parametros, dimensiones, linea(), columna()).Ejecutar(e);
             case "array":
                 return new CrearArray(parametros, dimensiones, linea(), columna()).Ejecutar(e);
-
+            case "typeof":
+                return HacerTypeOf(e);
+            case "length":
+                return new Length(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "ncol":
+                return new nCol(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "nrow":
+                return new nRow(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "stringlength":
+                return new StringLength(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "remove":
+                return new Remove(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "tolowercase":
+                return new ToLowerCase(parametros, dimensiones, linea(), columna(), false).getValor(e);
+            case "touppercase":
+                return new ToLowerCase(parametros, dimensiones, linea(), columna(), true).getValor(e);
+            case "trunk":
+                return new trunk(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "round":
+                return new Round(parametros, dimensiones, linea(), columna()).getValor(e);
         }
         return null;
     }
@@ -181,13 +199,13 @@ public class Llamadas implements Expresion {
                 TipoExp tipodo = Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
                 if (objeto instanceof Literal) {
                     Literal aux = (Literal) objeto;
-                    TipoExp tobjeto=Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
+                    TipoExp tobjeto = Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
                     Literal nueva = new Literal(CastearValor(tipodominante, aux.getValor(e), aux.getTipo(e)), tobjeto, linea(), columna());
                     LinkedList<Object> l = new LinkedList<>();
                     l.add(nueva);
                     EstructuraLineal n = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), nueva.getTipo(), l);
                     valores.add(n);
-                    
+
                 } else if (tipodo.isVector()) {
                     EstructuraLineal aux = (EstructuraLineal) objeto;
                     LinkedList<Object> datospasando = Globales.VarGlobales.getInstance().clonarListaVector(aux.getDimensiones(), e);
@@ -205,7 +223,7 @@ public class Llamadas implements Expresion {
                         valores.add(datospasando.get(i));
                     }
                 } else {
-                    TipoExp tobjeto=Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
+                    TipoExp tobjeto = Globales.VarGlobales.getInstance().obtenerTipo(objeto, e);
                     Literal nueva = new Literal(CastearValor(tipodominante, objeto, Globales.VarGlobales.getInstance().obtenerTipo(objeto, e)), tobjeto, linea(), columna());
                     LinkedList<Object> l = new LinkedList<>();
                     l.add(nueva);
@@ -330,7 +348,14 @@ public class Llamadas implements Expresion {
         } else {
             return new Errores(Errores.TipoError.SEMANTICO, "La funcion print no cuenta con esa cantidad de parametros", id.getLinea(), id.getColumna());
         }
+    }
 
+    private Object HacerTypeOf(Entorno e) {
+        if (parametros.size() == 1) {
+            return new Typeof(parametros.get(0), id.getLinea(), id.getColumna(), dimensiones).getValor(e);
+        } else {
+            return new Errores(Errores.TipoError.SEMANTICO, "La funcion typeof no cuenta con esa cantidad de parametros", id.getLinea(), id.getColumna());
+        }
     }
 
     private Object PasarVariables(Entorno e, Funcion f) {
@@ -485,6 +510,30 @@ public class Llamadas implements Expresion {
             case "matrix":
                 return true;
             case "array":
+                return true;
+            case "lenght":
+                return true;
+            case "ncol":
+                return true;
+            case "nrow":
+                return true;
+            case "stringlength":
+                return true;
+            case "remove":
+                return true;
+            case "tolowercase":
+                return true;
+            case "touppercase":
+                return true;
+            case "trunk":
+                return true;
+            case "round":
+                return true;
+            case "mean":
+                return true;
+            case "median":
+                return true;
+            case "mode":
                 return true;
             default:
                 return false;
