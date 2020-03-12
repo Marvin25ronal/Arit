@@ -18,6 +18,11 @@ import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 import Expresion.Funciones.*;
+import Reportes.BarPlot;
+import Reportes.Histograma;
+import Reportes.LinePlot;
+import Reportes.Pie;
+import Reportes.Plot;
 
 /**
  *
@@ -103,6 +108,20 @@ public class Llamadas implements Expresion {
                 return new trunk(parametros, dimensiones, linea(), columna()).getValor(e);
             case "round":
                 return new Round(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "mean":
+                return new Mean(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "median":
+                return new Median(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "mode":
+                return new Mode(parametros, dimensiones, linea(), columna()).getValor(e);
+            case "pie":
+                return new Pie(parametros, dimensiones, linea(), columna()).ejecutar(e);
+            case "barplot":
+                return new BarPlot(parametros, dimensiones, linea(), columna()).ejecutar(e);
+            case "plot":
+                return new Plot(parametros, dimensiones, linea(), columna()).ejecutar(e);
+            case "hist":
+                return new Histograma(parametros, dimensiones, linea(), columna()).ejecutar(e);
         }
         return null;
     }
@@ -288,6 +307,8 @@ public class Llamadas implements Expresion {
         }
         if (t.isList() || nuevot.isList()) {
             return new TipoExp(Tipos.LISTA);
+        } else if (t.isVector() || nuevot.isVector()) {
+            return new TipoExp(Tipos.VECTOR);
         } else if (t.isString() || nuevot.isString()) {
             return new TipoExp(Tipos.STRING);
         } else if (t.isNumeric() || nuevot.isNumeric()) {
@@ -534,6 +555,14 @@ public class Llamadas implements Expresion {
             case "median":
                 return true;
             case "mode":
+                return true;
+            case "pie":
+                return true;
+            case "barplot":
+                return true;
+            case "plot":
+                return true;
+            case "hist":
                 return true;
             default:
                 return false;

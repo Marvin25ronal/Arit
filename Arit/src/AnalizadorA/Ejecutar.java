@@ -19,7 +19,7 @@ public class Ejecutar {
         try {
             String texto = "src/AnalizadorA/";
             String opcFlex[] = {texto + "Lexico.jflex", "-d", texto};
-            String cupo[] = {"-destdir", texto, "-parser", "parser", texto + "Sintactico.cup"};
+            String cupo[] = {"-destdir", texto,"-expect","1", "-parser", "parser", texto + "Sintactico.cup"};
             JFlex.Main.generate(opcFlex);
             java_cup.Main.main(cupo);
         } catch (Exception e) {

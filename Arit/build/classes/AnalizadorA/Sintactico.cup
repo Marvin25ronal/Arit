@@ -94,8 +94,8 @@ CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RES
 	|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
 	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
 	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
-	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
-	|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
+	//|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	//|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
 	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
 	|CUERPO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
 	|DECFUNCION:d{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(d);RESULT=lista;:}
@@ -240,7 +240,8 @@ LCORCHETES::=
 DECFUNCION::=
 	ID:i IGUAL:g FUNCTION PAR_A LISTAPARAMETROS:p PAR_C BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
 	|ID:i IGUAL:g FUNCTION PAR_A PAR_C BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
-	//|ID IGUAL PAR_A LISTAPARAMETROS PAR_C IGUALMAYOR BLOQUE
+	|ID:i IGUAL:g PAR_A LISTAPARAMETROS:p PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	|ID:i IGUAL:g PAR_A PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
 	;
 LISTAPARAMETROS::=
 	LISTAPARAMETROS:l COMA ID:i{:l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
