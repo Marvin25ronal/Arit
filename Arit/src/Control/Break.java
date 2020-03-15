@@ -21,7 +21,6 @@ public class Break implements Instruccion {
         this.linea = linea;
         this.columna = columna;
     }
-    
 
     /**
      * @return the linea
@@ -64,5 +63,13 @@ public class Break implements Instruccion {
     @Override
     public int columna() {
         return this.columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Break \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        return nueva.toString();
     }
 }

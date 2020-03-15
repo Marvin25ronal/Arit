@@ -569,4 +569,23 @@ public class Llamadas implements Expresion {
         }
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Llamadas \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(id.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Parametros \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+1).append(";\n");
+        for (Expresion n : parametros) {
+            nueva.append(n.toDot(this.hashCode() + 1));
+        }
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"Acceso \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        for (Expresion e : dimensiones) {
+            nueva.append(e.toDot(this.hashCode() + 2));
+        }
+        return nueva.toString();
+    }
+
 }

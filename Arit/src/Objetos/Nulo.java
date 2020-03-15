@@ -48,4 +48,12 @@ public class Nulo implements Expresion.Expresion {
         return columna;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("nodo").append(this.hashCode()).append("[label=\"Nulo \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        return nueva.toString();
+    }
+
 }

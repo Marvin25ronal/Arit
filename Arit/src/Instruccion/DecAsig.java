@@ -336,5 +336,10 @@ public class DecAsig implements Instruccion {
     public void setColumna(int columna) {
         this.columna = columna;
     }
+
+    @Override
+    public String toDot(int padre) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

@@ -14,4 +14,7 @@ public interface Nodo {
     int linea();
 
     int columna();
+    String toDot(int padre);
+    
+   
 }

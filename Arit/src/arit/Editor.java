@@ -252,9 +252,8 @@ public class Editor extends javax.swing.JFrame {
             }
             AST ast = parser.ast;
             if (ast != null) {
-                ReporteAST reporte = new ReporteAST(ast);
-                reporte.IniciarReporte();
-                String codigo = reporte.codigo;
+                String reporte=ast.HacerDot();
+                /*String codigo = reporte;
                 String dotpath = "E:\\Program Files (x86)\\Graphviz\\bin\\dot.exe";
                 String fileoutput = "./Arit.txt";
                 File archivo = new File(fileoutput);
@@ -268,8 +267,8 @@ public class Editor extends javax.swing.JFrame {
                 cmd[3] = "-o";
                 cmd[4] = "Arbol.png";
                 Runtime rt = Runtime.getRuntime();
-                rt.exec(cmd);
-
+                rt.exec(cmd);*/
+                System.out.println(reporte);
             }
         } catch (Exception e) {
             jTextArea1.append(e.getMessage());

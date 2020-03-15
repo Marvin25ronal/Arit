@@ -109,6 +109,15 @@ public class Literal implements Expresion {
     public String toString() {
         return getValor().toString();
     }
-    
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Exp \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode()+1).append("[label=\"").append(valor.toString()).append(" \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+1).append(";\n");
+        return nueva.toString();
+    }
 
 }

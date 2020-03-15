@@ -110,4 +110,9 @@ public class Ternarias implements Expresion {
     public void setIsFalse(Expresion isFalse) {
         this.isFalse = isFalse;
     }
+
+    @Override
+    public String toDot(int padre) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

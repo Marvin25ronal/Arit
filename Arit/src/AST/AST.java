@@ -79,4 +79,16 @@ public class AST {
             }
         }
     }
+
+    public String HacerDot() {
+        StringBuilder cad = new StringBuilder();
+        cad.append("digraph G{\n"
+                + "node[shape=\"box\",color=\"white\"];");
+        cad.append("node"+this.hashCode()+"[label=\"raiz\",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        for (Nodo n : getAcciones()) {
+            cad.append(n.toDot(this.hashCode()));
+        }
+        cad.append("}");
+        return cad.toString();
+    }
 }

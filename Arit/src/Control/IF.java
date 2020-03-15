@@ -12,6 +12,7 @@ import Expresion.Literal;
 import Expresion.TipoExp;
 import Instruccion.Instruccion;
 import Objetos.EstructuraLineal;
+import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -40,8 +41,11 @@ public class IF implements Instruccion {
 
         Object ifacutal = condicion.getValor(e);
         if (ifacutal instanceof Errores) {
-            return ifacutal;
-        } else if (ifacutal instanceof EstructuraLineal) {
+            Globales.VarGlobales.getInstance().AgregarEU((Errores) ifacutal);
+            ifacutal = false;
+        }
+        TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(ifacutal, e);
+        if (t.isVector()) {
             //condicion = (Expresion) ((Vector) ifacutal).getDimensiones().get(0);
             EstructuraLineal v = (EstructuraLineal) ifacutal;
             Literal l = (Literal) v.getDimensiones().get(0);
@@ -50,10 +54,21 @@ public class IF implements Instruccion {
                 return ejecutarIF(e, ifacutal);
             } else {
                 Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Los elementos del vector no son booleanos", linea, columna));
-                return null;
+                ifacutal = false;
+            }
+        } else if (t.isMatrix()) {
+            Matrix m = (Matrix) ifacutal;
+            EstructuraLineal v = (EstructuraLineal) m.getColumnas().get(0).get(0);
+            Literal l = (Literal) v.getDimensiones().get(0);
+            ifacutal = l.getValor(e);
+            if (l.getTipo(e).isBoolean()) {
+                return ejecutarIF(e, ifacutal);
+            } else {
+                Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Los elementos del la matriz no son booleanos", linea, columna));
+                ifacutal = false;
             }
         }
-        if (condicion.getTipo(e).isBoolean()) {
+        if (t.isBoolean()) {
             return ejecutarIF(e, ifacutal);
         } else {
             Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "La condicion no es booleana", linea, columna));
@@ -93,19 +108,34 @@ public class IF implements Instruccion {
 
                 if (n instanceof ElseIf) {
                     ifacutal = ((ElseIf) n).getCondicion().getValor(e);
+
                     if (ifacutal instanceof Errores) {
                         Globales.VarGlobales.getInstance().AgregarEU((Errores) ifacutal);
                         continue;
-                    } else if (ifacutal instanceof EstructuraLineal) {
+                    }
+                    TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(ifacutal, e);
+                    if (t.isVector()) {
                         //condicion = (Expresion) ((Vector) ifacutal).getDimensiones().get(0);
                         EstructuraLineal v = (EstructuraLineal) ifacutal;
                         Literal l = (Literal) v.getDimensiones().get(0);
                         if (l.getTipo(e).isBoolean()) {
                             ifacutal = l.getValor(e);
                         } else {
-                            return new Errores(Errores.TipoError.SEMANTICO, "La condicion del else if no es de tipo booleana", linea, columna);
+                            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "La condicion del else if no es de tipo booleana", linea, columna));
+                            continue;
                         }
-                    } else if (!((ElseIf) n).getCondicion().getTipo(e).isBoolean()) {
+                    } else if (t.isMatrix()) {
+                        Matrix m = (Matrix) ifacutal;
+                        EstructuraLineal v = (EstructuraLineal) m.getColumnas().get(0).get(0);
+                        Literal l = (Literal) v.getDimensiones().get(0);
+                        ifacutal = l.getValor(e);
+                        if (l.getTipo(e).isBoolean()) {
+                            ifacutal = l.getValor(e);
+                        } else {
+                            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "Los elementos dev la matriz no son booleanos", linea, columna));
+                            return null;
+                        }
+                    } else if (!t.isBoolean()) {
                         Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "La condicion no es booleana del else if", ((ElseIf) n).getLinea(), ((ElseIf) n).getColumna()));
                         continue;
                     }
@@ -204,6 +234,27 @@ public class IF implements Instruccion {
      */
     public void setColumna(int columna) {
         this.columna = columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"IF \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Condicion \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"Cuerpo \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        nueva.append(condicion.toDot(this.hashCode() + 1));
+        for (Nodo n : sentencias) {
+            nueva.append(n.toDot(this.hashCode() + 2));
+        }
+        nueva.append("node").append(this.hashCode()+3).append("[label=\"L_IFS \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()+3).append(";\n");
+        for(Nodo n:Lifs){
+            nueva.append(n.toDot(this.hashCode()+3));
+        }
+        return nueva.toString();
     }
 
 }

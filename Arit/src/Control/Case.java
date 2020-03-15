@@ -121,4 +121,16 @@ public class Case implements Instruccion {
         this.columna = columna;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Case \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(exp.toDot(this.hashCode()));
+        for (Nodo n : sentencias) {
+            nueva.append(n.toDot(this.hashCode()));
+        }
+        return nueva.toString();
+    }
+
 }

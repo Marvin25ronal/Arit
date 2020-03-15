@@ -258,4 +258,14 @@ public class Acceso4 implements Expresion {
         this.linea = linea;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Acceso4[,] \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(AcFila.toDot(this.hashCode()));
+        nueva.append(AcColumna.toDot(this.hashCode()));
+        return nueva.toString();
+    }
+
 }

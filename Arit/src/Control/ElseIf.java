@@ -123,4 +123,20 @@ public class ElseIf implements Instruccion {
         this.columna = columna;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Else_IF \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Condicion \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"Cuerpo \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        nueva.append(condicion.toDot(this.hashCode() + 1));
+        for (Nodo n : sentencias) {
+            nueva.append(n.toDot(this.hashCode() + 2));
+        }
+        return nueva.toString();
+    }
+
 }

@@ -57,7 +57,8 @@ COMA=","
 ██║░░██║███████╗██████╔╝███████╗██║░░██║░░╚██╔╝░░██║░░██║██████╔╝██║░░██║██████╔╝
 ╚═╝░░╚═╝╚══════╝╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝╚═════╝░
 */
-
+IN="in"
+FOR="for"
 TRUE="true"
 FALSE="false"
 IF="if"
@@ -68,6 +69,9 @@ BREAK="break"
 DEFAULT="default"
 FUNCTION="function"
 RETURN="return"
+WHILE="while"
+DO="do"
+CONTINUE="continue"
 /*
 ████████╗██╗██████╗░░█████╗░░██████╗
 ╚══██╔══╝██║██╔══██╗██╔══██╗██╔════╝
@@ -139,6 +143,11 @@ ENTER=[\ \n]
 <YYINITIAL>{CASE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.CASE,yyline,yycolumn,yytext());}
 <YYINITIAL>{BREAK}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.BREAK,yyline,yycolumn,yytext());}
 <YYINITIAL>{DEFAULT}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DEFAULT,yyline,yycolumn,yytext());}
+<YYINITIAL>{WHILE}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.WHILE,yyline,yycolumn,yytext());}
+<YYINITIAL>{DO}        			{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.DO,yyline,yycolumn,yytext());}
+<YYINITIAL>{CONTINUE}        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.CONTINUE,yyline,yycolumn,yytext());}
+<YYINITIAL>{FOR}	        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.FOR,yyline,yycolumn,yytext());}
+<YYINITIAL>{IN}		        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IN,yyline,yycolumn,yytext());}
 
 <YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
 <YYINITIAL>{ID}        			{System.out.println("Token ID "+yytext()+" reconocido"); return new Symbol(sym.ID,yyline,yycolumn,yytext());}

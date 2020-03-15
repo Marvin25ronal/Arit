@@ -74,4 +74,13 @@ public class Bloque implements Instruccion {
         this.Acciones = Acciones;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        for (Nodo n : getAcciones()) {
+            nueva.append(n.toDot(padre));
+        }
+        return nueva.toString();
+    }
+
 }

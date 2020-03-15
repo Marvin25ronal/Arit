@@ -5,9 +5,14 @@
  */
 package Control;
 
+import AST.Nodo;
 import Entorno.Entorno;
 import Expresion.Expresion;
+import Expresion.Literal;
+import Expresion.TipoExp;
 import Instruccion.Instruccion;
+import Objetos.EstructuraLineal;
+import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -34,10 +39,19 @@ public class Switch implements Instruccion {
         Object val = condicion.getValor(local);
         boolean entro = false;
         if (val instanceof Errores) {
-            return val;
+            Globales.VarGlobales.getInstance().AgregarEU((Errores) val);
+            return null;
         }
+        TipoExp tipo = Globales.VarGlobales.getInstance().obtenerTipo(val, e);
         if (Lcase == null) {
             return null;
+        }
+        if (tipo.isVector()) {
+            EstructuraLineal v = (EstructuraLineal) val;
+            val = ((Literal) v.getDimensiones().get(0)).getValor(e);
+        } else if (tipo.isMatrix()) {
+            Matrix m = (Matrix) val;
+            val = ((Literal) m.getColumnas().get(0).get(0)).getValor(e);
         }
         for (Instruccion n : Lcase) {
             Object t = null;
@@ -46,6 +60,14 @@ public class Switch implements Instruccion {
                 if (t instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU((Errores) t);
                     continue;
+                }
+                TipoExp tt = Globales.VarGlobales.getInstance().obtenerTipo(t, e);
+                if (tt.isVector()) {
+                    EstructuraLineal v = (EstructuraLineal) t;
+                    t = ((Literal) v.getDimensiones().get(0)).getValor(e);
+                } else if (tt.isMatrix()) {
+                    Matrix m = (Matrix) t;
+                    t = ((Literal) m.getColumnas().get(0).get(0)).getValor(e);
                 }
             } else if (n instanceof Else) {
                 t = val;
@@ -74,6 +96,22 @@ public class Switch implements Instruccion {
     @Override
     public int columna() {
         return this.columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Switch \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Condicion \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        nueva.append(condicion.toDot(this.hashCode() + 1));
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"L_Case \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        for (Nodo n : Lcase) {
+            nueva.append(n.toDot(this.hashCode() + 2));
+        }
+        return nueva.toString();
     }
 
 }

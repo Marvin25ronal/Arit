@@ -15,10 +15,12 @@ public class sym {
   public static final int CASE = 42;
   public static final int INTEGER = 33;
   public static final int CONTINUE = 41;
+  public static final int FOR = 47;
   public static final int NUMERIC = 27;
   public static final int NOT = 9;
   public static final int AND = 10;
   public static final int IGUAL = 30;
+  public static final int IN = 48;
   public static final int OR = 8;
   public static final int PREGUNTA = 23;
   public static final int DIV = 19;
@@ -47,11 +49,13 @@ public class sym {
   public static final int MAYOR = 11;
   public static final int POTENCIA = 22;
   public static final int ELSE = 38;
+  public static final int WHILE = 45;
   public static final int DEFAULT = 43;
   public static final int STRING = 28;
   public static final int COR_C = 5;
   public static final int FALSE = 36;
   public static final int COR_A = 4;
+  public static final int DO = 46;
   public static final int MAS = 17;
   public static final String[] terminalNames = new String[] {
   "EOF",
@@ -98,7 +102,11 @@ public class sym {
   "CONTINUE",
   "CASE",
   "DEFAULT",
-  "RETURN"
+  "RETURN",
+  "WHILE",
+  "DO",
+  "FOR",
+  "IN"
   };
 }
 
