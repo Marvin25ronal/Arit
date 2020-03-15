@@ -482,7 +482,14 @@ public class AsignacionPosicion implements Instruccion {
 
     @Override
     public String toDot(int padre) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Asignacion Pos \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(acc.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"= \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        nueva.append(valor.toDot(this.hashCode()));
+        return nueva.toString();
     }
 
 }

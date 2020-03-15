@@ -249,11 +249,14 @@ public class IF implements Instruccion {
         for (Nodo n : sentencias) {
             nueva.append(n.toDot(this.hashCode() + 2));
         }
-        nueva.append("node").append(this.hashCode()+3).append("[label=\"L_IFS \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
-        nueva.append("node").append(padre).append("->node").append(this.hashCode()+3).append(";\n");
-        for(Nodo n:Lifs){
-            nueva.append(n.toDot(this.hashCode()+3));
+        nueva.append("node").append(this.hashCode() + 3).append("[label=\"L_IFS \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode() + 3).append(";\n");
+        if (Lifs != null) {
+            for (Nodo n : Lifs) {
+                nueva.append(n.toDot(this.hashCode() + 3));
+            }
         }
+
         return nueva.toString();
     }
 

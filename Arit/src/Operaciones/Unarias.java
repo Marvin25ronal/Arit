@@ -207,8 +207,8 @@ public class Unarias extends Operacion {
         StringBuilder nueva = new StringBuilder();
         nueva.append("node").append(this.hashCode()).append("[label=\"Exp \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
         nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
-        nueva.append("node").append(op.hashCode()).append("[label=\"Operador{").append(op.toString()).append("} \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
-        nueva.append("node").append(this.hashCode()).append("->node").append(op.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode()+1).append("[label=\"Operador{").append(op.toString()).append("} \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+1).append(";\n");
         nueva.append(op1.toDot(this.hashCode()));
         return nueva.toString();
     }

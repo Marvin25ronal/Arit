@@ -8,6 +8,7 @@ package Instruccion;
 import AST.Nodo;
 import Entorno.Entorno;
 import Entorno.Simbolo;
+import Expresion.Expresion;
 import Expresion.Identificador;
 import Expresion.Llamadas;
 import Expresion.TipoExp;
@@ -165,7 +166,25 @@ public class DecFuncion implements Instruccion {
 
     @Override
     public String toDot(int padre) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"DecFuncion \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(id.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Parametros \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        for (int i = 0; i < parametros.size(); i++) {
+            if (parametros.get(i) instanceof Expresion) {
+                nueva.append(((Expresion) parametros.get(i)).toDot(this.hashCode()));
+            } else if (parametros.get(i) instanceof Instruccion) {
+                nueva.append(((Instruccion) parametros.get(i)).toDot(this.hashCode()));
+            }
+        }
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"Cuerpo \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        for (int i = 0; i < sentencias.size(); i++) {
+            nueva.append(sentencias.get(i).toDot(this.hashCode() + 2));
+        }
+        return nueva.toString();
     }
 
 }
