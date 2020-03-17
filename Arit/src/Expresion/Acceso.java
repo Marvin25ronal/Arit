@@ -236,4 +236,16 @@ public class Acceso implements Expresion {
         this.incremento = incremento;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Acceso \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(id.toDot(this.hashCode()));
+        for (Expresion n : getIndices()) {
+            nueva.append(n.toDot(this.hashCode()));
+        }
+        return nueva.toString();
+    }
+
 }

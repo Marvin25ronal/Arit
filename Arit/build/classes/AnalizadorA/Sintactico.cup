@@ -48,13 +48,13 @@ terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
 terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS,COMA;
 terminal String ID,NUMERIC,STRING,UMENOS;
 terminal String IGUAL,PYCOMA,FUNCTION;
-terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT,RETURN;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT,RETURN,WHILE,DO,FOR,IN;
 
 non terminal AST INICIO;
 non terminal Expresion EXP;
 non terminal LinkedList<Nodo>CUERPO,CUERPOINTERNO;
 non terminal LinkedList<Nodo> BLOQUE;
-non terminal Nodo ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS,DECFUNCION;
+non terminal Nodo ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS,DECFUNCION,CONTROL_WHILE,CONTROL_DO_WHILE,CONTROL_FOR;
 non terminal LinkedList<Instruccion>LIFS,LCASE;
 non terminal Expresion ACCESOARREGLO;
 non terminal LinkedList<Expresion> LCORCHETES,LISTAEXPRESION;
@@ -69,8 +69,8 @@ precedence left AND;
 precedence left IGUAL_IGUAL,DISTINTO;
 precedence nonassoc MENOR,MENOR_I,MAYOR_I,MAYOR;
 precedence left MAS,MENOS;
-precedence left POTENCIA;
 precedence left POR,DIV,MODULO;
+precedence left POTENCIA;
 precedence right NOT;
 precedence right UMENOS;
 precedence left COR_A, COR_C;
@@ -136,9 +136,10 @@ EXP::=
 	MENOS:a EXP:b {:RESULT=new Unarias(b,null,Operacion.Operador.RESTA,aleft+1,aright+1);:}%prec UMENOS
 	|EXP:a MAS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.SUMA,aleft+1,aright+1);:}
 	|EXP:a MENOS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.RESTA,aleft+1,aright+1);:}
+	|EXP:a POTENCIA EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,aleft+1,aright+1);:}
 	|EXP:a POR EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MULTIPLICACION,aleft+1,aright+1);:}
 	|EXP:a DIV EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.DIVISION,aleft+1,aright+1);:}
-	|EXP:a POTENCIA EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,aleft+1,aright+1);:}
+	
 	|EXP:a MODULO EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MODULO,aleft+1,aright+1);:}
 	
 	|NOT:a EXP:b{:RESULT=new Unarias(b,null,Operacion.Operador.NOT,aleft+1,aright+1);:}
@@ -192,6 +193,10 @@ LLAMADAS::=
 CONTROLES::=
 	CONTROL_IF:a{:RESULT=a;:}
 	|CONTROL_SWITCH:a{:RESULT=a;:}
+	|CONTROL_DO_WHILE:a PYCOMA {:RESULT=a;:}
+	|CONTROL_DO_WHILE:a{:RESULT=a;:}
+	|CONTROL_WHILE:a{:RESULT=a;:}
+	|CONTROL_FOR:a{:RESULT=a;:}
 	;
 CONTROL_IF::=
 	IF:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new IF(e,b,null,aleft+1,aright+1);:}
@@ -205,6 +210,16 @@ LIFS::=
 CONTROL_SWITCH::=
 	SWITCH:i PAR_A EXP:e PAR_C LLAV_A LCASE:l LLAV_C{:RESULT=new Switch(e,l,ileft+1,iright+1);:}
 	|SWITCH:i PAR_A EXP:e PAR_C LLAV_A LLAV_C{:RESULT=new Switch(e,new LinkedList<Instruccion>(),ileft+1,iright+1);:}
+	;
+
+CONTROL_WHILE::=
+	WHILE:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new While(e,b,aleft+1,aright+1);:}
+	;
+CONTROL_DO_WHILE::=
+	DO:a BLOQUE:b WHILE PAR_A EXP:e PAR_C{:RESULT=new Do_While(e,b,aleft+1,aright+1);:}
+	;
+CONTROL_FOR::=
+	FOR:a PAR_A ID:i IN EXP:e PAR_C BLOQUE:b{:RESULT=new For(new Identificador(i,ileft+1,iright+1),e,b,aleft+1,aright+1);:}
 	;
 LCASE::=
 	CASE:i EXP:e DOSPUNTOS CUERPOINTERNO:c LCASE:l{:l.addFirst(new Case(e,c,ileft+1,iright+1));RESULT=l;:}

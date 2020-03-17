@@ -165,7 +165,7 @@ public class Dispersion implements Instruccion {
         XYPlot plot = js.getXYPlot();
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, Color.decode("#D2691E"));
+        renderer.setSeriesPaint(0, Color.decode("#20B2AA"));
         renderer.setSeriesStroke(0, new BasicStroke(1.0f));
         renderer.setLinesVisible(false);
         plot.setRenderer(renderer);
@@ -219,6 +219,11 @@ public class Dispersion implements Instruccion {
             }
         }
         return nueva;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -94,7 +94,7 @@ public class AccesoDoble implements Expresion {
             //return new EstructuraLineal(lista, new TipoExp(Tipos.LISTA), null, "");
             return l.getDimensiones().get(inde);
         } else if (s.getTipo().isList()) {
-           
+
             Globales.VarGlobales.getInstance().getAnterior().setAnterior(l);
             Globales.VarGlobales.getInstance().getAnterior().setIndice(inde);
             Globales.VarGlobales.getInstance().getAnterior().setAcceso(2);
@@ -187,6 +187,15 @@ public class AccesoDoble implements Expresion {
      */
     public void setIncremento(boolean incremento) {
         this.incremento = incremento;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Acceso2[[]] \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(indice.toDot(this.hashCode()));
+        return nueva.toString();
     }
 
 }

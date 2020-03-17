@@ -135,24 +135,39 @@ public class Llamadas implements Expresion {
             if (aux instanceof Errores) {
                 return aux;
             }
-            tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
-            if (tipodominante.isVector()) {
-                if (tipoObjeto == null) {
-                    tipoObjeto = new TipoExp(Tipos.VECTOR);
-                } else {
-                    if (!tipoObjeto.isList()) {
-                        tipoObjeto = new TipoExp(Tipos.VECTOR);
+            TipoExp taux = Globales.VarGlobales.getInstance().obtenerTipo(aux, e);
+            if (taux.isVector()) {
+                //es un vector y se trata con el segundo tipo
+                EstructuraLineal eaux = (EstructuraLineal) aux;
+                if(tipoObjeto==null){
+                    tipoObjeto=new TipoExp(Tipos.VECTOR);
+                }else{
+                    if(!tipoObjeto.isList()){
+                        tipoObjeto=new TipoExp(Tipos.VECTOR);
                     }
                 }
-                tipodominante = TipoDominante(tipodominante, ((EstructuraLineal) aux).getTiposecundario());
-            } else if (tipodominante.isList()) {
-
-                tipoObjeto = new TipoExp(Tipos.LISTA);
+                tipodominante=TipoDominante(tipodominante, eaux.getTiposecundario());
+            } else {
                 tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
+                if (tipodominante.isVector()) {
+                    if (tipoObjeto == null) {
+                        tipoObjeto = new TipoExp(Tipos.VECTOR);
+                    } else {
+                        if (!tipoObjeto.isList()) {
+                            tipoObjeto = new TipoExp(Tipos.VECTOR);
+                        }
+                    }
+                    tipodominante = TipoDominante(tipodominante, ((EstructuraLineal) aux).getTiposecundario());
+                } else if (tipodominante.isList()) {
+
+                    tipoObjeto = new TipoExp(Tipos.LISTA);
+                    tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
+                }
+                if (tipodominante == null) {
+                    return new Errores(Errores.TipoError.SEMANTICO, "La funcion c no puede contener ese tipo de objetos en el parametro " + (i + 1), linea(), columna());
+                }
             }
-            if (tipodominante == null) {
-                return new Errores(Errores.TipoError.SEMANTICO, "La funcion c no puede contener ese tipo de objetos en el parametro " + (i + 1), linea(), columna());
-            }
+
             cola.add(aux);
         }
 
@@ -567,6 +582,25 @@ public class Llamadas implements Expresion {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Llamadas \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(id.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode() + 1).append("[label=\"Parametros \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 1).append(";\n");
+        for (Expresion n : parametros) {
+            nueva.append(n.toDot(this.hashCode() + 1));
+        }
+        nueva.append("node").append(this.hashCode() + 2).append("[label=\"Acceso \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode() + 2).append(";\n");
+        for (Expresion e : dimensiones) {
+            nueva.append(e.toDot(this.hashCode() + 2));
+        }
+        return nueva.toString();
     }
 
 }

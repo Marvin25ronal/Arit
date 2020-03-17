@@ -1,8 +1,37 @@
 digraph G{
-node[shape="box",color="white"];
-nodo0[label="raiz",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
-nodo1[label="Instruccion ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
-nodo0->nodo1
-nodo2[label="Print ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
-nodo1->nodo2
+node[shape="box",color="white"];node1121480535[label="raiz",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node2096728011[label="Llamadas ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node1121480535->node2096728011;
+node2054585703[label="Identificador{print} ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node2096728011->node2054585703;
+node2096728012[label="Parametros ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node2096728011->node2096728012;
+node285933548[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node2096728012->node285933548;
+node271157325[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node285933548->node271157325;
+node271157326[label="true ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node271157325->node271157326;
+node285933549[label="? ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node285933548->node285933549;
+node551453276[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node285933548->node551453276;
+node1762283109[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node551453276->node1762283109;
+node1762283110[label="10 ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node1762283109->node1762283110;
+node551453277[label="Simbolo{MENOR} ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node551453276->node551453277;
+node800667959[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node551453276->node800667959;
+node800667960[label="20 ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node800667959->node800667960;
+node285933550[label=": ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node285933548->node285933550;
+node1930340205[label="Exp ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node285933548->node1930340205;
+node1930340206[label="hola ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node1930340205->node1930340206;
+node2096728013[label="Acceso ",fontcolor="white",fillcolor="dodgerblue4",style="filled,rounded"];
+node2096728011->node2096728013;
 }

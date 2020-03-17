@@ -110,4 +110,19 @@ public class Ternarias implements Expresion {
     public void setIsFalse(Expresion isFalse) {
         this.isFalse = isFalse;
     }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Exp \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(cond.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode()+1).append("[label=\"? \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+1).append(";\n");
+        nueva.append(isTrue.toDot(this.hashCode()));
+        nueva.append("node").append(this.hashCode()+2).append("[label=\": \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+2).append(";\n");
+        nueva.append(isFalse.toDot(this.hashCode()));
+        return nueva.toString();
+    }
 }

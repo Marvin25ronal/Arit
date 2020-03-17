@@ -79,11 +79,11 @@ public class Identificador implements Expresion {
     @Override
     public TipoExp getTipo(Entorno e) {
         Object s = getValor(e);
-        if (s == null|| s instanceof Errores) {
+        if (s == null || s instanceof Errores) {
             return null;
 
         }
-        return ((Simbolo)s).getTipo();
+        return ((Simbolo) s).getTipo();
     }
 
     @Override
@@ -94,6 +94,14 @@ public class Identificador implements Expresion {
     @Override
     public int columna() {
         return this.columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Identificador{").append(val.toString()).append("} \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        return nueva.toString();
     }
 
 }

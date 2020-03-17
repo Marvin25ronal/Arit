@@ -9,7 +9,6 @@ import Entorno.Entorno;
 import Expresion.Expresion;
 import Objetos.Nulo;
 
-
 /**
  *
  * @author marvi
@@ -63,6 +62,15 @@ public class Print implements Instruccion {
     @Override
     public int columna() {
         return columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("nodo").append(padre + 1).append("[label=\"Print \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];");
+        nueva.append("node").append(padre).append("->node").append(padre + 1).append(";\n");
+        nueva.append(toPrint.toDot(padre + 1));
+        return nueva.toString();
     }
 
 }

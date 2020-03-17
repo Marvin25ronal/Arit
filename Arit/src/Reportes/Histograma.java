@@ -151,4 +151,9 @@ public class Histograma implements Instruccion {
         return columna;
     }
 
+    @Override
+    public String toDot(int padre) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

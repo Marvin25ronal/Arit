@@ -29,7 +29,7 @@ public class Return implements Expresion {
         this.exp = exp;
         this.linea = linea;
         this.columna = columna;
-    }
+    } 
 
     /**
      * @return the linea
@@ -113,5 +113,16 @@ public class Return implements Expresion {
      */
     public void setExp(Expresion exp) {
         this.exp = exp;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Return \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        if(exp!=null){
+            nueva.append(exp.toDot(padre));
+        }
+        return nueva.toString();
     }
 }

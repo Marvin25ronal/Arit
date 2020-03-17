@@ -322,4 +322,13 @@ public class AccesoUnico implements Expresion {
         this.IndiceArray = IndiceArray;
     }
 
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Acceso1[] \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append(indice.toDot(this.hashCode()));
+        return nueva.toString();
+    }
+
 }

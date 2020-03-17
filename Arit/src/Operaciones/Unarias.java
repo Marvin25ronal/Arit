@@ -117,7 +117,7 @@ public class Unarias extends Operacion {
             }
             nuevosval.add(filas);
         }
-        Matrix nm = new Matrix(nuevosval, new TipoExp(Tipos.MATRIX), new TipoExp(Tipos.BOOLEAN), "", m.getColumna(),m.getFila());
+        Matrix nm = new Matrix(nuevosval, new TipoExp(Tipos.MATRIX), new TipoExp(Tipos.BOOLEAN), "", m.getColumna(), m.getFila());
         return nm;
     }
 
@@ -200,6 +200,17 @@ public class Unarias extends Operacion {
     @Override
     public int columna() {
         return this.columna;
+    }
+
+    @Override
+    public String toDot(int padre) {
+        StringBuilder nueva = new StringBuilder();
+        nueva.append("node").append(this.hashCode()).append("[label=\"Exp \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
+        nueva.append("node").append(this.hashCode()+1).append("[label=\"Operador{").append(op.toString()).append("} \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
+        nueva.append("node").append(this.hashCode()).append("->node").append(this.hashCode()+1).append(";\n");
+        nueva.append(op1.toDot(this.hashCode()));
+        return nueva.toString();
     }
 
 }
