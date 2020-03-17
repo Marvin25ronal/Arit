@@ -268,7 +268,7 @@ public class Editor extends javax.swing.JFrame {
                 cmd[4] = "Arbol.png";
                 Runtime rt = Runtime.getRuntime();
                 rt.exec(cmd);
-                System.out.println(reporte);
+                //System.out.println(reporte);
             }
         } catch (Exception e) {
             jTextArea1.append(e.getMessage());

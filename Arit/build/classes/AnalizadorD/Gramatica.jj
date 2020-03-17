@@ -13,13 +13,18 @@ import Expresion.*;
 import Expresion.TipoExp.Tipos;
 import AST.*;
 import Instruccion.Instruccion;
+import Instruccion.*;
 import Instruccion.Print;
 import Objetos.Nulo;
 import Operaciones.Aritmeticas;
 import Operaciones.Operacion;
 import Operaciones.Logicas;
 import Operaciones.Relacional;
+import Instruccion.DecAsig;
+import Expresion.Identificador;
 import Operaciones.Ternarias;
+import Operaciones.Unarias;
+import Control.*;
 public class Gramatica{
 }
 PARSER_END(Gramatica)
@@ -48,6 +53,7 @@ TOKEN : {
 	|<MENOS:"-">
 	|<POR:"*">
 	|<DIV:"/">
+	|<COMA:",">
 	|<POTENCIA:"^">
 	|<MODULO:"%%">
 	|<PAR_A:"(">
@@ -67,9 +73,15 @@ TOKEN : {
 	|<OR:"|">
 	|<NOT:"!">
 	|<BOOLEANO:"true"|"false">
+	|<IF:"if">
+	|<ELSE:"else">
+	|<SWITCH:"switch">
+	|<DO:"do">
+	|<WHILE:"while">
+	|<CASE:"case">
 	|<PREGUNTA:"?">
-	|<PRINT: "print">
 	|<NULO: "null">
+	|<TDEFAULT:"default">
 	|<DOSPUNTOS:":">
 	//|<IDENTIFICADOR: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_"] | ["0"-"9"] )* >
 	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z"](["a"-"z","A"-"Z","_"]|["0"-"9"])*)>
@@ -107,28 +119,214 @@ Nodo aux;
 
 Nodo CUERPO():
 {
-Instruccion aux;
+Nodo aux;
 }
 {
-	aux=FUNCIONES(){return aux;}
+	
+	(aux=CONTROLES()){return aux;}
+	|(aux=DECLARACION()){return aux;}
 
 }
-Instruccion FUNCIONES():
+
+LinkedList<Nodo>BLOQUE():
 {
-	Instruccion ins;
+	LinkedList<Nodo>lista=new LinkedList();
+	Nodo aux=null;
 }
 {
-	ins=IMPRIMIR(){return ins;}
+	<LLAV_A> (aux=CUERPOINTERNO(){lista.add(aux);})* <LLAV_C>{return lista;}
 }
 
-Instruccion IMPRIMIR():
+
+
+Nodo CUERPOINTERNO():
 {
-	Expresion exp;
+Nodo aux;
+}
+{
+	
+	(aux=CONTROLES()){return aux;}
+	|(aux=DECLARACION()){return aux;}
+}
+
+Nodo DECLARACION():
+{
+	Token i;
+	LinkedList<Expresion>par=new LinkedList();
+	LinkedList<Expresion>dim=new LinkedList();
+	Expresion e;
+}
+{
+	LOOKAHEAD(2)i=<IDENTIFICADOR> <IGUAL> e=EXP() (<PYCOMA>)?{return new DecAsig(e,new Identificador(i.image,i.beginLine,i.beginColumn),i.beginLine,i.beginColumn);}
+	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES() <IGUAL> e=EXP() (<PYCOMA>)?{return new AsignacionPosicion(new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn),e,i.beginLine,i.beginColumn);}
+	|LOOKAHEAD(2) i=<IDENTIFICADOR><PAR_A>(par=LISTAEXP())?<PAR_C>(<PYCOMA>)? {return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),par,dim);}
+}
+
+LinkedList<Expresion>LCORCHETES():
+{
+	LinkedList<Expresion>l=new LinkedList();
+	Expresion e;
+}
+{
+	(e=CORCHETES(){l.add(e);})+{return l;}
+}
+
+Expresion CORCHETES():
+{
+	Expresion aux;
+	
+}
+{
+	(aux=ACCESOS()){return aux;}
+}
+
+Expresion ACCESOS():
+{
+	Expresion e,d;
 	Token t;
 }
 {
-	t=<PRINT> <PAR_A> exp=EXP()<PAR_C> (<PYCOMA>)? {return new Print(exp,t.beginLine,t.beginColumn);}
+	LOOKAHEAD(3) t=<COR_A> e=EXP() <COR_C> {return new AccesoUnico(e,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(2) t=<COR_A> <COR_A> e=EXP() <COR_C> <COR_C>{return new AccesoDoble(e,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(4) t=<COR_A> e=EXP() <COMA> d=EXP() <COR_C>{return new Acceso4(e,d,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(2) t=<COR_A> <COMA> d=EXP() <COR_C>{return new Acceso4(null,d,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(4) t=<COR_A> e=EXP() <COMA> <COR_C>{return new Acceso4(e,null,t.beginLine,t.beginColumn);}
 }
+/*
+░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
+██╔══██╗██╔══██╗████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
+██║░░╚═╝██║░░██║██╔██╗██║░░░██║░░░██████╔╝██║░░██║██║░░░░░
+██║░░██╗██║░░██║██║╚████║░░░██║░░░██╔══██╗██║░░██║██║░░░░░
+╚█████╔╝╚█████╔╝██║░╚███║░░░██║░░░██║░░██║╚█████╔╝███████╗
+░╚════╝░░╚════╝░╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░╚══════╝
+*/
+
+Instruccion CONTROLES():
+{
+	Instruccion ins=null;
+}
+{
+	ins=CONTROL_IF(){return ins;}
+	|ins=CONTROL_SWITCH(){return ins;}
+	|ins=CONTROL_DO_WHILE(){return ins;}
+	|ins=CONTROL_WHILE(){return ins;}
+
+}
+
+Instruccion CONTROL_FOR():
+{
+
+}
+{
+	
+}
+
+Instruccion CONTROL_WHILE():
+{
+	Token i;
+	Expresion e;
+	LinkedList<Nodo>blo;
+}
+{
+	i=<WHILE> <PAR_A> e=EXP() <PAR_C> blo=BLOQUE(){return new While(e,blo,i.beginLine,i.beginColumn);}
+}
+
+Instruccion CONTROL_DO_WHILE():
+{
+	Expresion e;
+	Token i;
+	LinkedList<Nodo>blo;
+}
+{
+	i=<DO> blo=BLOQUE() <WHILE> <PAR_A> e=EXP() <PAR_C> (<PYCOMA>)? {return new Do_While(e,blo,i.beginLine,i.beginColumn);}
+}	
+
+Instruccion CONTROL_SWITCH():
+{
+	Token i;
+	Expresion e;
+	LinkedList<Instruccion>Lcase=new LinkedList();
+}
+{
+	i=<SWITCH> <PAR_A> e=EXP() <PAR_C> <LLAV_A> (Lcase=LCASE())? <LLAV_C>{return new Switch(e,Lcase,i.beginLine,i.beginColumn);}
+}
+
+LinkedList<Instruccion>LCASE():
+{
+	Instruccion i;
+	LinkedList<Instruccion>ins=new LinkedList();
+}
+{
+	 (i=CASE(){ins.add(i);})+ (i=CDEFAULT(){ins.add(i);})? {return ins;}
+}
+
+Instruccion CASE():
+{
+	Token i;
+	Expresion exp;
+	LinkedList<Nodo>blo=new LinkedList();
+	Nodo aux;
+}
+{
+	i=<CASE> exp=EXP() <DOSPUNTOS> (aux=CUERPOINTERNO(){blo.add(aux);})* {return new Case(exp,blo,i.beginLine,i.beginColumn);}
+}
+
+Instruccion CDEFAULT():
+{
+	Token i;
+	LinkedList<Nodo>blo=new LinkedList();
+	Nodo aux;
+}
+{
+	i=<TDEFAULT> <DOSPUNTOS> (aux=CUERPOINTERNO(){blo.add(aux);})* {return new Else(blo,i.beginLine,i.beginColumn);}
+}
+
+
+Instruccion CONTROL_IF():
+{
+	Token i,el,tel;
+	Instruccion ins;
+	LinkedList<Instruccion>Lifs=new LinkedList();
+	Expresion condi;
+	LinkedList<Nodo>blo,bloelse;
+}
+{
+	i=<IF><PAR_A> condi=EXP() <PAR_C> blo=BLOQUE() 	
+	(
+		LOOKAHEAD(2) el=<ELSE> ins=CONTROL_IF()
+		{
+			LinkedList<Instruccion>aux=((IF)ins).getLifs();
+			Expresion condicionNueva=((IF)ins).getCondicion();
+			LinkedList<Nodo>bloqueelse=((IF)ins).getSentencias();
+			ElseIf nuevo=new ElseIf(condicionNueva,bloqueelse,el.beginLine,el.beginColumn);
+			Lifs.add(nuevo);
+			for(Instruccion n : aux){
+				Lifs.add(n);
+			}
+		}
+		|LOOKAHEAD(2) tel=<ELSE> bloelse=BLOQUE(){Lifs.add(new Else(bloelse,tel.beginLine,tel.beginColumn));}
+	)?
+	{return new IF(condi,blo,Lifs,i.beginLine,i.beginColumn);}
+
+}
+
+
+
+
+LinkedList<Expresion>LISTAEXP():
+{
+	LinkedList<Expresion>lista=new LinkedList();
+	Expresion e;
+	Token d;
+}
+{
+	e=EXP(){lista.add(e);} (<COMA> e=EXP(){lista.add(e);}| d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));})*
+	{return lista;}
+}
+/*
+█▀▀ ▀▄▀ █▀█ █▀█ █▀▀ █▀ █ █▀█ █▄░█
+██▄ █░█ █▀▀ █▀▄ ██▄ ▄█ █ █▄█ █░▀█
+*/
 Expresion EXP():
 {
 	Expresion a,b,c;
@@ -217,23 +415,31 @@ Expresion a,b;
 }
 Expresion ExpresionUnaria():
 {
-	Expresion exp;
+	Expresion exp,a;
+	Token t;
 }
 {
-	<MENOS>ExpresionUnaria(){}
-	|<NOT>ExpresionUnaria(){}
+	t=<MENOS>exp=ExpresionUnaria(){return new Unarias(exp,null,Operacion.Operador.RESTA,t.beginLine,t.beginColumn);}
+	|t=<NOT>exp=ExpresionUnaria(){return new Unarias(exp,null,Operacion.Operador.NOT,t.beginLine,t.beginColumn);}
 	|exp=Primitivo(){return exp;}
 }
 Expresion Primitivo():
 {
 	Expresion aux;
+	Token i;
+	LinkedList<Expresion>dim=new LinkedList(),lex=new LinkedList();
 }
 {
 	<NUMERIC>{return new Literal(Double.parseDouble(token.image),new TipoExp(Tipos.NUMERIC),token.beginLine,token.beginColumn);}
 	|<BOOLEANO>{return new Literal(Boolean.parseBoolean(token.image),new TipoExp(Tipos.BOOLEAN),token.beginLine,token.beginColumn);}
 	|<INTEGER>{return new Literal(Integer.parseInt(token.image),new TipoExp(Tipos.INTEGER),token.beginLine,token.beginColumn);}
 	|<STRING>{return new Literal(token.image.substring(1,token.image.length()-1),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
-	|<IDENTIFICADOR>
+	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
+	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> lex=LISTAEXP() <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
+	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES(){return new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn);}
+	|i=<IDENTIFICADOR>{return new Identificador(i.image,i.beginLine,i.beginColumn);}
 	|<PAR_A> aux=EXP() <PAR_C>{return aux;}
 	|<NULO>{return new  Nulo(token.beginLine,token.beginColumn); }
 }
+
+
