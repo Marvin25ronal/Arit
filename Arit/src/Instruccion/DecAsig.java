@@ -182,14 +182,14 @@ public class DecAsig implements Instruccion {
     private void CrearArrayNueva(Entorno e, Object array) {
         Array arreglo = (Array) array;
         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarArray(e, arreglo.getArreglo());
-        Array nuevo = new Array(new TipoExp(Tipos.ARRAY), arreglo.getTiposecundario(), id.getVal(), valores, new LinkedList<>(arreglo.getDimensiones()));
+        Array nuevo = new Array(new TipoExp(Tipos.ARRAY), arreglo.getTiposecundario(), id.getVal(), valores, new LinkedList<>(arreglo.getDimensiones()),this.linea,this.columna);
         e.add(id.getVal(), nuevo);
     }
 
     private void CrearMatrizNueva(Entorno e, Object matriz) {
         Matrix m = (Matrix) matriz;
         LinkedList<LinkedList<Object>> valores = Globales.VarGlobales.getInstance().CopiarMatrix(e, m.getColumnas());
-        Matrix nueva = new Matrix(valores, new TipoExp(Tipos.MATRIX), new TipoExp(m.getTiposecundario().tp), id.getVal(), m.getColumna(), m.getFila());
+        Matrix nueva = new Matrix(valores, new TipoExp(Tipos.MATRIX), new TipoExp(m.getTiposecundario().tp), id.getVal(), m.getColumna(), m.getFila(),this.linea,this.columna);
         e.add(id.getVal(), nueva);
     }
 
@@ -207,7 +207,7 @@ public class DecAsig implements Instruccion {
         EstructuraLineal l = (EstructuraLineal) lista;
         LinkedList<Object> valores = Globales.VarGlobales.getInstance().CopiarLista(e, l.getDimensiones());
         //Lista nueva = new Lista(valores, new TipoExp(Tipos.LISTA), null, id.getVal());
-        EstructuraLineal nueva = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.LISTA), null, valores);
+        EstructuraLineal nueva = new EstructuraLineal(id.getVal(), new TipoExp(Tipos.LISTA), null, valores,this.linea,this.columna);
         e.add(id.getVal(), nueva);
     }
 
@@ -215,7 +215,7 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(setvalor, t, getLinea(), getColumna());
         datos.add(nueva);
-        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), t, datos,this.linea,this.columna);
         e.add(getId().getVal(), nuevo);
     }
 
@@ -223,7 +223,7 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
         datos.add(nueva);
-        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos,this.linea,this.columna);
         e.add(getId().getVal(), nuevo);
     }
 
@@ -250,7 +250,7 @@ public class DecAsig implements Instruccion {
     private void CrearNuevoVector_Vector(Entorno e, Object setvalor, TipoExp t) {
         EstructuraLineal v = (EstructuraLineal) setvalor;
         LinkedList<Object> datos = Globales.VarGlobales.getInstance().clonarListaVector(v.getDimensiones(), e);
-        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), datos);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), v.getTiposecundario(), datos,this.linea,this.columna);
         e.add(getId().getVal(), nuevo);
     }
 

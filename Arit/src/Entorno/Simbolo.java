@@ -13,13 +13,45 @@ import Expresion.TipoExp;
  */
 public abstract class Simbolo {
 
+    /**
+     * @return the linea
+     */
+    public int getLinea() {
+        return linea;
+    }
+
+    /**
+     * @param linea the linea to set
+     */
+    public void setLinea(int linea) {
+        this.linea = linea;
+    }
+
+    /**
+     * @return the columna
+     */
+    public int getColumna() {
+        return columna;
+    }
+
+    /**
+     * @param columna the columna to set
+     */
+    public void setColumna(int columna) {
+        this.columna = columna;
+    }
+
     private TipoExp tipo;
     private TipoExp tiposecundario;
     private String id;
-    public Simbolo(TipoExp tipo, TipoExp tiposecundario,String id) {
+    private int linea;
+    private int columna;
+    public Simbolo(TipoExp tipo, TipoExp tiposecundario,String id,int linea,int columna) {
         this.tipo = tipo;
         this.id=id;
         this.tiposecundario = tiposecundario;
+        this.linea=linea;
+        this.columna=columna;
     }
 
     /**

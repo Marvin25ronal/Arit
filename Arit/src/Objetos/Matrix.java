@@ -20,7 +20,13 @@ public class Matrix extends Simbolo {
     private LinkedList<LinkedList<Object>> columnas;
 
     public Matrix(LinkedList<LinkedList<Object>> columnas, TipoExp tipo, TipoExp tiposecundario, String id, int columna, int fila) {
-        super(tipo, tiposecundario, id);
+        super(tipo, tiposecundario, id,0,0);
+        this.columna = columna;
+        this.fila = fila;
+        this.columnas = columnas;
+    }
+    public Matrix(LinkedList<LinkedList<Object>> columnas, TipoExp tipo, TipoExp tiposecundario, String id, int columna, int fila,int linea,int columnasssss) {
+        super(tipo, tiposecundario, id,linea,columnasssss);
         this.columna = columna;
         this.fila = fila;
         this.columnas = columnas;

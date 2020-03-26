@@ -16,6 +16,7 @@ import Objetos.Nulo;
 import Objetos.EstructuraLineal;
 import java.util.LinkedList;
 import Reportes.Errores;
+import java.util.HashMap;
 import javax.swing.JTextArea;
 
 /**
@@ -23,6 +24,26 @@ import javax.swing.JTextArea;
  * @author marvi
  */
 public final class VarGlobales {
+
+    /**
+     * @return the listaEntornos
+     */
+
+
+    /**
+     * @return the listaE
+     */
+    
+    public LinkedList<Errores> getListaE() {
+        return listaE;
+    }
+
+    /**
+     * @param listaE the listaE to set
+     */
+    public void setListaE(LinkedList<Errores> listaE) {
+        this.listaE = listaE;
+    }
 
     /**
      * @return the anterior
@@ -46,6 +67,7 @@ public final class VarGlobales {
     }
 
     private LinkedList<Errores> listaE;
+    
     StringBuilder s = new StringBuilder();
     private JTextArea consola;
     private static VarGlobales instancia;
@@ -54,6 +76,7 @@ public final class VarGlobales {
     private VarGlobales() {
         listaE = new LinkedList<>();
         anterior = new Anterior(null, 0);
+       
     }
 
     public void setConsola(JTextArea consola) {
@@ -72,24 +95,25 @@ public final class VarGlobales {
     }
 
     public void LimpiarLista() {
-        this.listaE.clear();
+        this.getListaE().clear();
+        
     }
 
     public void AgregarErrores(LinkedList<Errores> listanueva) {
         for (int i = 0; i < listanueva.size(); i++) {
-            this.listaE.add(listanueva.get(i));
+            this.getListaE().add(listanueva.get(i));
         }
     }
 
     public void AgregarEU(Errores e) {
         this.consola.append(e.toString() + "\n");
-        this.listaE.add(e);
+        this.getListaE().add(e);
     }
 
     public String cadE() {
         s.setLength(0);
         for (int i = 0; i < 0; i++) {
-            s.append(this.listaE.get(i).toString() + "\n");
+            s.append(this.getListaE().get(i).toString() + "\n");
         }
         return s.toString();
     }

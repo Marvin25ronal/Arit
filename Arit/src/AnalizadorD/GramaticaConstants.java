@@ -55,39 +55,53 @@ public interface GramaticaConstants {
   /** RegularExpression Id. */
   int MAYOR = 28;
   /** RegularExpression Id. */
-  int MENOR = 29;
+  int IGUAL_MAYOR = 29;
   /** RegularExpression Id. */
-  int AND = 30;
+  int MENOR = 30;
   /** RegularExpression Id. */
-  int OR = 31;
+  int AND = 31;
   /** RegularExpression Id. */
-  int NOT = 32;
+  int OR = 32;
   /** RegularExpression Id. */
-  int BOOLEANO = 33;
+  int NOT = 33;
   /** RegularExpression Id. */
-  int IF = 34;
+  int BOOLEANO = 34;
   /** RegularExpression Id. */
-  int ELSE = 35;
+  int IF = 35;
   /** RegularExpression Id. */
-  int SWITCH = 36;
+  int ELSE = 36;
   /** RegularExpression Id. */
-  int DO = 37;
+  int SWITCH = 37;
   /** RegularExpression Id. */
-  int WHILE = 38;
+  int DO = 38;
   /** RegularExpression Id. */
-  int CASE = 39;
+  int WHILE = 39;
   /** RegularExpression Id. */
-  int PREGUNTA = 40;
+  int CASE = 40;
   /** RegularExpression Id. */
-  int NULO = 41;
+  int PREGUNTA = 41;
   /** RegularExpression Id. */
-  int TDEFAULT = 42;
+  int NULO = 42;
   /** RegularExpression Id. */
-  int DOSPUNTOS = 43;
+  int TDEFAULT = 43;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 44;
+  int BREAK = 44;
   /** RegularExpression Id. */
-  int STRING = 47;
+  int CONTINUE = 45;
+  /** RegularExpression Id. */
+  int FUNCTION = 46;
+  /** RegularExpression Id. */
+  int FOR = 47;
+  /** RegularExpression Id. */
+  int IN = 48;
+  /** RegularExpression Id. */
+  int DOSPUNTOS = 49;
+  /** RegularExpression Id. */
+  int IDENTIFICADOR = 50;
+  /** RegularExpression Id. */
+  int NOVAL = 51;
+  /** RegularExpression Id. */
+  int STRING = 54;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -125,6 +139,7 @@ public interface GramaticaConstants {
     "\">=\"",
     "\"<=\"",
     "\">\"",
+    "\"=>\"",
     "\"<\"",
     "\"&\"",
     "\"|\"",
@@ -139,10 +154,16 @@ public interface GramaticaConstants {
     "\"?\"",
     "\"null\"",
     "\"default\"",
+    "\"break\"",
+    "\"continue\"",
+    "\"function\"",
+    "\"for\"",
+    "\"in\"",
     "\":\"",
     "<IDENTIFICADOR>",
+    "<NOVAL>",
     "\"\\\"\"",
-    "<token of kind 46>",
+    "<token of kind 53>",
     "\"\\\"\"",
   };
 

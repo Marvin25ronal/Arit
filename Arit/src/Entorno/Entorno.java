@@ -22,8 +22,12 @@ public class Entorno {
 
     public Entorno padre;
     public HashMap<String, Simbolo> tabla;
+    public LinkedList<Entorno> hijo=new LinkedList<Entorno>();
 
     public Entorno(Entorno padre) {
+        if(padre!=null){
+            padre.hijo.add(this);
+        }
         this.padre = padre;
         tabla = new HashMap<>();
     }
@@ -37,9 +41,10 @@ public class Entorno {
         }
         return false;
     }
-    public boolean ExisteEnEntorno(String id){
-        Simbolo en=this.tabla.get(id.toLowerCase());
-        if(en!=null){
+
+    public boolean ExisteEnEntorno(String id) {
+        Simbolo en = this.tabla.get(id.toLowerCase());
+        if (en != null) {
             return true;
         }
         return false;
@@ -82,5 +87,4 @@ public class Entorno {
         return null;
     }
 
-   
 }

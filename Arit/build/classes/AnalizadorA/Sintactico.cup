@@ -21,12 +21,13 @@ import Expresion.Identificador;
 import Operaciones.Ternarias;
 import Operaciones.Unarias;
 import Control.*;
+import java.util.LinkedList;
 parser code 
 {://Codigo visible
     
     public AST ast;
    
-    public ArrayList<Errores>listaerrores=new ArrayList<>();
+    public LinkedList<Errores>listaerrores=new LinkedList<>();
     public void syntax_error(Symbol s){
         Errores nuevo=new Errores(TipoError.SINTACTICO,"Error R de sintaxis "+s.value,s.left+1,s.right+1);
         listaerrores.add(nuevo);
@@ -106,6 +107,9 @@ CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RES
 	|CUERPO:l LLAMADAS:a{:l.add(a);RESULT=l;:}
 	|CUERPO:l RETORNOS:r{:l.add(r);RESULT=l;:}
 	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
+	|error PYCOMA{:RESULT=new LinkedList<>();:}
+	|error PAR_C{:RESULT=new LinkedList<>();:}
+	|error COR_C{:RESULT=new LinkedList<>();:}
 	;
 CUERPOINTERNO::=
 	ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
@@ -122,6 +126,9 @@ CUERPOINTERNO::=
 	|CUERPOINTERNO:l LLAMADAS:a PYCOMA{:l.add(a);RESULT=l;:}
 	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
 	|CUERPOINTERNO:l RETORNOS:r{:l.add(r);RESULT=l;:}
+	|error PYCOMA{:RESULT=new LinkedList<>();:}
+	|error PAR_C{:RESULT=new LinkedList<>();:}
+	|error COR_C{:RESULT=new LinkedList<>();:}
 	;
 ASIGNACION::=ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
 	|ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
@@ -175,6 +182,7 @@ EXP::=
 BLOQUE::=
 	LLAV_A CUERPOINTERNO:l LLAV_C{:RESULT=l;:}
 	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
+	|error LLAV_C{:RESULT=new LinkedList<>();:}
 	;
 LLAMADAS::=
 	ID:i PAR_A PAR_C{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),new LinkedList<Expresion>(),new LinkedList<Expresion>());:}

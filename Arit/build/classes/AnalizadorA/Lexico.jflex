@@ -3,6 +3,7 @@ import Reportes.Errores;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import Reportes.Errores.TipoError;
+import java.util.LinkedList;
 %%
 %cup
 %class scanner
@@ -13,7 +14,7 @@ import Reportes.Errores.TipoError;
 %full
 %ignorecase
 %{
-	public ArrayList<Errores>listaerrores=new ArrayList<>();;
+	public LinkedList<Errores>listaerrores=new LinkedList<>();;
 %}
 /*
 ░██████╗██╗███╗░░░███╗██████╗░░█████╗░██╗░░░░░░█████╗░░██████╗

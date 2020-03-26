@@ -13,8 +13,15 @@ import AnalizadorD.ParseException;
 import AnalizadorD.TokenMgrError;
 import Color.CampoTexto;
 import Color.TextLineNumber;
+import Entorno.Entorno;
+import Entorno.Simbolo;
+import Objetos.Array;
+import Objetos.EstructuraLineal;
+import Objetos.Funcion;
+import Objetos.Matrix;
 import Reportes.Errores;
 import Reportes.ReporteAST;
+import java.awt.Button;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,9 +29,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 /**
@@ -88,6 +105,8 @@ public class Editor extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -147,6 +166,22 @@ public class Editor extends javax.swing.JFrame {
             }
         });
         jMenu4.add(jMenuItem3);
+
+        jMenuItem5.setText("Reporte de Errores");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem5);
+
+        jMenuItem6.setText("Reporte de Tabla de simbolos");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem6);
 
         jMenuBar1.add(jMenu4);
 
@@ -252,7 +287,7 @@ public class Editor extends javax.swing.JFrame {
             }
             AST ast = parser.ast;
             if (ast != null) {
-                String reporte=ast.HacerDot();
+                String reporte = ast.HacerDot();
                 String codigo = reporte;
                 String dotpath = "E:\\Program Files (x86)\\Graphviz\\bin\\dot.exe";
                 String fileoutput = "./Arit.txt";
@@ -296,6 +331,201 @@ public class Editor extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+    private void MostrarErrores(LinkedList<Errores> l) {
+        VE_Errores ventana = new VE_Errores();
+        for (Errores e : l) {
+            Object obj[] = {e.getTipo(), e.getMensaje(), e.getLinea(), e.getColumna()};
+            ventana.AgregarComponentes(obj);
+        }
+        ventana.show();
+    }
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        // TODO add your handling code here:
+        if (Globales.VarGlobales.getInstance().getListaE().size() > 0) {
+            //ya se ejecuto
+            MostrarErrores(Globales.VarGlobales.getInstance().getListaE());
+            return;
+        }
+        //Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                Globales.VarGlobales.getInstance().AgregarErrores(sc.listaerrores);
+            }
+            if (parser.listaerrores.size() != 0) {
+                Globales.VarGlobales.getInstance().AgregarErrores(parser.listaerrores);
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                ast.ejecutar();
+            }
+            MostrarErrores(Globales.VarGlobales.getInstance().getListaE());
+        } catch (Exception e) {
+            jTextArea1.append(e.toString());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                for (Errores e : sc.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            if (parser.listaerrores.size() != 0) {
+                for (Errores e : parser.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                Entorno e = ast.ejecutar2();
+                GraficarSimbolos(e);
+            }
+        } catch (Exception e) {
+            jTextArea1.append(e.getMessage());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+    private void HacerEntorno(DefaultMutableTreeNode padre, Entorno en, int i) {
+        for (Entorno e : en.hijo) {
+            DefaultMutableTreeNode entorno = new DefaultMutableTreeNode("Entorno_" + i);
+            i++;
+            padre.add(entorno);
+            for (Simbolo s : e.tabla.values()) {
+                if (s instanceof EstructuraLineal) {
+                    EstructuraLineal es = (EstructuraLineal) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Array) {
+                    Array es = (Array) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Matrix) {
+                    Matrix es = (Matrix) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Columnas:" + es.getColumnas().size());
+                    DefaultMutableTreeNode Filas = new DefaultMutableTreeNode("Filas:" + es.getColumnas().get(0).size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    var.add(Filas);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Funcion) {
+                    Funcion es = (Funcion) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Funcion_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    //DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    //var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                }
+            }
+            HacerEntorno(entorno, e, i);
+        }
+    }
+
+    private void GraficarSimbolos(Entorno en) {
+        int i = 0;
+        Entorno enuevo = new Entorno(null);
+        enuevo.hijo.add(en);
+        DefaultMutableTreeNode ra = new DefaultMutableTreeNode("Entornos");
+        HacerEntorno(ra, enuevo, i);
+        VE_Simbolos ventana = new VE_Simbolos();
+        GraficarSimbolos2(enuevo, ventana,0);   
+        JTree arbol = new JTree(ra);
+        ImageIcon imageIcon = new ImageIcon(("./y.png"));
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(imageIcon);
+        arbol.setCellRenderer(renderer);
+        arbol.setSize(580, 542);
+        arbol.setLocation(0, 0);
+        ventana.panel().add(arbol);
+        ventana.panel().validate();
+        ventana.panel().repaint();
+        ventana.show();
+    }
+
+    private void GraficarSimbolos2(Entorno en, VE_Simbolos simbolos,int entorno) {
+        for (Entorno e : en.hijo) {
+            for (Simbolo s : e.tabla.values()) {
+                if(s instanceof EstructuraLineal){
+                    EstructuraLineal es=(EstructuraLineal)s;
+                    Object obj[] = {es.getId(),es.getTipo(),es.getDimensiones().size(),s.getLinea(),s.getColumna(),entorno};
+                    simbolos.AgregarComponentes(obj);
+                }else if(s instanceof Matrix){
+                    Matrix m=(Matrix)s;
+                     Object obj[] = {m.getId(),m.getTipo(),"Columnas:"+((Matrix) s).getColumnas().size()+"Lineas: "+m.getColumnas().get(0).size(),s.getLinea(),s.getColumna(),entorno};
+                    simbolos.AgregarComponentes(obj);
+                }else if(s instanceof Array){
+                    Array es=(Array)s;
+                     Object obj[] = {es.getId(),es.getTipo(),es.getDimensiones().size(),s.getLinea(),s.getColumna(),entorno};
+                    simbolos.AgregarComponentes(obj);
+                }else if(s instanceof Funcion){
+                    Funcion es=(Funcion)s;
+                     Object obj[] = {es.getId(),es.getTipo(),0,s.getLinea(),s.getColumna(),entorno};
+                    simbolos.AgregarComponentes(obj);
+                }
+            }
+            GraficarSimbolos2(e, simbolos,entorno+1);
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -343,6 +573,8 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;

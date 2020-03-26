@@ -139,14 +139,14 @@ public class Llamadas implements Expresion {
             if (taux.isVector()) {
                 //es un vector y se trata con el segundo tipo
                 EstructuraLineal eaux = (EstructuraLineal) aux;
-                if(tipoObjeto==null){
-                    tipoObjeto=new TipoExp(Tipos.VECTOR);
-                }else{
-                    if(!tipoObjeto.isList()){
-                        tipoObjeto=new TipoExp(Tipos.VECTOR);
+                if (tipoObjeto == null) {
+                    tipoObjeto = new TipoExp(Tipos.VECTOR);
+                } else {
+                    if (!tipoObjeto.isList()) {
+                        tipoObjeto = new TipoExp(Tipos.VECTOR);
                     }
                 }
-                tipodominante=TipoDominante(tipodominante, eaux.getTiposecundario());
+                tipodominante = TipoDominante(tipodominante, eaux.getTiposecundario());
             } else {
                 tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
                 if (tipodominante.isVector()) {
@@ -320,7 +320,9 @@ public class Llamadas implements Expresion {
         if (t == null) {
             return nuevot;
         }
-        if (t.isList() || nuevot.isList()) {
+        if (t.isArrya() || nuevot.isArrya()) {
+            return new TipoExp(Tipos.ARRAY);
+        } else if (t.isList() || nuevot.isList()) {
             return new TipoExp(Tipos.LISTA);
         } else if (t.isVector() || nuevot.isVector()) {
             return new TipoExp(Tipos.VECTOR);
