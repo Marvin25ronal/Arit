@@ -77,6 +77,28 @@ public class TipoExp {
 
     @Override
     public String toString() {
+        switch(tp){
+            case ARRAY:
+                return "array";
+            case FUNCION:
+                return "funcion";
+            case BOOLEAN:
+                return "boolean";
+            case INTEGER:
+                return "integer";
+            case LISTA:
+                return "list";
+            case  MATRIX:
+                return "matrix";
+            case STRING:
+                return "string";
+            case NULO:
+                return "null";
+            case NUMERIC:
+                return "numeric";
+            case VECTOR:
+                return "vector";
+        }
         return tp.toString();//To change body of generated methods, choose Tools | Templates.
     }
 

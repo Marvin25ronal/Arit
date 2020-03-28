@@ -18,6 +18,7 @@ import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 import Expresion.Funciones.*;
+import Objetos.Array;
 import Reportes.BarPlot;
 import Reportes.Histograma;
 import Reportes.LinePlot;
@@ -463,7 +464,16 @@ public class Llamadas implements Expresion {
             } else {
                 enuevo.add(id.getVal(), nueva);
             }
-        } else if (tipo.isPrimitive(e)) {
+        }else if(tipo.isArrya()){
+            Array copia=(Array)valor;
+            LinkedList<Object>datos=Globales.VarGlobales.getInstance().CopiarArray(e,copia.getArreglo());
+            Array nuevo=new Array(new TipoExp(Tipos.ARRAY), new TipoExp(copia.getTiposecundario().tp),id.getVal(),datos,copia.getDimensiones(),this.linea(),this.columna());
+            if(actualizar){
+                enuevo.Actualizar(id.getVal(),nuevo);
+            }else{
+                enuevo.add(id.getVal(), nuevo);
+            }
+        }else if (tipo.isPrimitive(e)) {
             Literal l = new Literal(valor, tipo, linea(), columna());
             LinkedList<Object> lista = new LinkedList<>();
             lista.add(l);
@@ -549,7 +559,7 @@ public class Llamadas implements Expresion {
                 return true;
             case "array":
                 return true;
-            case "lenght":
+            case "length":
                 return true;
             case "ncol":
                 return true;

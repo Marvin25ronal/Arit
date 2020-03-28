@@ -95,13 +95,15 @@ public interface GramaticaConstants {
   /** RegularExpression Id. */
   int IN = 48;
   /** RegularExpression Id. */
-  int DOSPUNTOS = 49;
+  int RETORNO = 49;
   /** RegularExpression Id. */
-  int IDENTIFICADOR = 50;
+  int DOSPUNTOS = 50;
   /** RegularExpression Id. */
-  int NOVAL = 51;
+  int IDENTIFICADOR = 51;
   /** RegularExpression Id. */
-  int STRING = 54;
+  int NOVAL = 52;
+  /** RegularExpression Id. */
+  int STRING = 55;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -159,11 +161,12 @@ public interface GramaticaConstants {
     "\"function\"",
     "\"for\"",
     "\"in\"",
+    "\"return\"",
     "\":\"",
     "<IDENTIFICADOR>",
     "<NOVAL>",
     "\"\\\"\"",
-    "<token of kind 53>",
+    "<token of kind 54>",
     "\"\\\"\"",
   };
 

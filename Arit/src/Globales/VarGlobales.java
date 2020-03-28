@@ -28,12 +28,9 @@ public final class VarGlobales {
     /**
      * @return the listaEntornos
      */
-
-
     /**
      * @return the listaE
      */
-    
     public LinkedList<Errores> getListaE() {
         return listaE;
     }
@@ -67,7 +64,7 @@ public final class VarGlobales {
     }
 
     private LinkedList<Errores> listaE;
-    
+
     StringBuilder s = new StringBuilder();
     private JTextArea consola;
     private static VarGlobales instancia;
@@ -76,7 +73,7 @@ public final class VarGlobales {
     private VarGlobales() {
         listaE = new LinkedList<>();
         anterior = new Anterior(null, 0);
-       
+
     }
 
     public void setConsola(JTextArea consola) {
@@ -96,7 +93,7 @@ public final class VarGlobales {
 
     public void LimpiarLista() {
         this.getListaE().clear();
-        
+
     }
 
     public void AgregarErrores(LinkedList<Errores> listanueva) {
@@ -129,6 +126,9 @@ public final class VarGlobales {
     }
 
     public TipoExp obtenerTipo(Object t, Entorno e) {
+        if (t == null) {
+            return new TipoExp(TipoExp.Tipos.NULO);
+        }
         if (t instanceof Literal) {
             return ((Literal) t).getTipo(e);
         } else if (t instanceof EstructuraLineal) {

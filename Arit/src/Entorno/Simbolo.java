@@ -16,6 +16,9 @@ public abstract class Simbolo {
     /**
      * @return the linea
      */
+    public boolean isfor;
+    public TipoExp tfor;
+
     public int getLinea() {
         return linea;
     }
@@ -46,12 +49,13 @@ public abstract class Simbolo {
     private String id;
     private int linea;
     private int columna;
-    public Simbolo(TipoExp tipo, TipoExp tiposecundario,String id,int linea,int columna) {
+
+    public Simbolo(TipoExp tipo, TipoExp tiposecundario, String id, int linea, int columna) {
         this.tipo = tipo;
-        this.id=id;
+        this.id = id;
         this.tiposecundario = tiposecundario;
-        this.linea=linea;
-        this.columna=columna;
+        this.linea = linea;
+        this.columna = columna;
     }
 
     /**

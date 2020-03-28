@@ -88,6 +88,7 @@ TOKEN : {
 	|<FUNCTION:"function">
 	|<FOR:"for">
 	|<IN:"in">
+	|<RETORNO:"return">
 	|<DOSPUNTOS:":">
 	//|<IDENTIFICADOR: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_"] | ["0"-"9"] )* >
 	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z","."](["a"-"z","A"-"Z","_","."]|["0"-"9"])*)>
@@ -124,6 +125,7 @@ Nodo aux;
 	try{
 	(aux=CONTROLES()){return aux;}
 	|(aux=DECLARACION()){return aux;}
+	|(aux=RETORNOS()){return aux;}
 	}catch(ParseException x){
 		Token matchedToken = x.currentToken.next; 
 		Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SINTACTICO,"Caracter no esperado "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
@@ -171,6 +173,7 @@ Nodo aux;
 	(aux=CONTROLES()){return aux;}
 	|(aux=DECLARACION()){return aux;}
 	|(aux=TRANFERENCIAS()){return aux;}
+	|(aux=RETORNOS()){return aux;}
 	}catch(ParseException x){
 		Token matchedToken = x.currentToken.next; 
 		Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SINTACTICO,"Caracter no esperado "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
@@ -194,6 +197,19 @@ Nodo DECLARACION():
 	|LOOKAHEAD(3)i=<IDENTIFICADOR><IGUAL> <FUNCTION> <PAR_A> (fun=LISTAPARAMETROS())?<PAR_C>blo=BLOQUE(){return new DecFuncion(fun,new Identificador(i.image,i.beginLine,i.beginColumn),blo,i.beginLine,i.beginColumn);}
 	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES() <IGUAL> e=EXP() (<PYCOMA>)?{return new AsignacionPosicion(new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn),e,i.beginLine,i.beginColumn);}
 	|LOOKAHEAD(2)i=<IDENTIFICADOR><PAR_A>(par=LISTAEXP())?<PAR_C>(<PYCOMA>)? {return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),par,dim);}
+	
+}
+
+Nodo RETORNOS():
+{
+	Token t;
+	Expresion ex;
+}
+{
+	LOOKAHEAD(5) t=<RETORNO> <PAR_A> ex=EXP() <PAR_C> <PYCOMA>{return new Return(ex,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(4) t=<RETORNO> <PAR_A> ex=EXP() <PAR_C>{return new Return(ex,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(2) t=<RETORNO> <PYCOMA>{return new Return(new Nulo(t.beginLine,t.beginColumn),t.beginLine,t.beginColumn);}
+	|t=<RETORNO>{return new Return(new Nulo(t.beginLine,t.beginColumn),t.beginLine,t.beginColumn);} 
 	
 }
 

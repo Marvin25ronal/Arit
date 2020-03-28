@@ -61,13 +61,13 @@ public class Switch implements Instruccion {
                     Globales.VarGlobales.getInstance().AgregarEU((Errores) t);
                     continue;
                 }
-                TipoExp tt = Globales.VarGlobales.getInstance().obtenerTipo(t, e);
+                TipoExp tt = Globales.VarGlobales.getInstance().obtenerTipo(t, local);
                 if (tt.isVector()) {
                     EstructuraLineal v = (EstructuraLineal) t;
-                    t = ((Literal) v.getDimensiones().get(0)).getValor(e);
+                    t = ((Literal) v.getDimensiones().get(0)).getValor(local);
                 } else if (tt.isMatrix()) {
                     Matrix m = (Matrix) t;
-                    t = ((Literal) m.getColumnas().get(0).get(0)).getValor(e);
+                    t = ((Literal) m.getColumnas().get(0).get(0)).getValor(local);
                 }
             } else if (n instanceof Else) {
                 t = val;
@@ -81,6 +81,9 @@ public class Switch implements Instruccion {
                 } else if (ret instanceof Errores) {
                     Globales.VarGlobales.getInstance().AgregarEU((Errores) ret);
                     continue;
+                } else if (ret != null) {
+                    //Castear(e, t, new TipoExp(TipoExp.Tipos.VECTOR));
+                    return ret;
                 }
                 entro = true;
             }
