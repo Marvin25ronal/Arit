@@ -40,8 +40,7 @@ public class AsignacionPosicion implements Instruccion {
     
     @Override
     public Object ejecutar(Entorno e) {
-        Acceso ac = (Acceso) acc;
-        
+        Acceso ac = (Acceso) acc;       
         if (ac.getIndices().size() == 1) {
             ac.setIncremento(true);
         }
@@ -190,7 +189,7 @@ public class AsignacionPosicion implements Instruccion {
                 if (est.getTipo().isVector()) {
                     EstructuraLineal elemento = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), est.getTiposecundario(), est.getDimensiones());
                     est.setTipo(new TipoExp(Tipos.LISTA));
-                    est.getDimensiones().clear();
+                    est.setDimensiones(new LinkedList<>());
                     est.getDimensiones().add(elemento);
                 }
                 //no es lista y lo tengo que meter en una lista

@@ -277,7 +277,7 @@ public class For implements Instruccion {
                     if (est.getTipo().isVector()) {
                         EstructuraLineal elemento = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), est.getTiposecundario(), est.getDimensiones());
                         est.setTipo(new TipoExp(Tipos.LISTA));
-                        est.getDimensiones().clear();
+                        est.setDimensiones(new LinkedList<>());
                         est.getDimensiones().add(elemento);
                     }
                 } else {

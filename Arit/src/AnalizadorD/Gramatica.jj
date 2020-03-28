@@ -391,7 +391,7 @@ LinkedList<Expresion>LISTAEXP():
 	Token d;
 }
 {
-	(e=EXP(){lista.add(e);}|d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));} )(<COMA> e=EXP(){lista.add(e);}| d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));})*
+	(e=EXP(){lista.add(e);}|d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));} )(<COMA> (e=EXP(){lista.add(e);}| d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));}))*
 	{return lista;}
 }
 

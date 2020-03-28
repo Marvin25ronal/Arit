@@ -112,7 +112,7 @@ public class Mode implements Expresion {
             for (int i = 0; i < datos.size(); ++i) {
                 int count = 0;
                 for (int j = 0; j < datos.size(); ++j) {
-                    if (datos.get(j) == datos.get(i)) {
+                    if (datos.get(i).equals(datos.get(j))) {
                         ++count;
                     }
                 }

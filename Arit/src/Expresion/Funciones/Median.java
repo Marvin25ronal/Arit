@@ -111,7 +111,7 @@ public class Median implements Expresion {
                 res = (datos.get(indice) + datos.get(indice - 1)) / 2;
             } else {
                 //es impar
-                int indice = (int) (datos.size() / 12);
+                int indice = (int) (datos.size() / 2);
                 res = datos.get(indice);
             }
         } else {
@@ -152,7 +152,7 @@ public class Median implements Expresion {
                 res = (datos.get(indice) + datos.get(indice - 1)) / 2;
             } else {
                 //es impar
-                int indice = (int) (datos.size() / 12);
+                int indice = (int) (datos.size() / 2);
                 res = datos.get(indice);
             }
         } else {
