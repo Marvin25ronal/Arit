@@ -850,6 +850,14 @@ public class parser extends java_cup.runtime.lr_parser {
         listaerrores.add(nuevo);
         System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
     }
+    public String remplazar(String t){
+    	t=t.replace("\\n","\n");
+    	t=t.replace("\\t", "\t");
+    	t=t.replace("\\\"", "\"");
+    	t=t.replace("\\r", "\r");
+    	t=t.replace("\\\\", "\\");
+    	return t;
+    }
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -1708,7 +1716,7 @@ class CUP$parser$actions {
 		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String a = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT=new Literal(a.toString().replace("\"",""),new TipoExp(Tipos.STRING),aleft+1,aright+1);
+		RESULT=new Literal(remplazar(a.toString().replace("\"","")),new TipoExp(Tipos.STRING),aleft+1,aright+1);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("EXP",1, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

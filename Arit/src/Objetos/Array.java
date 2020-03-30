@@ -89,7 +89,7 @@ public class Array extends Simbolo {
             s.append(encabezado).append("\n\n");
             for (int j = 0; j < getDimensiones().get(dim + 1); j++) {
                 s.append("[");
-                s.append(j);
+                s.append(j+1);
                 s.append("]     ");
                 for (int i = 0; i < getDimensiones().get(dim); i++) {
                     LinkedList<Object> lista = (LinkedList<Object>) arr.get(i);

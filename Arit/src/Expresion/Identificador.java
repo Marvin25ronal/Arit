@@ -72,7 +72,7 @@ public class Identificador implements Expresion {
         if (e.ExisteVariable(val)) {
             return e.get(val);
         } else {
-            return new Errores(Errores.TipoError.SEMANTICO, "No se encontro la variable", linea, columna);
+            return new Errores(Errores.TipoError.SEMANTICO, "No se encontro la variable "+val, linea, columna);
         }
     }
 

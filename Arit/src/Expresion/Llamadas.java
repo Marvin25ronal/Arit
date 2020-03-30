@@ -69,7 +69,7 @@ public class Llamadas implements Expresion {
                         return f.ejecutar(nuevoE);
                     }
                 } else {
-                    return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta ", linea(), columna());
+                    return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta en la funcion "+id.getVal(), linea(), columna());
                 }
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "Funcion no declarada ", id.getLinea(), columna());

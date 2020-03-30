@@ -26,6 +26,14 @@ import Operaciones.Ternarias;
 import Operaciones.Unarias;
 import Control.*;
 public class Gramatica{
+	public String retirar(String t){
+		t=t.replace("\\n","\n");
+    	t=t.replace("\\t", "\t");
+    	t=t.replace("\\\"", "\"");
+    	t=t.replace("\\r", "\r");
+    	t=t.replace("\\\\", "\\");
+		return t;
+	}
 }
 PARSER_END(Gramatica)
 /*
@@ -501,7 +509,7 @@ Expresion Primitivo():
 	<NUMERIC>{return new Literal(Double.parseDouble(token.image),new TipoExp(Tipos.NUMERIC),token.beginLine,token.beginColumn);}
 	|<BOOLEANO>{return new Literal(Boolean.parseBoolean(token.image),new TipoExp(Tipos.BOOLEAN),token.beginLine,token.beginColumn);}
 	|<INTEGER>{return new Literal(Integer.parseInt(token.image),new TipoExp(Tipos.INTEGER),token.beginLine,token.beginColumn);}
-	|<STRING>{return new Literal(token.image.substring(1,token.image.length()-1),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
+	|<STRING>{return new Literal(retirar(token.image.substring(1,token.image.length()-1)),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
 	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
 	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> lex=LISTAEXP() <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
 	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES(){return new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn);}

@@ -79,7 +79,7 @@ public class Matrix extends Simbolo {
         StringBuilder cadena = new StringBuilder();
         for (int j = 0; j < fila; j++) {
             cadena.append("[");
-            cadena.append(j);
+            cadena.append(j+1);
             cadena.append("]     ");
             for (int i = 0; i <columna; i++) {
                 cadena.append(columnas.get(i).get(j).toString());

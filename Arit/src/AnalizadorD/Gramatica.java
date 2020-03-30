@@ -21,6 +21,14 @@ import Operaciones.Ternarias;
 import Operaciones.Unarias;
 import Control.*;
 public class Gramatica implements GramaticaConstants {
+        public String retirar(String t){
+                t=t.replace("\\n","\n");
+        t=t.replace("\\t", "\t");
+        t=t.replace("\\\"", "\"");
+        t=t.replace("\\r", "\r");
+        t=t.replace("\\\\", "\\");
+                return t;
+        }
 
   final public AST INICIO() throws ParseException {
 AST arbol;
@@ -1033,7 +1041,7 @@ Expresion a,b;
       break;
     case STRING:
       jj_consume_token(STRING);
-                  {if (true) return new Literal(token.image.substring(1,token.image.length()-1),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
+                  {if (true) return new Literal(retirar(token.image.substring(1,token.image.length()-1)),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
       break;
     default:
       jj_la1[42] = jj_gen;
@@ -1218,26 +1226,6 @@ Expresion a,b;
     try { return !jj_3_18(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(17, xla); }
-  }
-
-  private boolean jj_3R_38() {
-    if (jj_3R_45()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_37() {
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_36() {
-    if (jj_3R_43()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    if (jj_scan_token(IF)) return true;
-    return false;
   }
 
   private boolean jj_3R_35() {
@@ -1932,6 +1920,26 @@ Expresion a,b;
   private boolean jj_3_14() {
     if (jj_scan_token(ELSE)) return true;
     if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_38() {
+    if (jj_3R_45()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_37() {
+    if (jj_3R_44()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_36() {
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    if (jj_scan_token(IF)) return true;
     return false;
   }
 
