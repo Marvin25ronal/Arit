@@ -62,7 +62,7 @@ public class Plot implements Instruccion {
                     }
                     Literal aux = (Literal) t.getDimensiones().get(0);
                     exp.set(4, aux);
-                    return new LinePlot(exp, dimensiones, linea, columna);
+                    return new LinePlot(exp, dimensiones, linea, columna).ejecutar(e);
 
                 } else if (t.getTiposecundario().esNumero()) {
                     if (t.getDimensiones().size() != 2) {

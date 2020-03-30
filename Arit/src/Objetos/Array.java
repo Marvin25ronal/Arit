@@ -32,8 +32,13 @@ public class Array extends Simbolo {
     private LinkedList<Object> arreglo;
     private LinkedList<Integer> dimensiones;
 
+    public Array(TipoExp tipo, TipoExp tiposecundario, String id, LinkedList<Object> arreglo, LinkedList<Integer> dimensiones,int linea,int columna) {
+        super(tipo, tiposecundario, id,linea,columna);
+        this.arreglo = arreglo;
+        this.dimensiones = dimensiones;
+    }
     public Array(TipoExp tipo, TipoExp tiposecundario, String id, LinkedList<Object> arreglo, LinkedList<Integer> dimensiones) {
-        super(tipo, tiposecundario, id);
+        super(tipo, tiposecundario, id,0,0);
         this.arreglo = arreglo;
         this.dimensiones = dimensiones;
     }
@@ -84,7 +89,7 @@ public class Array extends Simbolo {
             s.append(encabezado).append("\n\n");
             for (int j = 0; j < getDimensiones().get(dim + 1); j++) {
                 s.append("[");
-                s.append(j);
+                s.append(j+1);
                 s.append("]     ");
                 for (int i = 0; i < getDimensiones().get(dim); i++) {
                     LinkedList<Object> lista = (LinkedList<Object>) arr.get(i);

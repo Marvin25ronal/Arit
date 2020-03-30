@@ -10,6 +10,7 @@ import Entorno.Simbolo;
 import Expresion.TipoExp.Tipos;
 import Objetos.Array;
 import Objetos.EstructuraLineal;
+import Objetos.Nulo;
 import Reportes.Errores;
 import java.util.LinkedList;
 
@@ -109,6 +110,23 @@ public class CrearArray {
                 metiendo.set(i, nueval);
             }
             tarreglo = new TipoExp(d.getTiposecundario().tp);
+        } else if (tvec.isList()) {
+            metiendo = Globales.VarGlobales.getInstance().CopiarLista(e, d.getDimensiones());
+            for (int i = 0; i < metiendo.size(); i++) {
+                LinkedList<Object> n = new LinkedList<>();
+                EstructuraLineal aux=(EstructuraLineal)metiendo.get(i);
+                if (aux.getTipo().isList()) {
+                    //n.add(metiendo.get(i));
+                    //EstructuraLineal nueval = new EstructuraLineal("", new TipoExp(Tipos.LISTA), ((EstructuraLineal) metiendo.get(i)).getTiposecundario(), n);
+                    metiendo.set(i,metiendo.get(i));
+                } else {
+                    n.add(metiendo.get(i));
+                    EstructuraLineal nueval = new EstructuraLineal("", new TipoExp(Tipos.LISTA), ((EstructuraLineal) metiendo.get(i)).getTiposecundario(), n);
+                    metiendo.set(i, nueval);
+                }
+            }
+            tarreglo=new TipoExp(Tipos.LISTA);
+
         } else {
             metiendo = Globales.VarGlobales.getInstance().CopiarLista(e, d.getDimensiones());
             tarreglo = ((EstructuraLineal) d.getDimensiones().get(0)).getTiposecundario();
@@ -138,6 +156,8 @@ public class CrearArray {
         }
     }
 
+  
+
     private void LlenarLista(LinkedList<Object> padre, LinkedList<Object> datos) {
         if (padre.size() == 0) {
             //aqui las meto
@@ -152,6 +172,9 @@ public class CrearArray {
             }
         }
     }
+
+
+    
 
     /**
      * @return the parametros

@@ -25,23 +25,22 @@ import java.util.LinkedList;
  * @author marvi
  */
 public class AsignacionPosicion implements Instruccion {
-    
+
     private Expresion acc;
     private Expresion valor;
     private int linea;
     private int columna;
-    
+
     public AsignacionPosicion(Expresion acc, Expresion valor, int linea, int columna) {
         this.acc = acc;
         this.valor = valor;
         this.linea = linea;
         this.columna = columna;
     }
-    
+
     @Override
     public Object ejecutar(Entorno e) {
         Acceso ac = (Acceso) acc;
-        
         if (ac.getIndices().size() == 1) {
             ac.setIncremento(true);
         }
@@ -97,7 +96,7 @@ public class AsignacionPosicion implements Instruccion {
          */
         return null;
     }
-    
+
     private Object ReasignarLista_Vector(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
         /*Anterior ant = (Anterior) Globales.VarGlobales.getInstance().getAnterior();
         Lista metiendo = (Lista) ant.getAnterior();
@@ -109,9 +108,9 @@ public class AsignacionPosicion implements Instruccion {
         EstructuraLineal nuevo = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), apasar.getTiposecundario(), valoresnuevos);
         metiendo.getLista().set(ant.getIndice(), nuevo);
          */
-        
+
         EstructuraLineal apasar = (EstructuraLineal) val;
-        
+
         if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
             //acceso 1
             if (apasar.getDimensiones().size() > 1) {
@@ -132,31 +131,80 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private Object ReasignarArray(Entorno e, Object val, TipoExp tvalor, EstructuraLineal s) {
         Acceso ac = (Acceso) acc;
         Array origen = (Array) ac.getId().getValor(e);
+        TipoExp tnuevo = null;
         //actualizar tipo o no
         if (tvalor.isList()) {
             EstructuraLineal pasando = (EstructuraLineal) val;
+            if (pasando.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El tamanio del elemento es mas grande, solo se puede agregar un elemento en un nodo del array", linea, columna);
+            }
             s.setDimensiones(Globales.VarGlobales.getInstance().CopiarLista(e, pasando.getDimensiones()));
             s.setTipo(new TipoExp(Tipos.LISTA));
+            tnuevo = new TipoExp(Tipos.LISTA);
             //s.setTiposecundario(new TipoExp(pasando.getTiposecundario().tp));
         } else if (tvalor.isVector()) {
             EstructuraLineal pasando = (EstructuraLineal) val;
+            if (pasando.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "El tamanio del elemento es mas grande, solo se puede agregar un elemento en un nodo del array", linea, columna);
+            }
             s.setDimensiones(Globales.VarGlobales.getInstance().clonarListaVector(pasando.getDimensiones(), e));
             s.setTiposecundario(new TipoExp(s.getTiposecundario().tp));
-            
+            tnuevo = new TipoExp(s.getTiposecundario().tp);
+
         } else if (tvalor.isPrimitive(e)) {
             Literal nueva = new Literal(val, tvalor, linea, columna);
             LinkedList<Object> nl = new LinkedList<>();
             nl.add(nueva);
             s.setDimensiones(nl);
             s.setTiposecundario(tvalor);
+            s.setTipo(new TipoExp(Tipos.VECTOR));
+            tnuevo = new TipoExp(s.getTiposecundario().tp);
         }
+        TipoExp tiponuevo = TipoDominanteMatriz(tnuevo, origen.getTiposecundario());
+
+        CastearArray(origen, tiponuevo);
+
         return null;
     }
-    
+
+    private void CastearArray(Array a, TipoExp objetivo) {
+        a.setTiposecundario(new TipoExp(objetivo.tp));
+        CastearArray(a.getArreglo(), objetivo);
+    }
+
+    private void CastearArray(Object val, TipoExp objetivo) {
+        if (val instanceof LinkedList) {
+            LinkedList<Object> l = (LinkedList<Object>) val;
+            for (int i = 0; i < l.size(); i++) {
+                CastearArray(l.get(i), objetivo);
+            }
+        } else {
+            //toda la logica
+            if (objetivo.isList()) {
+                //es lista y no tengo que castear
+                EstructuraLineal est = (EstructuraLineal) val;
+                if (est.getTipo().isVector()) {
+                    EstructuraLineal elemento = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), est.getTiposecundario(), est.getDimensiones());
+                    est.setTipo(new TipoExp(Tipos.LISTA));
+                    est.setDimensiones(new LinkedList<>());
+                    est.getDimensiones().add(elemento);
+                }
+                //no es lista y lo tengo que meter en una lista
+            } else {
+                EstructuraLineal est = (EstructuraLineal) val;
+                Literal l = (Literal) est.getDimensiones().get(0);
+                Object valcast = CastearValor(objetivo, l.getValor(), l.getTipo());
+                l.setValor(valcast);
+                l.setTipo(new TipoExp(objetivo.tp));
+                est.setTiposecundario(new TipoExp(objetivo.tp));
+            }
+        }
+    }
+
     private Object ReasignarMatriz_Primitivo(Entorno e, Object val, TipoExp t, EstructuraLineal vector) {
         Acceso ac = (Acceso) acc;
         Matrix origen = (Matrix) ac.getId().getValor(e);
@@ -174,7 +222,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private Object ReasignarMatriz_Vector(Entorno e, Object val, TipoExp t, EstructuraLineal vecto) {
         Acceso ac = (Acceso) acc;
         Matrix origen = (Matrix) ac.getId().getValor(e);
@@ -191,7 +239,7 @@ public class AsignacionPosicion implements Instruccion {
             Literal lmetiendo = (Literal) metiendo.getDimensiones().get(0);
             l.setTipo(new TipoExp(dominante.tp));
             l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
-            
+
         } else {
             //tip 2,3
             if (metiendo.getDimensiones().size() == vector.getDimensiones().size()) {
@@ -217,7 +265,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private void CastearMatriz(Matrix m, Entorno e, TipoExp tipo) {
         m.setTiposecundario(tipo);
         for (int i = 0; i < m.getColumna(); i++) {
@@ -230,10 +278,10 @@ public class AsignacionPosicion implements Instruccion {
             }
         }
     }
-    
+
     private Object ReasignarLista_Lista(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
         Anterior ant = Globales.VarGlobales.getInstance().getAnterior();
-        
+
         if (ant.getAcceso() == 1) {
             EstructuraLineal lista2 = (EstructuraLineal) lista.getDimensiones().get(0);
             //Lista metiendo = (Lista) ant.getAnterior();
@@ -248,7 +296,7 @@ public class AsignacionPosicion implements Instruccion {
             //EstructuraLineal nueva = new Lista(valoresnuevos, new TipoExp(Tipos.LISTA), null, "");
             //metiendo.getLista().set(ant.getIndice(), nueva);
             return null;
-            
+
         } else {
             //acceso 2 no tiene restricciones
             EstructuraLineal apasar = (EstructuraLineal) val;
@@ -257,11 +305,11 @@ public class AsignacionPosicion implements Instruccion {
             lista.setTipo(new TipoExp(Tipos.LISTA));
             lista.setDimensiones(valoresnuevos);
             return null;
-            
+
         }
-        
+
     }
-    
+
     private Object ReasignarLista_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal lista) {
         if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
             //el contenido va en una lista
@@ -282,10 +330,10 @@ public class AsignacionPosicion implements Instruccion {
             lista.setDimensiones(objetos);
             lista.setTiposecundario(new TipoExp(t.tp));
         }
-        
+
         return null;
     }
-    
+
     private Object ReasignarVector_Primitivo(Entorno e, Object setvalor, TipoExp t, EstructuraLineal v) {
         TipoExp nuevot = Dominante_Vector(v.getDimensiones(), e, t);
         ((Literal) v.getDimensiones().get(0)).setValor(CastearValor(nuevot, setvalor, t));
@@ -298,7 +346,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private Object ReasignarVector_Vector(Entorno e, Object setvalor, TipoExp t, EstructuraLineal v) {
         if (setvalor instanceof EstructuraLineal) {
             EstructuraLineal set = (EstructuraLineal) setvalor;
@@ -312,10 +360,10 @@ public class AsignacionPosicion implements Instruccion {
                 if ((s instanceof EstructuraLineal)) {
                     CastearVector(nuevot, e);
                 } else {
-                    
+
                     CastearVector(nuevot, e, (EstructuraLineal) Globales.VarGlobales.getInstance().getAnterior().getAnterior());
                 }
-                
+
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector solo puede contener vectores de tamanio 1", linea, columna);
             }
@@ -324,9 +372,9 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private void CastearVector(TipoExp t, Entorno e) {
-        
+
         EstructuraLineal v = (EstructuraLineal) e.get(((Acceso) acc).getId().getVal());
         v.setTiposecundario(t);
         Literal aux;
@@ -336,7 +384,7 @@ public class AsignacionPosicion implements Instruccion {
             aux.setTipo(t);
         }
     }
-    
+
     private void CastearVector(TipoExp t, Entorno e, EstructuraLineal r) {
         EstructuraLineal v = r;
         if (!v.getTipo().isVector()) {
@@ -349,7 +397,7 @@ public class AsignacionPosicion implements Instruccion {
             aux.setTipo(t);
         }
     }
-    
+
     private Object CastearValor(TipoExp tdestino, Object valor, TipoExp torigen) {
         if (null != tdestino.tp) {
             switch (tdestino.tp) {
@@ -385,7 +433,7 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private TipoExp Dominante_Vector(LinkedList<Object> l, Entorno e, TipoExp tul) {
         Literal li = (Literal) l.get(0);
         if (tul.tp == Tipos.NULO || li.getTipo(e).tp == Tipos.NULO) {
@@ -401,9 +449,11 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     private TipoExp TipoDominanteMatriz(TipoExp tul, TipoExp tiob) {
-        if (tul.tp == Tipos.NULO || tiob.tp == Tipos.NULO) {
+        if (tul.isList() || tiob.isList()) {
+            return new TipoExp(Tipos.LISTA);
+        } else if (tul.tp == Tipos.NULO || tiob.tp == Tipos.NULO) {
             return new TipoExp(Tipos.STRING);
         } else if (tul.tp == Tipos.STRING || tiob.tp == Tipos.STRING) {
             return new TipoExp(Tipos.STRING);
@@ -416,12 +466,12 @@ public class AsignacionPosicion implements Instruccion {
         }
         return null;
     }
-    
+
     @Override
     public int linea() {
         return this.linea;
     }
-    
+
     @Override
     public int columna() {
         return this.columna;
@@ -482,7 +532,7 @@ public class AsignacionPosicion implements Instruccion {
     public void setColumna(int columna) {
         this.columna = columna;
     }
-    
+
     @Override
     public String toDot(int padre) {
         StringBuilder nueva = new StringBuilder();
@@ -494,5 +544,5 @@ public class AsignacionPosicion implements Instruccion {
         nueva.append(valor.toDot(this.hashCode()));
         return nueva.toString();
     }
-    
+
 }

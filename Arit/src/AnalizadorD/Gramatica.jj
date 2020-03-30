@@ -26,6 +26,14 @@ import Operaciones.Ternarias;
 import Operaciones.Unarias;
 import Control.*;
 public class Gramatica{
+	public String retirar(String t){
+		t=t.replace("\\n","\n");
+    	t=t.replace("\\t", "\t");
+    	t=t.replace("\\\"", "\"");
+    	t=t.replace("\\r", "\r");
+    	t=t.replace("\\\\", "\\");
+		return t;
+	}
 }
 PARSER_END(Gramatica)
 /*
@@ -68,6 +76,7 @@ TOKEN : {
 	|<MAYOR_I:">=">
 	|<MENOR_I:"<=">
 	|<MAYOR:">">
+	|<IGUAL_MAYOR:"=>">
 	|<MENOR:"<">
 	|<AND:"&">
 	|<OR:"|">
@@ -82,9 +91,19 @@ TOKEN : {
 	|<PREGUNTA:"?">
 	|<NULO: "null">
 	|<TDEFAULT:"default">
+	|<BREAK:"break">
+	|<CONTINUE:"continue">
+	|<FUNCTION:"function">
+	|<FOR:"for">
+	|<IN:"in">
+	|<RETORNO:"return">
 	|<DOSPUNTOS:":">
 	//|<IDENTIFICADOR: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_"] | ["0"-"9"] )* >
-	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z"](["a"-"z","A"-"Z","_"]|["0"-"9"])*)>
+	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z","."](["a"-"z","A"-"Z","_","."]|["0"-"9"])*)>
+	|<NOVAL: ~["a"-"z","0"-"9","-","\""]>//E.R. de caracteres no validos de este lenguaje
+  {System.out.println("Error 1: \"Caracter no valido en linea "+matchedToken.beginLine+"\"");
+  Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.LEXICO,"Caracter no valido "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
+  }//Manda un mensaje de error en pantall
 }
 MORE:{
 	"\"" : STRING_STATE
@@ -95,18 +114,7 @@ MORE:{
 <STRING_STATE> TOKEN:{
 	<STRING:"\""> : DEFAULT
 }
-/*
 
-░██████╗██╗███╗░░██╗████████╗░█████╗░░█████╗░████████╗██╗░█████╗░░█████╗░
-██╔════╝██║████╗░██║╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║██╔══██╗██╔══██╗
-╚█████╗░██║██╔██╗██║░░░██║░░░███████║██║░░╚═╝░░░██║░░░██║██║░░╚═╝██║░░██║
-░╚═══██╗██║██║╚████║░░░██║░░░██╔══██║██║░░██╗░░░██║░░░██║██║░░██╗██║░░██║
-██████╔╝██║██║░╚███║░░░██║░░░██║░░██║╚█████╔╝░░░██║░░░██║╚█████╔╝╚█████╔╝
-╚═════╝░╚═╝╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░░░░╚═╝░░░╚═╝░╚════╝░░╚════╝░
-*/
-/**
-INICIO->(CUERPO)+EOF
-*/
 AST INICIO():
 {
 AST arbol;
@@ -122,11 +130,36 @@ Nodo CUERPO():
 Nodo aux;
 }
 {
-	
+	try{
 	(aux=CONTROLES()){return aux;}
 	|(aux=DECLARACION()){return aux;}
-
+	|(aux=RETORNOS()){return aux;}
+	}catch(ParseException x){
+		Token matchedToken = x.currentToken.next; 
+		Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SINTACTICO,"Caracter no esperado "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
+		error_skypto();
+		return null;
+	}
 }
+/*
+█▀▄ █░░ ▄▀▄ ▄▀█ █░█ █▀▀ 
+█▀█ █░▄ █░█ █░█ █░█ █▀▀ 
+▀▀░ ▀▀▀ ░▀░ ░▀█ ░▀░ ▀▀▀ 
+*/
+void error_skypto():
+{
+	ParseException e=generateParseException();
+	Token t;
+}
+{
+	{
+		 do{
+                t=getNextToken();
+                System.out.println("EERorr  "+t.image);
+        }while(!(t.kind == PYCOMA || t.kind == LLAV_C||t.kind==EOF));
+	}
+}
+
 
 LinkedList<Nodo>BLOQUE():
 {
@@ -144,9 +177,17 @@ Nodo CUERPOINTERNO():
 Nodo aux;
 }
 {
-	
+	try{
 	(aux=CONTROLES()){return aux;}
 	|(aux=DECLARACION()){return aux;}
+	|(aux=TRANFERENCIAS()){return aux;}
+	|(aux=RETORNOS()){return aux;}
+	}catch(ParseException x){
+		Token matchedToken = x.currentToken.next; 
+		Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SINTACTICO,"Caracter no esperado "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
+		error_skypto();
+		return null;
+	}	
 }
 
 Nodo DECLARACION():
@@ -154,12 +195,47 @@ Nodo DECLARACION():
 	Token i;
 	LinkedList<Expresion>par=new LinkedList();
 	LinkedList<Expresion>dim=new LinkedList();
+	LinkedList<Nodo>blo=new LinkedList();
+	LinkedList<Object>fun=new LinkedList();
 	Expresion e;
 }
 {
-	LOOKAHEAD(2)i=<IDENTIFICADOR> <IGUAL> e=EXP() (<PYCOMA>)?{return new DecAsig(e,new Identificador(i.image,i.beginLine,i.beginColumn),i.beginLine,i.beginColumn);}
+	LOOKAHEAD(7)i=<IDENTIFICADOR><IGUAL> <PAR_A> (fun=LISTAPARAMETROS())? <PAR_C><IGUAL_MAYOR> blo=BLOQUE(){return new DecFuncion(fun,new Identificador(i.image,i.beginLine,i.beginColumn),blo,i.beginLine,i.beginColumn);}
+	|LOOKAHEAD(3)i=<IDENTIFICADOR> <IGUAL> e=EXP() (<PYCOMA>)?{return new DecAsig(e,new Identificador(i.image,i.beginLine,i.beginColumn),i.beginLine,i.beginColumn);}
+	|LOOKAHEAD(3)i=<IDENTIFICADOR><IGUAL> <FUNCTION> <PAR_A> (fun=LISTAPARAMETROS())?<PAR_C>blo=BLOQUE(){return new DecFuncion(fun,new Identificador(i.image,i.beginLine,i.beginColumn),blo,i.beginLine,i.beginColumn);}
 	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES() <IGUAL> e=EXP() (<PYCOMA>)?{return new AsignacionPosicion(new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn),e,i.beginLine,i.beginColumn);}
-	|LOOKAHEAD(2) i=<IDENTIFICADOR><PAR_A>(par=LISTAEXP())?<PAR_C>(<PYCOMA>)? {return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),par,dim);}
+	|LOOKAHEAD(2)i=<IDENTIFICADOR><PAR_A>(par=LISTAEXP())?<PAR_C>(<PYCOMA>)? {return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),par,dim);}
+	
+}
+
+Nodo RETORNOS():
+{
+	Token t;
+	Expresion ex;
+}
+{
+	LOOKAHEAD(5) t=<RETORNO> <PAR_A> ex=EXP() <PAR_C> <PYCOMA>{return new Return(ex,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(4) t=<RETORNO> <PAR_A> ex=EXP() <PAR_C>{return new Return(ex,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(2) t=<RETORNO> <PYCOMA>{return new Return(new Nulo(t.beginLine,t.beginColumn),t.beginLine,t.beginColumn);}
+	|t=<RETORNO>{return new Return(new Nulo(t.beginLine,t.beginColumn),t.beginLine,t.beginColumn);} 
+	
+}
+
+LinkedList<Object> LISTAPARAMETROS():
+{
+	LinkedList<Object>lista=new LinkedList();
+	Object a;
+}
+{
+	a=PARAMETROS(){lista.add(a);}(<COMA> a=PARAMETROS(){lista.add(a);})* {return lista;}
+}
+Object PARAMETROS():
+{
+	Token t;
+	Expresion e;
+}
+{
+	t=<IDENTIFICADOR>(<IGUAL> e=EXP(){return new DecAsig(e,new Identificador(t.image,t.beginLine,t.beginColumn),t.beginLine,t.beginColumn);})?{return new Identificador(t.image,t.beginLine,t.beginColumn);}
 }
 
 LinkedList<Expresion>LCORCHETES():
@@ -192,33 +268,36 @@ Expresion ACCESOS():
 	|LOOKAHEAD(2) t=<COR_A> <COMA> d=EXP() <COR_C>{return new Acceso4(null,d,t.beginLine,t.beginColumn);}
 	|LOOKAHEAD(4) t=<COR_A> e=EXP() <COMA> <COR_C>{return new Acceso4(e,null,t.beginLine,t.beginColumn);}
 }
-/*
-░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
-██╔══██╗██╔══██╗████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
-██║░░╚═╝██║░░██║██╔██╗██║░░░██║░░░██████╔╝██║░░██║██║░░░░░
-██║░░██╗██║░░██║██║╚████║░░░██║░░░██╔══██╗██║░░██║██║░░░░░
-╚█████╔╝╚█████╔╝██║░╚███║░░░██║░░░██║░░██║╚█████╔╝███████╗
-░╚════╝░░╚════╝░╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░╚══════╝
-*/
+
+Instruccion TRANFERENCIAS():
+{
+	Token i;
+}
+{
+	i=<BREAK> (<PYCOMA>)?{return new Break(i.beginLine,i.beginColumn);}
+	|i=<CONTINUE>(<PYCOMA>)?{return new Continue(i.beginLine,i.beginColumn);}
+}
 
 Instruccion CONTROLES():
 {
 	Instruccion ins=null;
 }
-{
+{	
 	ins=CONTROL_IF(){return ins;}
 	|ins=CONTROL_SWITCH(){return ins;}
 	|ins=CONTROL_DO_WHILE(){return ins;}
 	|ins=CONTROL_WHILE(){return ins;}
-
+	|ins=CONTROL_FOR(){return ins;}
 }
 
 Instruccion CONTROL_FOR():
 {
-
+	Token i,id;
+	Expresion e;
+	LinkedList<Nodo>blo;
 }
 {
-	
+	i=<FOR> <PAR_A> id=<IDENTIFICADOR> <IN> e=EXP() <PAR_C> blo=BLOQUE(){return new For(new Identificador(id.image,id.beginLine,id.beginColumn),e,blo,i.beginLine,i.beginColumn);}
 }
 
 Instruccion CONTROL_WHILE():
@@ -320,20 +399,17 @@ LinkedList<Expresion>LISTAEXP():
 	Token d;
 }
 {
-	e=EXP(){lista.add(e);} (<COMA> e=EXP(){lista.add(e);}| d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));})*
+	(e=EXP(){lista.add(e);}|d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));} )(<COMA> (e=EXP(){lista.add(e);}| d=<TDEFAULT>{lista.add(new Default(d.beginLine,d.beginColumn));}))*
 	{return lista;}
 }
-/*
-█▀▀ ▀▄▀ █▀█ █▀█ █▀▀ █▀ █ █▀█ █▄░█
-██▄ █░█ █▀▀ █▀▄ ██▄ ▄█ █ █▄█ █░▀█
-*/
+
 Expresion EXP():
 {
 	Expresion a,b,c;
 	Token t;
 }
 {
-	a=CondicionOR()(t=<PREGUNTA>b=EXP()<DOSPUNTOS>c=EXP()
+	a=CondicionOR()(t=<PREGUNTA>b=EXP()<DOSPUNTOS>c=EXP(){return new Ternarias(a,b,c,t.beginLine,t.beginColumn);}
 		)?
 	{return a;}
 }
@@ -433,7 +509,7 @@ Expresion Primitivo():
 	<NUMERIC>{return new Literal(Double.parseDouble(token.image),new TipoExp(Tipos.NUMERIC),token.beginLine,token.beginColumn);}
 	|<BOOLEANO>{return new Literal(Boolean.parseBoolean(token.image),new TipoExp(Tipos.BOOLEAN),token.beginLine,token.beginColumn);}
 	|<INTEGER>{return new Literal(Integer.parseInt(token.image),new TipoExp(Tipos.INTEGER),token.beginLine,token.beginColumn);}
-	|<STRING>{return new Literal(token.image.substring(1,token.image.length()-1),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
+	|<STRING>{return new Literal(retirar(token.image.substring(1,token.image.length()-1)),new TipoExp(Tipos.STRING),token.beginLine,token.beginColumn);}
 	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
 	|LOOKAHEAD(3)i=<IDENTIFICADOR> <PAR_A> lex=LISTAEXP() <PAR_C> (dim=LCORCHETES())?{return new Llamadas(new Identificador(i.image,i.beginLine,i.beginColumn),lex,dim);}
 	|LOOKAHEAD(2)i=<IDENTIFICADOR> dim=LCORCHETES(){return new Acceso(new Identificador(i.image,i.beginLine,i.beginColumn),dim,i.beginLine,i.beginColumn);}

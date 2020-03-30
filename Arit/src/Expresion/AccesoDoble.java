@@ -21,6 +21,7 @@ import java.util.LinkedList;
 public class AccesoDoble implements Expresion {
 
     private Expresion indice;
+    private Expresion indiceAux;
     private int linea;
     private int columna;
     private Object objeto;
@@ -35,6 +36,7 @@ public class AccesoDoble implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
+        indiceAux=indice;
         Object i = getIndice().getValor(e);
         if (i instanceof Errores) {
             return i;
@@ -46,7 +48,7 @@ public class AccesoDoble implements Expresion {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector no es de tipo INTEGER", linea, columna);
             }
             if (v.getDimensiones().size() == 1) {
-                indice = (Expresion) v.getDimensiones().get(0);
+                indiceAux = (Expresion) v.getDimensiones().get(0);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vetor de indice es de mayor tamanio que 1 " + tipo.tp, linea, columna);
             }
@@ -123,7 +125,7 @@ public class AccesoDoble implements Expresion {
      * @return the indice
      */
     public Expresion getIndice() {
-        return indice;
+        return indiceAux;
     }
 
     /**

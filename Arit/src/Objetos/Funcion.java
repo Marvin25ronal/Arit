@@ -34,7 +34,7 @@ public class Funcion extends Simbolo implements Instruccion {
     private LinkedList<Object> valores;
 
     public Funcion(LinkedList<Nodo> Sentencias, LinkedList<Object> parametros, int linea, int columna, TipoExp tipo, TipoExp tiposecundario, String id) {
-        super(tipo, tiposecundario, id);
+        super(tipo, tiposecundario, id,linea,columna);
         this.Sentencias = Sentencias;
         this.parametros = parametros;
         this.linea = linea;

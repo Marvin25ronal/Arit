@@ -42,6 +42,9 @@ public class Print implements Instruccion {
     public Object ejecutar(Entorno e) {
         Object val = getToPrint().getValor(e);
         //
+        if(val==null){
+           val="null";
+        }
         if (val instanceof Reportes.Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Reportes.Errores) val);
             return null;

@@ -37,6 +37,7 @@ public class AccesoUnico implements Expresion {
     }
 
     private Expresion indice;
+    private Expresion indiceAuxiliar;
     private int linea;
     private int columna;
     private Object objeto;
@@ -52,6 +53,7 @@ public class AccesoUnico implements Expresion {
 
     @Override
     public Object getValor(Entorno e) {
+        indiceAuxiliar=indice;
         Object i = getIndice().getValor(e);
         if (i instanceof Errores) {
             return i;
@@ -66,7 +68,7 @@ public class AccesoUnico implements Expresion {
             }
             if (v.getDimensiones().size() == 1) {
 
-                indice = (Expresion) v.getDimensiones().get(0);
+                indiceAuxiliar = (Expresion) v.getDimensiones().get(0);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector de indice es de mayor tama;o que 1", linea, columna);
             }
@@ -106,7 +108,7 @@ public class AccesoUnico implements Expresion {
      * @return the indice
      */
     public Expresion getIndice() {
-        return indice;
+        return indiceAuxiliar;
     }
 
     /**

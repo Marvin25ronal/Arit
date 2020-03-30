@@ -109,7 +109,7 @@ public class Relacional extends Operacion {
                 case IGUAL_IGUAL:
                     return new Literal(cad1.equals(cad2), new TipoExp(Tipos.BOOLEAN), linea, columna);
                 case DISTINTO:
-                    return new Literal(cad1.equals(cad2), new TipoExp(Tipos.BOOLEAN), linea, columna);
+                    return new Literal(!cad1.equals(cad2), new TipoExp(Tipos.BOOLEAN), linea, columna);
                 case MAYOR:
                     return new Literal(valorcad(cad1) > valorcad(cad2), new TipoExp(Tipos.BOOLEAN), linea, columna);
                 case MENOR:

@@ -18,6 +18,7 @@ import Objetos.Matrix;
 import Reportes.Errores;
 import java.util.LinkedList;
 import Expresion.Funciones.*;
+import Objetos.Array;
 import Reportes.BarPlot;
 import Reportes.Histograma;
 import Reportes.LinePlot;
@@ -68,7 +69,7 @@ public class Llamadas implements Expresion {
                         return f.ejecutar(nuevoE);
                     }
                 } else {
-                    return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta ", linea(), columna());
+                    return new Errores(Errores.TipoError.SEMANTICO, "La cantidad de parametros es incorrecta en la funcion "+id.getVal(), linea(), columna());
                 }
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "Funcion no declarada ", id.getLinea(), columna());
@@ -139,14 +140,14 @@ public class Llamadas implements Expresion {
             if (taux.isVector()) {
                 //es un vector y se trata con el segundo tipo
                 EstructuraLineal eaux = (EstructuraLineal) aux;
-                if(tipoObjeto==null){
-                    tipoObjeto=new TipoExp(Tipos.VECTOR);
-                }else{
-                    if(!tipoObjeto.isList()){
-                        tipoObjeto=new TipoExp(Tipos.VECTOR);
+                if (tipoObjeto == null) {
+                    tipoObjeto = new TipoExp(Tipos.VECTOR);
+                } else {
+                    if (!tipoObjeto.isList()) {
+                        tipoObjeto = new TipoExp(Tipos.VECTOR);
                     }
                 }
-                tipodominante=TipoDominante(tipodominante, eaux.getTiposecundario());
+                tipodominante = TipoDominante(tipodominante, eaux.getTiposecundario());
             } else {
                 tipodominante = TipoDominante(tipodominante, Globales.VarGlobales.getInstance().obtenerTipo(aux, e));
                 if (tipodominante.isVector()) {
@@ -320,7 +321,9 @@ public class Llamadas implements Expresion {
         if (t == null) {
             return nuevot;
         }
-        if (t.isList() || nuevot.isList()) {
+        if (t.isArrya() || nuevot.isArrya()) {
+            return new TipoExp(Tipos.ARRAY);
+        } else if (t.isList() || nuevot.isList()) {
             return new TipoExp(Tipos.LISTA);
         } else if (t.isVector() || nuevot.isVector()) {
             return new TipoExp(Tipos.VECTOR);
@@ -461,7 +464,16 @@ public class Llamadas implements Expresion {
             } else {
                 enuevo.add(id.getVal(), nueva);
             }
-        } else if (tipo.isPrimitive(e)) {
+        }else if(tipo.isArrya()){
+            Array copia=(Array)valor;
+            LinkedList<Object>datos=Globales.VarGlobales.getInstance().CopiarArray(e,copia.getArreglo());
+            Array nuevo=new Array(new TipoExp(Tipos.ARRAY), new TipoExp(copia.getTiposecundario().tp),id.getVal(),datos,copia.getDimensiones(),this.linea(),this.columna());
+            if(actualizar){
+                enuevo.Actualizar(id.getVal(),nuevo);
+            }else{
+                enuevo.add(id.getVal(), nuevo);
+            }
+        }else if (tipo.isPrimitive(e)) {
             Literal l = new Literal(valor, tipo, linea(), columna());
             LinkedList<Object> lista = new LinkedList<>();
             lista.add(l);
@@ -547,7 +559,7 @@ public class Llamadas implements Expresion {
                 return true;
             case "array":
                 return true;
-            case "lenght":
+            case "length":
                 return true;
             case "ncol":
                 return true;
