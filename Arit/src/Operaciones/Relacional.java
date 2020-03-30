@@ -154,6 +154,17 @@ public class Relacional extends Operacion {
                 default:
                     return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esa operacion con " + op.toString(), linea, columna);
             }
+        } else if (top1.isNulo() || top2.isNulo()) {
+            Object a = valor1.toString();
+            Object b = valor2.toString();
+            switch (op) {
+                case IGUAL_IGUAL:
+                    return new Literal(a.equals(b), new TipoExp(Tipos.BOOLEAN), linea, columna);
+                case DISTINTO:
+                    return new Literal(!a.equals(b), new TipoExp(Tipos.BOOLEAN), linea, columna);
+                default:
+                    return new Errores(Errores.TipoError.SEMANTICO, "No se puede hacer esta operacion con " + op.toString(), linea, columna);
+            }
         }
         return null;
     }
