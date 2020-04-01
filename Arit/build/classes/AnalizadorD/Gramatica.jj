@@ -262,9 +262,9 @@ Expresion ACCESOS():
 	Token t;
 }
 {
-	LOOKAHEAD(5) t=<COR_A> e=EXP() <COMA> d=EXP() <COR_C>{return new Acceso4(e,d,t.beginLine,t.beginColumn);}
-	|LOOKAHEAD(4) t=<COR_A> e=EXP() <COMA> <COR_C>{return new Acceso4(e,null,t.beginLine,t.beginColumn);}
-	|LOOKAHEAD(3) t=<COR_A> e=EXP() <COR_C> {return new AccesoUnico(e,t.beginLine,t.beginColumn);}
+	LOOKAHEAD(100) t=<COR_A> e=EXP() <COR_C> {return new AccesoUnico(e,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(120) t=<COR_A> e=EXP() <COMA> d=EXP() <COR_C>{return new Acceso4(e,d,t.beginLine,t.beginColumn);}
+	|LOOKAHEAD(90) t=<COR_A> e=EXP() <COMA> <COR_C>{return new Acceso4(e,null,t.beginLine,t.beginColumn);}
 	|LOOKAHEAD(2) t=<COR_A> <COR_A> e=EXP() <COR_C> <COR_C>{return new AccesoDoble(e,t.beginLine,t.beginColumn);}
 	|LOOKAHEAD(2) t=<COR_A> <COMA> d=EXP() <COR_C>{return new Acceso4(null,d,t.beginLine,t.beginColumn);}
 	

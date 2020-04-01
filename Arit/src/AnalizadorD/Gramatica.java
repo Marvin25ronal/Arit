@@ -385,24 +385,24 @@ Nodo aux;
   final public Expresion ACCESOS() throws ParseException {
         Expresion e,d;
         Token t;
-    if (jj_2_8(5)) {
+    if (jj_2_8(100)) {
+      t = jj_consume_token(COR_A);
+      e = EXP();
+      jj_consume_token(COR_C);
+                                                  {if (true) return new AccesoUnico(e,t.beginLine,t.beginColumn);}
+    } else if (jj_2_9(120)) {
       t = jj_consume_token(COR_A);
       e = EXP();
       jj_consume_token(COMA);
       d = EXP();
       jj_consume_token(COR_C);
-                                                              {if (true) return new Acceso4(e,d,t.beginLine,t.beginColumn);}
-    } else if (jj_2_9(4)) {
+                                                                 {if (true) return new Acceso4(e,d,t.beginLine,t.beginColumn);}
+    } else if (jj_2_10(90)) {
       t = jj_consume_token(COR_A);
       e = EXP();
       jj_consume_token(COMA);
       jj_consume_token(COR_C);
-                                                       {if (true) return new Acceso4(e,null,t.beginLine,t.beginColumn);}
-    } else if (jj_2_10(3)) {
-      t = jj_consume_token(COR_A);
-      e = EXP();
-      jj_consume_token(COR_C);
-                                                 {if (true) return new AccesoUnico(e,t.beginLine,t.beginColumn);}
+                                                        {if (true) return new Acceso4(e,null,t.beginLine,t.beginColumn);}
     } else if (jj_2_11(2)) {
       t = jj_consume_token(COR_A);
       jj_consume_token(COR_A);
@@ -1264,6 +1264,11 @@ Expresion a,b;
     return false;
   }
 
+  private boolean jj_3R_93() {
+    if (jj_scan_token(TDEFAULT)) return true;
+    return false;
+  }
+
   private boolean jj_3R_60() {
     if (jj_scan_token(SWITCH)) return true;
     return false;
@@ -1297,6 +1302,9 @@ Expresion a,b;
     if (jj_scan_token(PAR_A)) return true;
     if (jj_3R_20()) return true;
     if (jj_scan_token(PAR_C)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_90()) jj_scanpos = xsp;
     return false;
   }
 
@@ -1369,6 +1377,11 @@ Expresion a,b;
     return false;
   }
 
+  private boolean jj_3R_92() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
   private boolean jj_3R_76() {
     if (jj_3R_81()) return true;
     return false;
@@ -1422,8 +1435,14 @@ Expresion a,b;
     return false;
   }
 
-  private boolean jj_3R_90() {
+  private boolean jj_3R_91() {
     if (jj_scan_token(COMA)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_92()) {
+    jj_scanpos = xsp;
+    if (jj_3R_93()) return true;
+    }
     return false;
   }
 
@@ -1620,6 +1639,7 @@ Expresion a,b;
     if (jj_scan_token(COR_A)) return true;
     if (jj_scan_token(COMA)) return true;
     if (jj_3R_17()) return true;
+    if (jj_scan_token(COR_C)) return true;
     return false;
   }
 
@@ -1627,12 +1647,15 @@ Expresion a,b;
     if (jj_scan_token(COR_A)) return true;
     if (jj_scan_token(COR_A)) return true;
     if (jj_3R_17()) return true;
+    if (jj_scan_token(COR_C)) return true;
+    if (jj_scan_token(COR_C)) return true;
     return false;
   }
 
   private boolean jj_3_10() {
     if (jj_scan_token(COR_A)) return true;
     if (jj_3R_17()) return true;
+    if (jj_scan_token(COMA)) return true;
     if (jj_scan_token(COR_C)) return true;
     return false;
   }
@@ -1641,14 +1664,13 @@ Expresion a,b;
     if (jj_scan_token(COR_A)) return true;
     if (jj_3R_17()) return true;
     if (jj_scan_token(COMA)) return true;
+    if (jj_3R_17()) return true;
     if (jj_scan_token(COR_C)) return true;
     return false;
   }
 
   private boolean jj_3_8() {
     if (jj_scan_token(COR_A)) return true;
-    if (jj_3R_17()) return true;
-    if (jj_scan_token(COMA)) return true;
     if (jj_3R_17()) return true;
     if (jj_scan_token(COR_C)) return true;
     return false;
@@ -1770,6 +1792,7 @@ Expresion a,b;
     if (jj_scan_token(PREGUNTA)) return true;
     if (jj_3R_17()) return true;
     if (jj_scan_token(DOSPUNTOS)) return true;
+    if (jj_3R_17()) return true;
     return false;
   }
 
@@ -1855,7 +1878,7 @@ Expresion a,b;
     }
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_90()) { jj_scanpos = xsp; break; }
+      if (jj_3R_91()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
@@ -1921,6 +1944,11 @@ Expresion a,b;
     }
     }
     }
+    return false;
+  }
+
+  private boolean jj_3R_90() {
+    if (jj_3R_18()) return true;
     return false;
   }
 

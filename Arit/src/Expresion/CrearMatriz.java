@@ -77,7 +77,7 @@ public class CrearMatriz {
                         return new Errores(Errores.TipoError.SEMANTICO, "El vector tiene que contener solo un elemento para las columna", linea, columna);
                     }
                 }
-                return new Errores(Errores.TipoError.SEMANTICO, "Los parametros de fila y columna tienen que ser de tipo INTEGER ", linea, columna);
+                //return new Errores(Errores.TipoError.SEMANTICO, "Los parametros de fila y columna tienen que ser de tipo INTEGER ", linea, columna);
             }
             if (tipo.isPrimitive(e)) {
                 return ConstruirMatriz_Primitivo(e, datos, tipo, Integer.parseInt(ncol.toString()), Integer.parseInt(nrow.toString()));
