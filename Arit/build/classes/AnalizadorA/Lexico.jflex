@@ -97,7 +97,7 @@ STRING=\"([^\"])*\"
 
 COMENTARIO1= "#*" ([^*])* ~"*#"
 COMENTARIO2= "#"[^\r\n]* (\r|\n|\r\n)?
-ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ"."]* | "."[A-Za-zñÑ][_.0-9A-Za-zñÑ]*
+ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ"."]* | "."[A-Za-zñÑ_][_.0-9A-Za-zñÑ]*
 //ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ]*
 SPACE=[\ \r\t\f\t]
 ENTER=[\ \n]

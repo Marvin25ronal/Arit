@@ -250,7 +250,7 @@ public class AsignacionPosicion implements Instruccion {
                     l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
                 }
             } else if (metiendo.getDimensiones().size() == 1) {
-                for (int i = 0; i < metiendo.getDimensiones().size(); i++) {
+                for (int i = 0; i < vector.getDimensiones().size(); i++) {
                     Literal l = (Literal) vector.getDimensiones().get(i);
                     Literal lmetiendo = (Literal) metiendo.getDimensiones().get(0);
                     l.setTipo(new TipoExp(dominante.tp));
@@ -357,7 +357,7 @@ public class AsignacionPosicion implements Instruccion {
                 ((Literal) v.getDimensiones().get(0)).setValor(CastearValor(nuevot, aux.getValor(), aux.getTipo(e)));
                 ((Literal) v.getDimensiones().get(0)).setTipo(nuevot);
                 Simbolo s = e.get(((Acceso) acc).getId().getVal());
-                if ((s instanceof EstructuraLineal)) {
+                if ((s.getTipo().isVector())) {
                     CastearVector(nuevot, e);
                 } else {
 

@@ -126,7 +126,7 @@ public class CrearMatriz {
         return m;
     }
 
-    private Object ConstruirMatriz_Primitivo(Entorno e, Object valor, TipoExp tipo, int fil, int col) {
+    private Object ConstruirMatriz_Primitivo(Entorno e, Object valor, TipoExp tipo, int col,int fil) {
         LinkedList<LinkedList<Object>> matriz = new LinkedList<>();
         for (int i = 0; i < col; i++) {
             LinkedList<Object> nueva = new LinkedList<>();

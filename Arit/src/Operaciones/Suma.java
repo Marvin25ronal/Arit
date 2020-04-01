@@ -38,6 +38,22 @@ public class Suma extends Aritmeticas {
         }
         TipoExp top1 = Globales.VarGlobales.getInstance().obtenerTipo(valor1, e);
         TipoExp top2 = Globales.VarGlobales.getInstance().obtenerTipo(valor2, e);
+        if (top1.isList()) {
+            Literal n = new Literal(valor1.toString(), new TipoExp(Tipos.STRING), linea, columna);
+            LinkedList dimensiones = new LinkedList();
+            dimensiones.add(n);
+            EstructuraLineal nueva = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), dimensiones);
+            top1 = new TipoExp(Tipos.VECTOR);
+            valor1 = nueva;
+        }
+        if (top2.isList()) {
+            Literal n = new Literal(valor2.toString(), new TipoExp(Tipos.STRING), linea, columna);
+            LinkedList dimensiones = new LinkedList();
+            dimensiones.add(n);
+            EstructuraLineal nueva = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), dimensiones);
+            top2 = new TipoExp(Tipos.VECTOR);
+            valor2 = nueva;
+        }
         TipoExp aux = max(top1, top2);
 
         //esto para cuando la division trae algun numero raro

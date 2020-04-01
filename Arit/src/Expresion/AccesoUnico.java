@@ -288,7 +288,7 @@ public class AccesoUnico implements Expresion {
             case INTEGER:
                 return new Literal(0, t, linea, columna);
             case STRING:
-                return new Literal("", t, linea, columna);
+                return new Literal(new Nulo(linea, columna), t, linea, columna);
             case NUMERIC:
                 return new Literal(0.0, t, linea, columna);
 
