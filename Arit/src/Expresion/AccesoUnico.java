@@ -268,7 +268,7 @@ public class AccesoUnico implements Expresion {
         for (int i = l.getDimensiones().size(); i < inde; i++) {
             LinkedList<Object> li = new LinkedList<>();
             li.add(new Literal(new Nulo(linea, columna), new TipoExp(Tipos.STRING), linea, columna));
-            EstructuraLineal v = new EstructuraLineal("", new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), li);
+            EstructuraLineal v = new EstructuraLineal("", new TipoExp(Tipos.LISTA), new TipoExp(Tipos.STRING), li);
             l.getDimensiones().add(v);
         }
         inde--;

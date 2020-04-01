@@ -182,6 +182,11 @@ public class Editor extends javax.swing.JFrame {
         jMenu2.add(jMenuItem1);
 
         jMenuItem10.setText("Remover");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem10);
 
         jMenuBar1.add(jMenu2);
@@ -550,6 +555,19 @@ public class Editor extends javax.swing.JFrame {
         // TODO add your handling code here:
         GuardarComo();
     }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        // TODO add your handling code here:
+        int indice = jTabbedPane1.getSelectedIndex();
+        if (indice == 0) {
+            Lista.get(indice).setText("");
+            rutas.set(0, "");
+        }else{
+            jTabbedPane1.remove(indice);
+            Lista.remove(indice);
+            rutas.remove(indice);
+        }
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
     private void HacerEntorno(DefaultMutableTreeNode padre, Entorno en, int i) {
         for (Entorno e : en.hijo) {
             DefaultMutableTreeNode entorno = new DefaultMutableTreeNode("Entorno_" + i);

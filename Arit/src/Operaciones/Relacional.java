@@ -92,6 +92,10 @@ public class Relacional extends Operacion {
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "La matriz no puede hacer relacionales con ese tipo de objeto " + top1.toString() + top2.toString(), linea, columna);
             }
+        } else if (max(top1, top2).isList()) {
+            String a = valor1.toString();
+            String b = valor2.toString();
+            return new Literal(a.equals(b), new TipoExp(Tipos.BOOLEAN), linea, columna);
         }
         if (top1.isNulo() && top2.isNulo()) {
             switch (op) {

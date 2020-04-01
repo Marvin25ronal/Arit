@@ -13,8 +13,11 @@ import java.util.LinkedList;
 %column
 %full
 %ignorecase
+%state STRING
 %{
 	public LinkedList<Errores>listaerrores=new LinkedList<>();;
+	 StringBuilder NuevoString = new StringBuilder();
+    char NuevoChar;
 %}
 /*
 ░██████╗██╗███╗░░░███╗██████╗░░█████╗░██╗░░░░░░█████╗░░██████╗
@@ -50,6 +53,7 @@ NOT="!"
 PREGUNTA="?"
 DOSPUNTOS=":"
 COMA=","
+COMILLA=\"
 /*
 ██████╗░███████╗░██████╗███████╗██████╗░██╗░░░██╗░█████╗░██████╗░░█████╗░░██████╗
 ██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██║░░░██║██╔══██╗██╔══██╗██╔══██╗██╔════╝
@@ -84,7 +88,7 @@ CONTINUE="continue"
 NUMERIC=[0-9]+ "." [0-9]+
 INTEGER=[0-9]+
 NULO="null"
-STRING=\"([^\"])*\"
+//STRING=\"([^\"])*\"
 /*
 ░█████╗░░█████╗░███╗░░░███╗███████╗███╗░░██╗████████╗░█████╗░██████╗░██╗░█████╗░░██████╗
 ██╔══██╗██╔══██╗████╗░████║██╔════╝████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║██╔══██╗██╔════╝
@@ -97,10 +101,10 @@ STRING=\"([^\"])*\"
 
 COMENTARIO1= "#*" ([^*])* ~"*#"
 COMENTARIO2= "#"[^\r\n]* (\r|\n|\r\n)?
-ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ"."]* | "."[A-Za-zñÑ_][_.0-9A-Za-zñÑ]*
+ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ"."]* | "."[A-Za-zñÑ_"."][_.0-9A-Za-zñÑ]* |"."
 //ID=[A-Za-zñÑ_][_0-9A-Za-zñÑ]*
-SPACE=[\ \r\t\f\t]
-ENTER=[\ \n]
+SPACE=[\ \t\f\t]
+ENTER=[\r|\n|\r\n]
 
 %%
 <YYINITIAL>{PAR_A}         		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.PAR_A,yyline,yycolumn,yytext());}
@@ -150,7 +154,7 @@ ENTER=[\ \n]
 <YYINITIAL>{FOR}	        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.FOR,yyline,yycolumn,yytext());}
 <YYINITIAL>{IN}		        	{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.IN,yyline,yycolumn,yytext());}
 
-<YYINITIAL>{STRING}        		{System.out.println("Token "+yytext()+" reconocido"); return new Symbol(sym.STRING,yyline,yycolumn,yytext());}
+<YYINITIAL>{COMILLA}        	{yybegin(STRING); NuevoString.setLength(0);}
 <YYINITIAL>{ID}        			{System.out.println("Token ID "+yytext()+" reconocido"); return new Symbol(sym.ID,yyline,yycolumn,yytext());}
 <YYINITIAL>{COMENTARIO1}        {/*ignorado*/}
 <YYINITIAL>{COMENTARIO2}        {/*ignorado*/}
@@ -161,4 +165,15 @@ ENTER=[\ \n]
         listaerrores.add(nuevo);
         String errLex = "Error léxico : '"+yytext()+"' en la línea: "+(yyline+1)+" y columna: "+(yycolumn+1);
         System.out.println(errLex);
+}
+<STRING> {
+    \"                           { yybegin(YYINITIAL); return new Symbol(sym.STRING, NuevoString.toString());}
+    \\\"                         { NuevoString.append('\"'); }
+    \\\\                         { NuevoString.append("\\"); } 
+    \\n                          { NuevoString.append('\n'); }
+    \\r                          { NuevoString.append('\r'); }
+    \\t                          { NuevoString.append('\t'); }
+    {ENTER}                   { yybegin(YYINITIAL);
+                                   System.out.println("String sin finalizar." + yyline + yycolumn); }
+    .                            { NuevoString.append(yytext()); }
 }

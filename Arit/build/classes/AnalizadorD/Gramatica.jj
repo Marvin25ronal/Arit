@@ -99,7 +99,7 @@ TOKEN : {
 	|<RETORNO:"return">
 	|<DOSPUNTOS:":">
 	//|<IDENTIFICADOR: ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_"] | ["0"-"9"] )* >
-	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z",".","_"](["a"-"z","A"-"Z","_","."]|["0"-"9"])*)>
+	|<IDENTIFICADOR:(["A"-"Z","a"-"z","_"](["a"-"z","A"-"Z",".","_"]|["0"-"9"])*)|("." ["A"-"Z","a"-"z",".","_"](["a"-"z","A"-"Z","_","."]|["0"-"9"])*)|".">
 	|<NOVAL: ~["a"-"z","0"-"9","-","\""]>//E.R. de caracteres no validos de este lenguaje
   {System.out.println("Error 1: \"Caracter no valido en linea "+matchedToken.beginLine+"\"");
   Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.LEXICO,"Caracter no valido "+matchedToken.image ,matchedToken.beginLine,matchedToken.beginColumn));
@@ -108,8 +108,14 @@ TOKEN : {
 MORE:{
 	"\"" : STRING_STATE
 }
-<STRING_STATE> MORE:{
-	<~["\""]>
+<STRING_STATE> MORE:
+{
+    <~["\""]> 
+    | <("\\" "\"")>
+    | <("\\" "n")>
+    | <("\\" "\\")>
+    | <("\\" "r")>
+    | <("\\" "t")>
 }
 <STRING_STATE> TOKEN:{
 	<STRING:"\""> : DEFAULT

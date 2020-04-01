@@ -41,9 +41,10 @@ parser code
         System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
     }
     public String remplazar(String t){
+    	System.out.println("Cadena"+t);
     	t=t.replace("\\n","\n");
     	t=t.replace("\\t", "\t");
-    	t=t.replace("\\\"", "\"");
+    	//t=t.replace("\"", "\"");
     	t=t.replace("\\r", "\r");
     	t=t.replace("\\\\", "\\");
     	return t;
@@ -214,7 +215,7 @@ EXP::=
 	|PAR_A EXP:a PAR_C{:RESULT=a;:}
 	|ID:a{:RESULT=new Identificador(a,aleft+1,aright+1);:}
 	|NUMERIC:a{:RESULT=new Literal(Double.parseDouble(a.toString()),new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
-	|STRING:a{:RESULT=new Literal(remplazar(a.toString().replace("\"","")),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
+	|STRING:a{:RESULT=new Literal(remplazar(a.toString()),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
 	|INTEGER:a{:RESULT=new Literal(Integer.parseInt(a.toString()),new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
 	|TRUE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	|FALSE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
