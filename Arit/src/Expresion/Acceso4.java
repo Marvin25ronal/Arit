@@ -263,8 +263,10 @@ public class Acceso4 implements Expresion {
         StringBuilder nueva = new StringBuilder();
         nueva.append("node").append(this.hashCode()).append("[label=\"Acceso4[,] \",fontcolor=\"white\",fillcolor=\"dodgerblue4\",style=\"filled,rounded\"];\n");
         nueva.append("node").append(padre).append("->node").append(this.hashCode()).append(";\n");
-        nueva.append(AcFila.toDot(this.hashCode()));
-        nueva.append(AcColumna.toDot(this.hashCode()));
+        if(AcFila!=null)
+            nueva.append(AcFila.toDot(this.hashCode()));
+        if(AcColumna!=null)
+            nueva.append(AcColumna.toDot(this.hashCode()));
         return nueva.toString();
     }
 

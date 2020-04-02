@@ -130,10 +130,10 @@ public class DecAsig implements Instruccion {
         TipoExp t = Globales.VarGlobales.getInstance().obtenerTipo(setvalor, variables);
         if (t.tp == Tipos.NULO) {
             //cuando es nulo
-            if (variables.ExisteEnEntorno(getId().getVal())) {
+            if (declarar.ExisteEnEntorno(getId().getVal())) {
                 isfor=variables.get(id.getVal()).isfor;
                 tfor=variables.get(id.getVal()).tfor;
-                ReasignarVector_Nulo(declarar);
+                ReasignarVector_Nulo(variables);
             } else {
                 CrearVector_Nulo(declarar);
             }
@@ -144,11 +144,11 @@ public class DecAsig implements Instruccion {
             primero ver si no existe antes para reasignar valor
             agregarla a la tabla
              */
-            if (variables.ExisteEnEntorno(getId().getVal())) {
+            if (declarar.ExisteEnEntorno(getId().getVal())) {
                 //se reasigna
                 isfor=variables.get(id.getVal()).isfor;
                 tfor=variables.get(id.getVal()).tfor;
-                ReasignarVector_Primitivo(declarar, setvalor, t);
+                ReasignarVector_Primitivo(variables, setvalor, t);
             } else {
                 //arreglo nuevo
                 CrearNuevoVector_Primitivo(declarar, setvalor, t);
@@ -156,34 +156,34 @@ public class DecAsig implements Instruccion {
         } else {
             //el vector va a cambiar cuando son una lista de valores
             if (t.isVector()) {
-                if (variables.ExisteEnEntorno(getId().getVal())) {
+                if (declarar.ExisteEnEntorno(getId().getVal())) {
                     isfor=variables.get(id.getVal()).isfor;
                     tfor=variables.get(id.getVal()).tfor;
-                    ReasignarVector_Vector(declarar, setvalor, t);
+                    ReasignarVector_Vector(variables, setvalor, t);
                 } else {
                     CrearNuevoVector_Vector(declarar, setvalor, t);
                 }
             } else if (t.isList()) {
-                if (variables.ExisteEnEntorno(getId().getVal())) {
+                if (declarar.ExisteEnEntorno(getId().getVal())) {
                     isfor=variables.get(id.getVal()).isfor;
                     tfor=variables.get(id.getVal()).tfor;
-                    ReasignarLista_Lista(declarar, setvalor);
+                    ReasignarLista_Lista(variables, setvalor);
                 } else {
                     CrearListaNueva(declarar, setvalor);
                 }
             } else if (t.isMatrix()) {
-                if (variables.ExisteEnEntorno(getId().getVal())) {
+                if (declarar.ExisteEnEntorno(getId().getVal())) {
                     isfor=variables.get(id.getVal()).isfor;
                     tfor=variables.get(id.getVal()).tfor;
-                    ReasignarMatriz_Matriz(declarar, setvalor);
+                    ReasignarMatriz_Matriz(variables, setvalor);
                 } else {
                     CrearMatrizNueva(declarar, setvalor);
                 }
             } else if (t.isArrya()) {
-                if (variables.ExisteEnEntorno(id.getVal())) {
+                if (declarar.ExisteEnEntorno(id.getVal())) {
                     isfor=variables.get(id.getVal()).isfor;
                     tfor=variables.get(id.getVal()).tfor;
-                    ReasignarArray_Array(declarar, setvalor);
+                    ReasignarArray_Array(variables, setvalor);
                 } else {
                     CrearArrayNueva(declarar, setvalor);
                 }
@@ -287,7 +287,7 @@ public class DecAsig implements Instruccion {
         LinkedList<Object> datos = new LinkedList<>();
         Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
         datos.add(nueva);
-        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.STRING), datos, this.linea, this.columna);
+        EstructuraLineal nuevo = new EstructuraLineal(getId().getVal(), new TipoExp(Tipos.VECTOR), new TipoExp(Tipos.NULO), datos, this.linea, this.columna);
         e.add(getId().getVal(), nuevo);
     }
 
@@ -302,7 +302,7 @@ public class DecAsig implements Instruccion {
                 //Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
                 //lfor.getDimensiones().clear();
                 //lfor.getDimensiones().add(nueva);
-                lfor.setTiposecundario(new TipoExp(Tipos.STRING));
+                lfor.setTiposecundario(new TipoExp(Tipos.NULO));
                 e.Actualizar(id.getVal(), lfor);
                 return;
             }
@@ -310,7 +310,7 @@ public class DecAsig implements Instruccion {
             Literal nueva = new Literal(new Nulo(getLinea(), getColumna()), new TipoExp(Tipos.NULO), getLinea(), getColumna());
             lfor.getDimensiones().clear();
             lfor.getDimensiones().add(nueva);
-            lfor.setTiposecundario(new TipoExp(Tipos.STRING));
+            lfor.setTiposecundario(new TipoExp(Tipos.NULO));
             e.Actualizar(id.getVal(), lfor);
             return;
         }

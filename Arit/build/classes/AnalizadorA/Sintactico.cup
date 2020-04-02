@@ -41,12 +41,56 @@ parser code
         System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
     }
     public String remplazar(String t){
+    	System.out.println("Cadena"+t);
     	t=t.replace("\\n","\n");
     	t=t.replace("\\t", "\t");
-    	t=t.replace("\\\"", "\"");
+    	//t=t.replace("\"", "\"");
     	t=t.replace("\\r", "\r");
     	t=t.replace("\\\\", "\\");
     	return t;
+    }
+    public Nodo Generar(String s,LinkedList<Nodo>sent,int linea,int columna){
+    	return new DecFuncion(new LinkedList<Object>(),new Identificador(s,linea,columna),sent,linea,columna);
+    }
+    public Nodo Generar(String s,Nodo exp,LinkedList<Nodo>sent,int linea,int columna){
+    	if(exp instanceof Identificador){
+    		LinkedList<Object>parametros=new LinkedList<>();
+    		parametros.add(exp);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,Expresion exp,LinkedList<Nodo>sent,int lineaA,int columnaA,int linea,int columna){
+    	if(id instanceof Identificador){
+    		DecAsig nueva=new DecAsig(exp,(Identificador)id,lineaA,columnaA);
+    		LinkedList<Object>parametros=new LinkedList<>();
+    		parametros.add(nueva);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,LinkedList<Object>parametros,LinkedList<Nodo>sent,int linea,int columna){
+    	if(id instanceof Identificador){
+    		parametros.addFirst(id);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,Expresion exp,LinkedList<Object>parametros,LinkedList<Nodo>sent,int lineaA,int columnaA,int linea,int columna){
+    	if(id instanceof Identificador){
+    		DecAsig nueva=new DecAsig(exp,(Identificador)id,lineaA,columnaA);
+    		parametros.addFirst(nueva);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
     }
 :}
 action code
@@ -67,7 +111,7 @@ non terminal Nodo ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS,
 non terminal LinkedList<Instruccion>LIFS,LCASE;
 non terminal Expresion ACCESOARREGLO;
 non terminal LinkedList<Expresion> LCORCHETES,LISTAEXPRESION;
-non terminal LinkedList<Object> LISTAPARAMETROS;
+non terminal LinkedList<Object> LPAR;
 non terminal Expresion LLAMADAS;
 non terminal Nodo RETORNOS;
 
@@ -99,9 +143,9 @@ start with INICIO;
 
 INICIO::= CUERPO:a{:AST arbol=new AST(a);ast=arbol;:};
 
-CUERPO::=ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
-	|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
-	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+CUERPO::=//ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	//|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
+	CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
 	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
 	//|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
 	//|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
@@ -171,7 +215,7 @@ EXP::=
 	|PAR_A EXP:a PAR_C{:RESULT=a;:}
 	|ID:a{:RESULT=new Identificador(a,aleft+1,aright+1);:}
 	|NUMERIC:a{:RESULT=new Literal(Double.parseDouble(a.toString()),new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
-	|STRING:a{:RESULT=new Literal(remplazar(a.toString().replace("\"","")),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
+	|STRING:a{:RESULT=new Literal(remplazar(a.toString()),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
 	|INTEGER:a{:RESULT=new Literal(Integer.parseInt(a.toString()),new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
 	|TRUE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
 	|FALSE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
@@ -269,17 +313,38 @@ LCORCHETES::=
 	;
 
 DECFUNCION::=
-	ID:i IGUAL:g FUNCTION PAR_A LISTAPARAMETROS:p PAR_C BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
-	|ID:i IGUAL:g FUNCTION PAR_A PAR_C BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
-	|ID:i IGUAL:g PAR_A LISTAPARAMETROS:p PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
-	|ID:i IGUAL:g PAR_A PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//ID:i IGUAL:g FUNCTION PAR_A LISTAPARAMETROS:p PAR_C BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g FUNCTION PAR_A PAR_C BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g PAR_A LISTAPARAMETROS:p PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g PAR_A PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	  ID:a IGUAL PAR_A PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	  |ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e IGUAL:i EXP:e1 PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,e1,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e COMA LPAR:l PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,l,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e IGUAL:i EXP:e1 COMA LPAR:l PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,e1,l,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A PAR_C BLOQUE:b{:RESULT=Generar(a,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=Generar(a,e,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e IGUAL:i EXP:e1 PAR_C BLOQUE:b{:RESULT=Generar(a,e,e1,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e COMA LPAR:l PAR_C BLOQUE:b{:RESULT=Generar(a,e,l,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e IGUAL:i EXP:e1 COMA LPAR:l PAR_C BLOQUE:b{:RESULT=Generar(a,e,e1,l,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ACCESOARREGLO:a IGUAL:i EXP:e{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:}
+	  |ACCESOARREGLO:a IGUAL:i EXP:e PYCOMA{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:}
 	;
+LPAR::=
+	ID:a{:LinkedList<Object>lista=new LinkedList<>();lista.add(new Identificador(a,aleft+1,aright+1));RESULT=lista;:}
+	|ID:a COMA LPAR:l{:l.addFirst(new Identificador(a,aleft+1,aright+1));RESULT=l;:}
+	|ID:a IGUAL EXP:e{:LinkedList<Object>lista=new LinkedList<>();lista.add(new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=lista;:}
+	|ID:a IGUAL EXP:e COMA LPAR:l{:l.addFirst(new Identificador(a,aleft+1,aright+1));RESULT=l;:}
+	;
+/*
 LISTAPARAMETROS::=
 	LISTAPARAMETROS:l COMA ID:i{:l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
 	|ID:i{:LinkedList<Object>l=new LinkedList<>();l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
 	|ID:a IGUAL EXP:e{:LinkedList<Object>l=new LinkedList<>();l.add(new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
 	|LISTAPARAMETROS:l COMA ID:a IGUAL EXP:e{:l.add(new  DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
-	;
+	;*/
 LISTAEXPRESION::=
 	LISTAEXPRESION:l COMA EXP:e{:l.add(e);RESULT=l;:}
 	|EXP:e{:LinkedList<Expresion>l=new LinkedList<>();l.add(e);RESULT=l;:}

@@ -8,6 +8,7 @@ package Instruccion;
 import Entorno.Entorno;
 import Expresion.Expresion;
 import Objetos.Nulo;
+import Reportes.Errores;
 
 /**
  *
@@ -42,8 +43,9 @@ public class Print implements Instruccion {
     public Object ejecutar(Entorno e) {
         Object val = getToPrint().getValor(e);
         //
-        if(val==null){
-           val="null";
+        if (val == null) {
+            Globales.VarGlobales.getInstance().AgregarEU(new Errores(Errores.TipoError.SEMANTICO, "No retorno nada el objeto del print", linea, columna));
+            val = "null";
         }
         if (val instanceof Reportes.Errores) {
             Globales.VarGlobales.getInstance().AgregarEU((Reportes.Errores) val);

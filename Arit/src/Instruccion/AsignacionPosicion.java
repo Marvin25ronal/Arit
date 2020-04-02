@@ -74,6 +74,9 @@ public class AsignacionPosicion implements Instruccion {
                 return ReasignarVector_Primitivo(e, val, tvalor, (EstructuraLineal) obj);
             } else if (tvalor.isVector()) {
                 return ReasignarVector_Vector(e, val, tvalor, (EstructuraLineal) obj);
+            } else if (tvalor.isList()) {
+                //esto va a modificar el vector actual a lista
+                return ReasignarVector_Lista(e, val, tvalor, (EstructuraLineal) obj);
             } else {
                 return new Errores(Errores.TipoError.SEMANTICO, "El vector no puede contener ese tipo de objetos ", linea, columna);
             }
@@ -132,6 +135,35 @@ public class AsignacionPosicion implements Instruccion {
         return null;
     }
 
+    private Object ReasignarVector_Lista(Entorno e, Object val, TipoExp t, EstructuraLineal lista) {
+        EstructuraLineal apasar = (EstructuraLineal) val;
+        Simbolo origen = (Simbolo)((Acceso) acc).getId().getValor(e);
+        if(origen.getTipo().isArrya()||origen.getTipo().isList()){
+            
+        }else{
+            return new Errores(Errores.TipoError.SEMANTICO,"No se puede insertar una lista a ese objeto", linea, columna);
+        }
+        if (Globales.VarGlobales.getInstance().getAnterior().getAcceso() == 1) {
+            //acceso 1
+            if (apasar.getDimensiones().size() > 1) {
+                return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un vector en su nodo de tamanio 1", linea, columna);
+            }
+            EstructuraLineal lista2 = (EstructuraLineal) lista.getDimensiones().get(0);
+            lista2.getDimensiones().clear();
+            lista2.setTipo(new TipoExp(Tipos.LISTA));
+            //lista2.setTiposecundario(new TipoExp(t.tp));
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getDimensiones());
+            lista2.setDimensiones(valoresnuevos);
+        } else {
+            lista.getDimensiones().clear();
+            lista.setTipo(new TipoExp(Tipos.LISTA));
+            //lista.setTiposecundario(new TipoExp(t.tp));
+            LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getDimensiones());
+            lista.setDimensiones(valoresnuevos);
+        }
+        return null;
+    }
+
     private Object ReasignarArray(Entorno e, Object val, TipoExp tvalor, EstructuraLineal s) {
         Acceso ac = (Acceso) acc;
         Array origen = (Array) ac.getId().getValor(e);
@@ -152,7 +184,8 @@ public class AsignacionPosicion implements Instruccion {
                 return new Errores(Errores.TipoError.SEMANTICO, "El tamanio del elemento es mas grande, solo se puede agregar un elemento en un nodo del array", linea, columna);
             }
             s.setDimensiones(Globales.VarGlobales.getInstance().clonarListaVector(pasando.getDimensiones(), e));
-            s.setTiposecundario(new TipoExp(s.getTiposecundario().tp));
+            s.setTipo(new TipoExp(Tipos.VECTOR));
+            s.setTiposecundario(new TipoExp(tvalor.tp));
             tnuevo = new TipoExp(s.getTiposecundario().tp);
 
         } else if (tvalor.isPrimitive(e)) {
@@ -250,7 +283,7 @@ public class AsignacionPosicion implements Instruccion {
                     l.setValor(CastearValor(dominante, lmetiendo.getValor(), origen.getTiposecundario()));
                 }
             } else if (metiendo.getDimensiones().size() == 1) {
-                for (int i = 0; i < metiendo.getDimensiones().size(); i++) {
+                for (int i = 0; i < vector.getDimensiones().size(); i++) {
                     Literal l = (Literal) vector.getDimensiones().get(i);
                     Literal lmetiendo = (Literal) metiendo.getDimensiones().get(0);
                     l.setTipo(new TipoExp(dominante.tp));
@@ -289,6 +322,11 @@ public class AsignacionPosicion implements Instruccion {
             if (apasar.getDimensiones().size() > 1) {
                 return new Errores(Errores.TipoError.SEMANTICO, "La lista solo puede contener un elemento en su nodo ", linea, columna);
             }
+            Object valor=apasar.getDimensiones().get(0);
+            if(valor instanceof EstructuraLineal){
+                EstructuraLineal l=(EstructuraLineal)valor;
+                apasar.setDimensiones(l.getDimensiones());
+            }
             LinkedList<Object> valoresnuevos = Globales.VarGlobales.getInstance().CopiarLista(e, apasar.getDimensiones());
             lista2.getDimensiones().clear();
             lista2.setTipo(new TipoExp(Tipos.LISTA));
@@ -296,7 +334,6 @@ public class AsignacionPosicion implements Instruccion {
             //EstructuraLineal nueva = new Lista(valoresnuevos, new TipoExp(Tipos.LISTA), null, "");
             //metiendo.getLista().set(ant.getIndice(), nueva);
             return null;
-
         } else {
             //acceso 2 no tiene restricciones
             EstructuraLineal apasar = (EstructuraLineal) val;
@@ -357,7 +394,7 @@ public class AsignacionPosicion implements Instruccion {
                 ((Literal) v.getDimensiones().get(0)).setValor(CastearValor(nuevot, aux.getValor(), aux.getTipo(e)));
                 ((Literal) v.getDimensiones().get(0)).setTipo(nuevot);
                 Simbolo s = e.get(((Acceso) acc).getId().getVal());
-                if ((s instanceof EstructuraLineal)) {
+                if ((s.getTipo().isVector())) {
                     CastearVector(nuevot, e);
                 } else {
 
