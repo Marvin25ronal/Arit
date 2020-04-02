@@ -1,21 +1,96 @@
 package AnalizadorA;
 import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+import Reportes.Errores;
+import Reportes.Errores.TipoError;
+import java.util.ArrayList;
+import Expresion.*;
+import Expresion.TipoExp.Tipos;
+import AST.*;
+import Instruccion.Instruccion;
+import Instruccion.Print;
+import Instruccion.AsignacionPosicion;
+import Instruccion.DecFuncion;
+import Objetos.Nulo;
+import Operaciones.Aritmeticas;
+import Operaciones.Operacion;
+import Operaciones.Logicas;
+import Operaciones.Relacional;
+import Instruccion.DecAsig;
+import Expresion.Identificador;
+import Operaciones.Ternarias;
+import Operaciones.Unarias;
+import Control.*;
+import java.util.LinkedList;
 parser code 
 {://Codigo visible
     
-    //public AST ast;
+    public AST ast;
    
-    //public ArrayList<Errores>listaerrores=new ArrayList<>();
+    public LinkedList<Errores>listaerrores=new LinkedList<>();
     public void syntax_error(Symbol s){
-        //Errores nuevo=new Errores(s.left+1,s.right+1,"Error R de sintaxis "+s.value,Errores.Terror.SINTACTICO);
-        //listaerrores.add(nuevo);
+        Errores nuevo=new Errores(TipoError.SINTACTICO,"Error R de sintaxis "+s.value,s.left+1,s.right+1);
+        listaerrores.add(nuevo);
         System.out.println("Error R de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
        
     }
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        Errores nuevo=new Errores(TipoError.SINTACTICO,"Error NR de sintaxis "+s.value,s.left+1,s.right+1);
         //Errores nuevo=new Errores(s.left+1,s.right+1,"Error NR de sintaxis "+s.value,Errores.Terror.SINTACTICO);
-        //listaerrores.add(nuevo);
+        listaerrores.add(nuevo);
         System.out.println("Error NR de sintaxis: "+ s.value +" Linea "+(s.left+1)+" columna "+(s.right+1) );
+    }
+    public String remplazar(String t){
+    	System.out.println("Cadena"+t);
+    	t=t.replace("\\n","\n");
+    	t=t.replace("\\t", "\t");
+    	//t=t.replace("\"", "\"");
+    	t=t.replace("\\r", "\r");
+    	t=t.replace("\\\\", "\\");
+    	return t;
+    }
+    public Nodo Generar(String s,LinkedList<Nodo>sent,int linea,int columna){
+    	return new DecFuncion(new LinkedList<Object>(),new Identificador(s,linea,columna),sent,linea,columna);
+    }
+    public Nodo Generar(String s,Nodo exp,LinkedList<Nodo>sent,int linea,int columna){
+    	if(exp instanceof Identificador){
+    		LinkedList<Object>parametros=new LinkedList<>();
+    		parametros.add(exp);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,Expresion exp,LinkedList<Nodo>sent,int lineaA,int columnaA,int linea,int columna){
+    	if(id instanceof Identificador){
+    		DecAsig nueva=new DecAsig(exp,(Identificador)id,lineaA,columnaA);
+    		LinkedList<Object>parametros=new LinkedList<>();
+    		parametros.add(nueva);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,LinkedList<Object>parametros,LinkedList<Nodo>sent,int linea,int columna){
+    	if(id instanceof Identificador){
+    		parametros.addFirst(id);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
+    }
+    public Nodo Generar(String s,Nodo id,Expresion exp,LinkedList<Object>parametros,LinkedList<Nodo>sent,int lineaA,int columnaA,int linea,int columna){
+    	if(id instanceof Identificador){
+    		DecAsig nueva=new DecAsig(exp,(Identificador)id,lineaA,columnaA);
+    		parametros.addFirst(nueva);
+    		return new DecFuncion(parametros,new Identificador(s,linea,columna),sent,linea,columna);
+    	}else{
+    		listaerrores.add(new Errores(TipoError.SINTACTICO,"Los parametros de una funcion solo pueden ser ID o ASIGNACION",linea,columna));
+    		return null;
+    	}
     }
 :}
 action code
@@ -23,33 +98,263 @@ action code
 
 :}
 terminal String LLAV_A,LLAV_C,COR_A,COR_C,PAR_A,PAR_C;
-terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA;
-terminal String ID,NUMERIC,STRING,INTEGER,TRUE,FALSE;
-terminal String IGUAL,PYCOMA;
+terminal String OR,NOT,AND,MAYOR,MAYOR_I,MENOR,MENOR_I,DISTINTO,IGUAL_IGUAL,MAS,MENOS,DIV,POR,MODULO,POTENCIA,PREGUNTA,DOSPUNTOS,COMA;
+terminal String ID,NUMERIC,STRING,UMENOS;
+terminal String IGUAL,PYCOMA,FUNCTION;
+terminal String INTEGER,NULO,TRUE,FALSE,IF,ELSE,SWITCH,BREAK,CONTINUE,CASE,DEFAULT,RETURN,WHILE,DO,FOR,IN;
 
-non terminal String INICIO;
-non terminal String ASIGNACION,CUERPO,EXP;
-non terminal String CONTROLES,BLOQUE;
+non terminal AST INICIO;
+non terminal Expresion EXP;
+non terminal LinkedList<Nodo>CUERPO,CUERPOINTERNO;
+non terminal LinkedList<Nodo> BLOQUE;
+non terminal Nodo ASIGNACION,CONTROLES,CONTROL_IF,CONTROL_SWITCH,TRANSFERENCIAS,DECFUNCION,CONTROL_WHILE,CONTROL_DO_WHILE,CONTROL_FOR;
+non terminal LinkedList<Instruccion>LIFS,LCASE;
+non terminal Expresion ACCESOARREGLO;
+non terminal LinkedList<Expresion> LCORCHETES,LISTAEXPRESION;
+non terminal LinkedList<Object> LPAR;
+non terminal Expresion LLAMADAS;
+non terminal Nodo RETORNOS;
+
+precedence right IGUAL;
+precedence right PREGUNTA,DOSPUNTOS;
+precedence left OR;
+precedence left AND;
+precedence left IGUAL_IGUAL,DISTINTO;
+precedence nonassoc MENOR,MENOR_I,MAYOR_I,MAYOR;
+precedence left MAS,MENOS;
+precedence left POR,DIV,MODULO;
+precedence left POTENCIA;
+precedence right NOT;
+precedence right UMENOS;
+precedence left COR_A, COR_C;
+//precedence left PAR_A, PAR_C;
+
+
+
+
+
+//precedence left PAR_A, TYPEVAR, PAR_C;
+
+//precedence right COR_A, COR_C;
+
+//precedence left POTENCIA;
+
 start with INICIO;
 
-INICIO::= CUERPO;
+INICIO::= CUERPO:a{:AST arbol=new AST(a);ast=arbol;:};
 
-CUERPO::=ASIGNACION
-	|CUERPO ASIGNACION
-	|CONTROLES
-	|CUERPO CONTROLES
-	|BLOQUE
-	|CUERPO BLOQUE
+CUERPO::=//ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	//|CUERPO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
+	CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+	|CUERPO:c CONTROLES:b{:c.add(b);RESULT=c;:}
+	//|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	//|CUERPO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
+	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
+	|DECFUNCION:d{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(d);RESULT=lista;:}
+	|CUERPO:l DECFUNCION:d{:l.add(d);RESULT=l;:}
+	|LLAMADAS:l{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|LLAMADAS:l PYCOMA{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|CUERPO:l LLAMADAS:a PYCOMA{:l.add(a);RESULT=l;:}
+	|CUERPO:l LLAMADAS:a{:l.add(a);RESULT=l;:}
+	|CUERPO:l RETORNOS:r{:l.add(r);RESULT=l;:}
+	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
+	|error PYCOMA{:RESULT=new LinkedList<>();:}
+	|error PAR_C{:RESULT=new LinkedList<>();:}
+	|error COR_C{:RESULT=new LinkedList<>();:}
+	;
+CUERPOINTERNO::=
+	ASIGNACION:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPOINTERNO:c ASIGNACION:a{:c.add(a);RESULT=c;:}
+	|CONTROLES:c{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(c);RESULT=lista;:}
+	|CUERPOINTERNO:c CONTROLES:b{:c.add(b);RESULT=c;:}
+	|BLOQUE:b{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(new Bloque(b));RESULT=lista;:}
+	|CUERPOINTERNO:c BLOQUE:b{:c.add(new Bloque(b));RESULT=c;:}
+	|TRANSFERENCIAS:a{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(a);RESULT=lista;:}
+	|CUERPOINTERNO:l TRANSFERENCIAS:a{:l.add(a);RESULT=l;:}
+	|LLAMADAS:l{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:} 
+	|LLAMADAS:l PYCOMA{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(l);RESULT=lista;:}
+	|CUERPOINTERNO:l LLAMADAS:a{:l.add(a);RESULT=l;:}
+	|CUERPOINTERNO:l LLAMADAS:a PYCOMA{:l.add(a);RESULT=l;:}
+	|RETORNOS:r{:LinkedList<Nodo>lista=new LinkedList<>();lista.add(r);RESULT=lista;:}
+	|CUERPOINTERNO:l RETORNOS:r{:l.add(r);RESULT=l;:}
+	|error PYCOMA{:RESULT=new LinkedList<>();:}
+	|error PAR_C{:RESULT=new LinkedList<>();:}
+	|error COR_C{:RESULT=new LinkedList<>();:}
+	;
+ASIGNACION::=ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	|ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	|ACCESOARREGLO:a IGUAL:i EXP:e{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:}
+	|ACCESOARREGLO:a IGUAL:i EXP:e PYCOMA{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:} 
+	;
+/*
+█▀▀ ▀▄▀ █▀█ █▀█ █▀▀ █▀ █ █▀█ █▄░█
+██▄ █░█ █▀▀ █▀▄ ██▄ ▄█ █ █▄█ █░▀█
+*/
+EXP::=
+	MENOS:a EXP:b {:RESULT=new Unarias(b,null,Operacion.Operador.RESTA,aleft+1,aright+1);:}%prec UMENOS
+	|EXP:a MAS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.SUMA,aleft+1,aright+1);:}
+	|EXP:a MENOS EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.RESTA,aleft+1,aright+1);:}
+	|EXP:a POTENCIA EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.POTENCIA,aleft+1,aright+1);:}
+	|EXP:a POR EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MULTIPLICACION,aleft+1,aright+1);:}
+	|EXP:a DIV EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.DIVISION,aleft+1,aright+1);:}
+	
+	|EXP:a MODULO EXP:b{:RESULT=new Aritmeticas(a,b,Operacion.Operador.MODULO,aleft+1,aright+1);:}
+	
+	|NOT:a EXP:b{:RESULT=new Unarias(b,null,Operacion.Operador.NOT,aleft+1,aright+1);:}
+	|EXP:a OR EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.OR,aleft+1,aright+1);:}
+	|EXP:a AND EXP:b{:RESULT=new Logicas(a,b,Operacion.Operador.AND,aleft+1,aright+1);:}
+	|EXP:a MENOR EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR,aleft+1,aright+1);:}
+	|EXP:a MAYOR EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MAYOR,aleft+1,aright+1);:}
+	|EXP:a MENOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MENOR_IGUAL,aleft+1,aright+1);:}
+	|EXP:a MAYOR_I EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.MAYOR_IGUAL,aleft+1,aright+1);:}
+	|EXP:a IGUAL_IGUAL EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.IGUAL_IGUAL,aleft+1,aright+1);:}
+	|EXP:a DISTINTO EXP:b{:RESULT=new Relacional(a,b,Operacion.Operador.DISTINTO,aleft+1,aright+1);:}
+	|EXP:c PREGUNTA:p EXP:a DOSPUNTOS EXP:b{:RESULT=new Ternarias(c,a,b,pleft+1,pright+1);:}
+
+	|PAR_A EXP:a PAR_C{:RESULT=a;:}
+	|ID:a{:RESULT=new Identificador(a,aleft+1,aright+1);:}
+	|NUMERIC:a{:RESULT=new Literal(Double.parseDouble(a.toString()),new TipoExp(Tipos.NUMERIC),aleft+1,aright+1);:}
+	|STRING:a{:RESULT=new Literal(remplazar(a.toString()),new TipoExp(Tipos.STRING),aleft+1,aright+1);:}
+	|INTEGER:a{:RESULT=new Literal(Integer.parseInt(a.toString()),new TipoExp(Tipos.INTEGER),aleft+1,aright+1);:}
+	|TRUE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
+	|FALSE:a{:RESULT=new Literal(Boolean.parseBoolean(a.toString()),new TipoExp(Tipos.BOOLEAN),aleft+1,aright+1);:}
+	|NULO:a{:RESULT=new Nulo(aleft+1,aright+1);:}
+
+	|ACCESOARREGLO:a{:RESULT=a;:}
+	|LLAMADAS:a{:RESULT=a;:}
 	;
 
-ASIGNACION::=ID IGUAL EXP
-	|ID IGUAL EXP PYCOMA;
+/*
+░█▀▀▀ ░█─░█ ░█▄─░█ ░█▀▀█ ▀█▀ ░█▀▀▀█ ░█▄─░█ ░█▀▀▀ ░█▀▀▀█ ░█▀▀▀ ░█▀▀▀█ ░█▀▀█ ░█▀▀▀ ░█▀▀█ ▀█▀ ─█▀▀█ ░█─── ░█▀▀▀ ░█▀▀▀█ 
+░█▀▀▀ ░█─░█ ░█░█░█ ░█─── ░█─ ░█──░█ ░█░█░█ ░█▀▀▀ ─▀▀▀▄▄ ░█▀▀▀ ─▀▀▀▄▄ ░█▄▄█ ░█▀▀▀ ░█─── ░█─ ░█▄▄█ ░█─── ░█▀▀▀ ─▀▀▀▄▄ 
+░█─── ─▀▄▄▀ ░█──▀█ ░█▄▄█ ▄█▄ ░█▄▄▄█ ░█──▀█ ░█▄▄▄ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ ░█─── ░█▄▄▄ ░█▄▄█ ▄█▄ ░█─░█ ░█▄▄█ ░█▄▄▄ ░█▄▄▄█
+*/
 
-EXP::=
-	NUMERIC
-	|STRING
-	|INTEGER
-	|TRUE
-	|FALSE
+BLOQUE::=
+	LLAV_A CUERPOINTERNO:l LLAV_C{:RESULT=l;:}
+	|LLAV_A LLAV_C{:RESULT=new LinkedList<Nodo>();:}
+	|error LLAV_C{:RESULT=new LinkedList<>();:}
+	;
+LLAMADAS::=
+	ID:i PAR_A PAR_C{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),new LinkedList<Expresion>(),new LinkedList<Expresion>());:}
+	|ID:i PAR_A LISTAEXPRESION:l PAR_C{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),l,new LinkedList<Expresion>());:}
+	|ID:i PAR_A PAR_C LCORCHETES:c{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),new LinkedList<Expresion>(),c);:}
+	|ID:i PAR_A LISTAEXPRESION:l PAR_C LCORCHETES:c{:RESULT=new Llamadas(new Identificador(i,ileft+1,iright+1),l,c);:}
+	;
+/*
+░█████╗░░█████╗░███╗░░██╗████████╗██████╗░░█████╗░██╗░░░░░
+██╔══██╗██╔══██╗████╗░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
+██║░░╚═╝██║░░██║██╔██╗██║░░░██║░░░██████╔╝██║░░██║██║░░░░░
+██║░░██╗██║░░██║██║╚████║░░░██║░░░██╔══██╗██║░░██║██║░░░░░
+╚█████╔╝╚█████╔╝██║░╚███║░░░██║░░░██║░░██║╚█████╔╝███████╗
+░╚════╝░░╚════╝░╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░╚═╝░╚════╝░╚══════╝
+*/
+CONTROLES::=
+	CONTROL_IF:a{:RESULT=a;:}
+	|CONTROL_SWITCH:a{:RESULT=a;:}
+	|CONTROL_DO_WHILE:a PYCOMA {:RESULT=a;:}
+	|CONTROL_DO_WHILE:a{:RESULT=a;:}
+	|CONTROL_WHILE:a{:RESULT=a;:}
+	|CONTROL_FOR:a{:RESULT=a;:}
+	;
+CONTROL_IF::=
+	IF:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new IF(e,b,null,aleft+1,aright+1);:}
+	|IF:a PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:RESULT=new IF(e,b,l,aleft+1,aright+1);:}
+	;
+LIFS::=
+	ELSE:a IF PAR_A EXP:e PAR_C BLOQUE:b LIFS:l{:l.addFirst(new ElseIf(e,b,aleft+1,aright+1));RESULT=l;:}
+	|ELSE:as IF PAR_A EXP:e PAR_C BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new ElseIf(e,b,asleft+1,asright+1));RESULT=a;:}
+	|ELSE:as BLOQUE:b{:LinkedList<Instruccion>a=new LinkedList<>();a.add(new Else(b,asleft+1,asright+1));RESULT=a;:}
+	;
+CONTROL_SWITCH::=
+	SWITCH:i PAR_A EXP:e PAR_C LLAV_A LCASE:l LLAV_C{:RESULT=new Switch(e,l,ileft+1,iright+1);:}
+	|SWITCH:i PAR_A EXP:e PAR_C LLAV_A LLAV_C{:RESULT=new Switch(e,new LinkedList<Instruccion>(),ileft+1,iright+1);:}
+	;
+
+CONTROL_WHILE::=
+	WHILE:a PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=new While(e,b,aleft+1,aright+1);:}
+	;
+CONTROL_DO_WHILE::=
+	DO:a BLOQUE:b WHILE PAR_A EXP:e PAR_C{:RESULT=new Do_While(e,b,aleft+1,aright+1);:}
+	;
+CONTROL_FOR::=
+	FOR:a PAR_A ID:i IN EXP:e PAR_C BLOQUE:b{:RESULT=new For(new Identificador(i,ileft+1,iright+1),e,b,aleft+1,aright+1);:}
+	;
+LCASE::=
+	CASE:i EXP:e DOSPUNTOS CUERPOINTERNO:c LCASE:l{:l.addFirst(new Case(e,c,ileft+1,iright+1));RESULT=l;:}
+	|CASE:i EXP:e DOSPUNTOS LCASE:l{:l.addFirst(new Case(e,new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=l;:}
+	|CASE:i EXP:e DOSPUNTOS CUERPOINTERNO:c{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Case(e,c,ileft+1,iright+1));RESULT=lista;:}
+	|CASE:i EXP:e DOSPUNTOS{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Case(e,new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=lista;:}
+	|DEFAULT:i DOSPUNTOS CUERPOINTERNO:l{:LinkedList<Instruccion>lista=new LinkedList<>();lista.addFirst(new Else(l,ileft+1,iright+1));RESULT=lista;:}
+	|DEFAULT:i DOSPUNTOS{:LinkedList<Instruccion>lista=new LinkedList<>();lista.add(new Else(new LinkedList<Nodo>(),ileft+1,iright+1));RESULT=lista;:}
+	;
+TRANSFERENCIAS::=
+	BREAK:a PYCOMA{:RESULT=new Break(aleft+1,aright+1);:}
+	|BREAK:a {:RESULT=new Break(aleft+1,aright+1);:}
+	|CONTINUE:a PYCOMA{:RESULT=new Continue(aleft+1,aright+1);:}
+	|CONTINUE:a{:RESULT=new Continue(aleft+1,aright+1);:}
+	;
+
+ACCESOARREGLO::=
+	ID:a LCORCHETES:l{:RESULT=new Acceso(new Identificador(a,aleft+1,aright+1),l,aleft+1,aright+1);:}
+	;
+LCORCHETES::=
+	COR_A:a EXP:e COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.addFirst(new AccesoUnico(e,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a EXP:e COR_C LCORCHETES:l{:l.addFirst(new AccesoUnico(e,aleft+1,aright+1));RESULT=l;:}
+	|COR_A:a COR_A EXP:e COR_C COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.addFirst(new AccesoDoble(e,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a COR_A EXP:e COR_C COR_C LCORCHETES:l{:l.addFirst(new AccesoDoble(e,aleft+1,aright+1));RESULT=l;:}
+	|COR_A:a EXP:f COMA EXP:c COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.addFirst(new Acceso4(f,c,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a EXP:f COMA EXP:c COR_C LCORCHETES:l{:l.addFirst(new Acceso4(f,c,aleft+1,aright+1));RESULT=l;:}
+	|COR_A:a EXP:f COMA COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.add(new Acceso4(f,null,aleft+1,aright+1));RESULT=lista;:}
+	|COR_A:a EXP:f COMA COR_C LCORCHETES:l{:l.addFirst(new Acceso4(f,null,aleft+1,aright+1));RESULT=l;:}
+	|COR_A:a COMA EXP:c COR_C{:LinkedList<Expresion>lista=new LinkedList<>();lista.add(new Acceso4(null,c,aleft+1,aleft+1));RESULT=lista;:}
+	|COR_A:a COMA EXP:c COR_C LCORCHETES:l{:l.addFirst(new Acceso4(null,c,aleft+1,aright+1));RESULT=l;:}
+	;
+
+DECFUNCION::=
+	//ID:i IGUAL:g FUNCTION PAR_A LISTAPARAMETROS:p PAR_C BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g FUNCTION PAR_A PAR_C BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g PAR_A LISTAPARAMETROS:p PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(p,new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	//|ID:i IGUAL:g PAR_A PAR_C IGUAL MAYOR BLOQUE:s{:RESULT=new DecFuncion(new LinkedList<Object>(),new Identificador(i,ileft+1,iright+1),s,gleft+1,gright+1);:}
+	  ID:a IGUAL PAR_A PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL EXP:e{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	  |ID:a IGUAL EXP:e PYCOMA{:RESULT=new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e IGUAL:i EXP:e1 PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,e1,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e COMA LPAR:l PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,l,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL PAR_A EXP:e IGUAL:i EXP:e1 COMA LPAR:l PAR_C IGUAL MAYOR BLOQUE:b{:RESULT=Generar(a,e,e1,l,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A PAR_C BLOQUE:b{:RESULT=Generar(a,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e PAR_C BLOQUE:b{:RESULT=Generar(a,e,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e IGUAL:i EXP:e1 PAR_C BLOQUE:b{:RESULT=Generar(a,e,e1,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e COMA LPAR:l PAR_C BLOQUE:b{:RESULT=Generar(a,e,l,b,aleft+1,aright+1);:}
+	  |ID:a IGUAL FUNCTION PAR_A EXP:e IGUAL:i EXP:e1 COMA LPAR:l PAR_C BLOQUE:b{:RESULT=Generar(a,e,e1,l,b,ileft+1,iright+1,aleft+1,aright+1);:}
+	  |ACCESOARREGLO:a IGUAL:i EXP:e{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:}
+	  |ACCESOARREGLO:a IGUAL:i EXP:e PYCOMA{:RESULT=new AsignacionPosicion(a,e,ileft+1,iright+1);:}
+	;
+LPAR::=
+	ID:a{:LinkedList<Object>lista=new LinkedList<>();lista.add(new Identificador(a,aleft+1,aright+1));RESULT=lista;:}
+	|ID:a COMA LPAR:l{:l.addFirst(new Identificador(a,aleft+1,aright+1));RESULT=l;:}
+	|ID:a IGUAL EXP:e{:LinkedList<Object>lista=new LinkedList<>();lista.add(new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=lista;:}
+	|ID:a IGUAL EXP:e COMA LPAR:l{:l.addFirst(new Identificador(a,aleft+1,aright+1));RESULT=l;:}
+	;
+/*
+LISTAPARAMETROS::=
+	LISTAPARAMETROS:l COMA ID:i{:l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
+	|ID:i{:LinkedList<Object>l=new LinkedList<>();l.add(new Identificador(i,ileft+1,iright+1));RESULT=l;:}
+	|ID:a IGUAL EXP:e{:LinkedList<Object>l=new LinkedList<>();l.add(new DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
+	|LISTAPARAMETROS:l COMA ID:a IGUAL EXP:e{:l.add(new  DecAsig(e,new Identificador(a,aleft+1,aright+1),aleft+1,aright+1));RESULT=l;:}
+	;*/
+LISTAEXPRESION::=
+	LISTAEXPRESION:l COMA EXP:e{:l.add(e);RESULT=l;:}
+	|EXP:e{:LinkedList<Expresion>l=new LinkedList<>();l.add(e);RESULT=l;:}
+	|DEFAULT:e{:LinkedList<Expresion>l=new LinkedList<>();l.add(new Default(eleft+1,eright+1));RESULT=l;:}
+	|LISTAEXPRESION:l COMA DEFAULT:i{:l.add(new Default(ileft+1,iright+1));RESULT=l;:}
+	;
+RETORNOS::=
+	RETURN:r PAR_A EXP:e PAR_C{:RESULT=new Return(e,rleft+1,rright+1);:}
+	|RETURN:r PAR_A EXP:e  PAR_C PYCOMA{:RESULT=new Return(e,rleft+1,rright+1);:}
+	|RETURN:r{:RESULT=new Return(new Nulo(rleft+1,rright+1),rleft+1,rright+1);:}
+	|RETURN:r PYCOMA{:RESULT=new Return(new Nulo(rleft+1,rright+1),rleft+1,rright+1);:}
 	;
 

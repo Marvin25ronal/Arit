@@ -5,10 +5,52 @@
  */
 package arit;
 
+import AST.AST;
+import AnalizadorA.parser;
+import AnalizadorA.scanner;
+import AnalizadorD.Gramatica;
+import AnalizadorD.ParseException;
+import AnalizadorD.TokenMgrError;
 import Color.CampoTexto;
 import Color.TextLineNumber;
+import Entorno.Entorno;
+import Entorno.Simbolo;
+import Objetos.Array;
+import Objetos.EstructuraLineal;
+import Objetos.Funcion;
+import Objetos.Matrix;
+import Reportes.Errores;
+import Reportes.ReporteAST;
+import java.awt.Button;
+import java.awt.Desktop;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 /**
@@ -25,12 +67,13 @@ public class Editor extends javax.swing.JFrame {
     List<RSyntaxTextArea> Lista;
     List<String> rutas;
     int id = 0;
-    String directorioArchivos = "C:\\Users\\User\\Desktop";
+    String directorioArchivos = "E:\\Alienware-R4\\Downloads";
 
     public Editor() {
         initComponents();
         Lista = new ArrayList<RSyntaxTextArea>();
         rutas = new ArrayList<String>();
+        agregarpest();
     }
 
     private void agregarpest() {
@@ -64,15 +107,34 @@ public class Editor extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
+        jMenuItem9 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
+        jMenuItem14 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem15 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jTextArea1.setBackground(new java.awt.Color(5, 49, 78));
         jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 16)); // NOI18N
+        jTextArea1.setForeground(new java.awt.Color(255, 255, 255));
         jTextArea1.setRows(5);
+        jTextArea1.setSelectedTextColor(new java.awt.Color(59, 126, 255));
         jScrollPane1.setViewportView(jTextArea1);
 
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
@@ -82,8 +144,38 @@ public class Editor extends javax.swing.JFrame {
         });
 
         jButton1.setText("Limpiar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("Archivo");
+
+        jMenuItem7.setText("Abrir");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
+        jMenuItem8.setText("Guardar");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem8);
+
+        jMenuItem9.setText("Guardar Como");
+        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem9ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem9);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Pestaña");
@@ -96,13 +188,107 @@ public class Editor extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItem1);
 
+        jMenuItem10.setText("Remover");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem10);
+
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Ejecutar");
+
+        jMenuItem2.setText("Ascendente");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuItem4.setText("Descendente");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem4);
+
         jMenuBar1.add(jMenu3);
 
         jMenu4.setText("Reportes");
+
+        jMenuItem3.setText("Reporte AST");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem3);
+
+        jMenuItem5.setText("Reporte de Errores");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem5);
+
+        jMenuItem6.setText("Reporte de Tabla de simbolos");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem6);
+
         jMenuBar1.add(jMenu4);
+
+        jMenu5.setText("Extra");
+
+        jMenuItem11.setText("Diagrama de clases");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem11);
+
+        jMenuItem13.setText("Manual Usuario");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem13);
+
+        jMenuItem14.setText("Manual Tecnico");
+        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem14ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem14);
+
+        jMenuItem12.setText("Diagrama de paquetes");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem12);
+
+        jMenuItem15.setText("Gramaticas");
+        jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem15ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem15);
+
+        jMenuBar1.add(jMenu5);
 
         setJMenuBar(jMenuBar1);
 
@@ -111,33 +297,33 @@ public class Editor extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(661, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
-                    .addComponent(jScrollPane1))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 841, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(1389, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2)
                     .addComponent(jTextField3)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
+                .addContainerGap())
         );
 
         pack();
@@ -151,6 +337,480 @@ public class Editor extends javax.swing.JFrame {
         // TODO add your handling code here:
         agregarpest();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                for (Errores e : sc.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            if (parser.listaerrores.size() != 0) {
+                for (Errores e : parser.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                ast.ejecutar();
+            }
+        } catch (Exception e) {
+            jTextArea1.append(e.getMessage());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                for (Errores e : sc.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            if (parser.listaerrores.size() != 0) {
+                for (Errores e : parser.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                String reporte = ast.HacerDot();
+                String codigo = reporte;
+                String dotpath = "E:\\Program Files (x86)\\Graphviz\\bin\\dot.exe";
+                String fileoutput = "./Arit.txt";
+                File archivo = new File(fileoutput);
+                BufferedWriter nuevo = new BufferedWriter(new FileWriter(archivo));
+                nuevo.write(codigo);
+                nuevo.close();
+                String[] cmd = new String[5];
+                cmd[0] = dotpath;
+                cmd[1] = "-Tjpg";
+                cmd[2] = "./Arit.txt";
+                cmd[3] = "-o";
+                cmd[4] = "Arbol.png";
+                Process p = Runtime.getRuntime().exec(cmd);
+                p.waitFor();
+                File imagen = new File("Arbol.png");
+                try {
+                    Desktop.getDesktop().open(imagen);
+                } catch (IOException ex) {
+                    Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //System.out.println(reporte);
+            }
+        } catch (Exception e) {
+            jTextArea1.append(e.getMessage());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        if (!texto.isEmpty()) {
+            try {
+                Gramatica parser = new Gramatica(new BufferedReader(new StringReader((texto))));
+                AST arbol = parser.INICIO();
+                arbol.ejecutar();
+            } catch (ParseException e) {
+                jTextArea1.append(e.getMessage() + "\n");
+            } catch (TokenMgrError e) {
+                jTextArea1.append(e.getMessage() + "\n");
+            }
+        }
+
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+    private void MostrarErrores(LinkedList<Errores> l) {
+        VE_Errores ventana = new VE_Errores();
+        for (Errores e : l) {
+            Object obj[] = {e.getTipo(), e.getMensaje(), e.getLinea(), e.getColumna()};
+            ventana.AgregarComponentes(obj);
+        }
+        ventana.show();
+    }
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        // TODO add your handling code here:
+        if (Globales.VarGlobales.getInstance().getListaE().size() > 0) {
+            //ya se ejecuto
+            MostrarErrores(Globales.VarGlobales.getInstance().getListaE());
+            return;
+        }
+        //Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                Globales.VarGlobales.getInstance().AgregarErrores(sc.listaerrores);
+            }
+            if (parser.listaerrores.size() != 0) {
+                Globales.VarGlobales.getInstance().AgregarErrores(parser.listaerrores);
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                ast.ejecutar();
+            }
+            MostrarErrores(Globales.VarGlobales.getInstance().getListaE());
+        } catch (Exception e) {
+            jTextArea1.append(e.toString());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        Globales.VarGlobales.getInstance().LimpiarLista();
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        scanner sc = new scanner(new BufferedReader(new StringReader(texto)));
+        jTextArea1.setText("");
+        Globales.VarGlobales.getInstance().setConsola(jTextArea1);
+        parser parser = new parser(sc);
+        try {
+            parser.parse();
+            if (sc.listaerrores.size() != 0) {
+                for (Errores e : sc.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            if (parser.listaerrores.size() != 0) {
+                for (Errores e : parser.listaerrores) {
+                    jTextArea1.append(e.toString() + "\n");
+                }
+            }
+            AST ast = parser.ast;
+            if (ast != null) {
+                Entorno e = ast.ejecutar2();
+                GraficarSimbolos(e);
+            }
+        } catch (Exception e) {
+            jTextArea1.append(e.getMessage());
+            Logger.getLogger(Arit.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+    private void AbrirArchivo(String ruta) throws FileNotFoundException, IOException {
+        File fn = new File(ruta);
+        String nombre = fn.getName();
+        BufferedReader lector = new BufferedReader(new FileReader(fn));
+        String lines = "";
+        StringBuilder contenido = new StringBuilder();
+        while ((lines = lector.readLine()) != null) {
+            contenido.append(lines + "\n");
+        }
+        lector.close();
+        int indice = jTabbedPane1.getSelectedIndex();
+        rutas.set(indice, ruta);
+        Lista.get(indice).setText(contenido.toString());
+        jTabbedPane1.setTitleAt(indice, nombre);
+    }
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        JFileChooser buscador = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("ARIT", "arit");
+        buscador.addChoosableFileFilter(filter);
+        int returnv = buscador.showOpenDialog(this);
+        if (returnv == JFileChooser.APPROVE_OPTION) {
+            File fn = buscador.getSelectedFile();
+            directorioArchivos = buscador.getSelectedFile().getParentFile().toString();
+
+            try {
+                AbrirArchivo(fn.getAbsolutePath().toString());
+            } catch (IOException ex1) {
+                this.jTextArea1.append("No se pudo abrir el archivo");
+            }
+
+        }
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+        int indice = jTabbedPane1.getSelectedIndex();
+        String texto = Lista.get(indice).getText();
+        if (rutas.get(indice).isEmpty()) {
+            GuardarComo();
+            return;
+        }
+        FileWriter fichero = null;
+        PrintWriter pw = null;
+        try {
+            fichero = new FileWriter(rutas.get(indice));
+            pw = new PrintWriter(fichero);
+            pw.print(texto);
+
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (fichero != null) {
+                    fichero.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
+    private void GuardarComo() {
+        JFileChooser buscador = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("ARIT", "arit");
+        buscador.addChoosableFileFilter(filter);
+        int returnv = buscador.showSaveDialog(this);
+        if (returnv == JFileChooser.APPROVE_OPTION) {
+            try {
+                File fn = new File(buscador.getSelectedFile().getAbsolutePath());
+                BufferedWriter bw = new BufferedWriter(new FileWriter(fn));
+                int i = jTabbedPane1.getSelectedIndex();
+                String texto = Lista.get(i).getText();
+                jTabbedPane1.setTitleAt(i, fn.getName());
+                rutas.set(i, buscador.getSelectedFile().getAbsolutePath());
+                bw.write(texto);
+                bw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        this.jTextArea1.setText("");
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+        // TODO add your handling code here:
+        GuardarComo();
+    }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        // TODO add your handling code here:
+        int indice = jTabbedPane1.getSelectedIndex();
+        if (indice == 0) {
+            Object[] options = {"Yes", "No"};
+            int n = JOptionPane.showOptionDialog(this,
+                    "Esta seguro de cerrar esta pestaña?", null, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+            if (n == 0) {
+                Lista.get(indice).setText("");
+                rutas.set(0, "");
+                jTabbedPane1.setTitleAt(indice, "Pestana" + id);
+                id++;
+            }
+        } else {
+            Object[] options = {"Yes", "No"};
+            int n = JOptionPane.showOptionDialog(this,
+                    "Esta seguro de cerrar esta pestaña?", null, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+            if (n == 0) {
+                jTabbedPane1.remove(indice);
+                Lista.remove(indice);
+                rutas.remove(indice);
+
+            }
+        }
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        // TODO add your handling code here:
+        File imagen = new File("D1.png");
+        try {
+            Desktop.getDesktop().open(imagen);
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        // TODO add your handling code here:
+        File imagen = new File("Paquetes.png");
+        try {
+            Desktop.getDesktop().open(imagen);
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
+    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
+        // TODO add your handling code here:
+        File imagen = new File("Manual Usuario.pdf");
+        try {
+            Desktop.getDesktop().open(imagen);
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem13ActionPerformed
+
+    private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
+        // TODO add your handling code here:
+        File imagen = new File("Manual Tecnico.pdf");
+        try {
+            Desktop.getDesktop().open(imagen);
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem14ActionPerformed
+
+    private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
+        // TODO add your handling code here:
+          File imagen = new File("Gramatica.pdf");
+        try {
+            Desktop.getDesktop().open(imagen);
+        } catch (IOException ex) {
+            Logger.getLogger(Editor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem15ActionPerformed
+    private void HacerEntorno(DefaultMutableTreeNode padre, Entorno en, int i) {
+        for (Entorno e : en.hijo) {
+            DefaultMutableTreeNode entorno = new DefaultMutableTreeNode("Entorno_" + i);
+            i++;
+            padre.add(entorno);
+            for (Simbolo s : e.tabla.values()) {
+                if (s instanceof EstructuraLineal) {
+                    EstructuraLineal es = (EstructuraLineal) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Array) {
+                    Array es = (Array) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Matrix) {
+                    Matrix es = (Matrix) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Variable_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Columnas:" + es.getColumnas().size());
+                    DefaultMutableTreeNode Filas = new DefaultMutableTreeNode("Filas:" + es.getColumnas().get(0).size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    var.add(Dimensiones);
+                    var.add(Filas);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                } else if (s instanceof Funcion) {
+                    Funcion es = (Funcion) s;
+                    DefaultMutableTreeNode var = new DefaultMutableTreeNode("Funcion_" + es.getId());
+                    entorno.add(var);
+                    DefaultMutableTreeNode id = new DefaultMutableTreeNode(es.getId());
+                    DefaultMutableTreeNode tipo = new DefaultMutableTreeNode(es.getTipo());
+                    DefaultMutableTreeNode Location = new DefaultMutableTreeNode("Location");
+                    DefaultMutableTreeNode Linea = new DefaultMutableTreeNode("Linea:" + s.getLinea());
+                    DefaultMutableTreeNode Columna = new DefaultMutableTreeNode("Columna:" + s.getColumna());
+                    //DefaultMutableTreeNode Dimensiones = new DefaultMutableTreeNode("Dimensiones:" + es.getDimensiones().size());
+                    var.add(id);
+                    var.add(tipo);
+                    var.add(Location);
+                    //var.add(Dimensiones);
+                    Location.add(Linea);
+                    Location.add(Columna);
+                }
+            }
+            HacerEntorno(entorno, e, i);
+        }
+    }
+
+    private void GraficarSimbolos(Entorno en) {
+        int i = 0;
+        Entorno enuevo = new Entorno(null);
+        enuevo.hijo.add(en);
+        DefaultMutableTreeNode ra = new DefaultMutableTreeNode("Entornos");
+        HacerEntorno(ra, enuevo, i);
+        VE_Simbolos ventana = new VE_Simbolos();
+        GraficarSimbolos2(enuevo, ventana, 0);
+        JTree arbol = new JTree(ra);
+        ImageIcon imageIcon = new ImageIcon(("./y.png"));
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(imageIcon);
+        arbol.setCellRenderer(renderer);
+        arbol.setSize(580, 542);
+        arbol.setLocation(0, 0);
+        //ventana.panel().add(arbol);
+        JScrollPane barra = new JScrollPane(arbol,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        barra.setSize(580, 542);
+        barra.setLocation(0, 0);
+        ventana.panel().add(barra);
+        ventana.panel().validate();
+        ventana.panel().repaint();
+        ventana.show();
+    }
+
+    private void GraficarSimbolos2(Entorno en, VE_Simbolos simbolos, int entorno) {
+        for (Entorno e : en.hijo) {
+            for (Simbolo s : e.tabla.values()) {
+                if (s instanceof EstructuraLineal) {
+                    EstructuraLineal es = (EstructuraLineal) s;
+                    Object obj[] = {es.getId(), es.getTipo(), es.getDimensiones().size(), s.getLinea(), s.getColumna(), entorno};
+                    simbolos.AgregarComponentes(obj);
+                } else if (s instanceof Matrix) {
+                    Matrix m = (Matrix) s;
+                    Object obj[] = {m.getId(), m.getTipo(), "Columnas:" + ((Matrix) s).getColumnas().size() + "Lineas: " + m.getColumnas().get(0).size(), s.getLinea(), s.getColumna(), entorno};
+                    simbolos.AgregarComponentes(obj);
+                } else if (s instanceof Array) {
+                    Array es = (Array) s;
+                    Object obj[] = {es.getId(), es.getTipo(), es.getDimensiones().size(), s.getLinea(), s.getColumna(), entorno};
+                    simbolos.AgregarComponentes(obj);
+                } else if (s instanceof Funcion) {
+                    Funcion es = (Funcion) s;
+                    Object obj[] = {es.getId(), es.getTipo(), 0, s.getLinea(), s.getColumna(), entorno};
+                    simbolos.AgregarComponentes(obj);
+                }
+            }
+            GraficarSimbolos2(e, simbolos, entorno + 1);
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -193,8 +853,23 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
+    private javax.swing.JMenuItem jMenuItem13;
+    private javax.swing.JMenuItem jMenuItem14;
+    private javax.swing.JMenuItem jMenuItem15;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
